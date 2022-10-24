@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>PLSF Winter</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Paul Julian" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/tabwid/tabwid.css" rel="stylesheet" />
+    <link rel="stylesheet" href="libs/custom.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+layout: true
+
+---
+name: title
+class: left, middle
+
+### Petit-lac-Saint-François - Winter Limnology
+
+October 18, 2022 &lt;br&gt;(Updated: October 24, 2022 )
+
+
+&lt;!-- this ends up being the title slide since seal = FALSE--&gt;
+
+
+.footnote[
+Paul Julian PhD [<svg aria-hidden="true" role="img" viewBox="0 0 512 512" style="height:1em;width:1em;vertical-align:-0.125em;margin-left:auto;margin-right:auto;font-size:inherit;fill:currentColor;overflow:visible;position:relative;"><path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"/></svg>](mailto: paul.julian@umontreal.ca) .small[paul.julian@umontreal.ca]
+
+.small[Use cursor keys for navigation, press .red["O"] for a slide .red[O]verview]
+
+<a href="https://swampthingecology.org/ATRAPP/slides/ATRAPP_PLSF_Winter.pdf">
+<button class="btn btn-primary btn-sm">Download PDF Version</button>
+</a>
+]
+
+---
+name: objectives
+
+## Objective(s)/Goal(s)
+
+* Examine total and dissolved nutrients during winter in a seasonally ice-covered lake focusing on the link between inorganic nutrient changes and ice duration (similar to Powers et al. 2017)
+
+* ??
+
+## Hypotheses
+
+* Due to changes to the physical structure of the lake and the constraints that lake ice places on energy and material fluxes (Cavaliere et al 2021) concentrations of dissolved inorganic nutrients (i.e. DIN and SRP) will be greater in the winter/ice period; 
+
+* Inorganic  nutrient accumulation rates will be sensitive to regional and local climate metrics (i.e. FDD, PDO, etc.) resulting in shorter periods of ice cover and therefore less time to accumulate .
+
+---
+name: pdo
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/xx_pdo.png" alt="Monthly Pacific Decadal Oscillation Index values from 2009 to 2022." width="80%" /&gt;
+&lt;p class="caption"&gt;Monthly Pacific Decadal Oscillation Index values from 2009 to 2022.&lt;/p&gt;
+&lt;/div&gt;
+
+* El Nino-Southern Oscillation events affect climatic conditions in the region (Shabbar et al 1997)
+* Impact of global warming is expressed mainly in winte
+* Small shallow lakes can be susceptible to changes in winter hydrology, water level, and associated ecological interactions (McGowan et al 2005)
+* Precipitation patterns in Canada are influenced by shorter timescale teleconnections such as the PDO
+
+---
+name: climate.plot
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_climate.png" alt="Long term trend in winter mean air temp and cumulative freezing degree days" width="80%" /&gt;
+&lt;p class="caption"&gt;Long term trend in winter mean air temp and cumulative freezing degree days&lt;/p&gt;
+&lt;/div&gt;
+
+* Winter mean air temp vs year: `\(\tau\)` = 0.38 `\(\rho\)`-value &lt; 0.01
+* FDD vs year: `\(\tau\)` = -0.44 `\(\rho\)`-value &lt; 0.01
+
+---
+name: ice cover1
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_IceCover.png" alt="Ice on/off dates for PLSF" width="100%" /&gt;
+&lt;p class="caption"&gt;Ice on/off dates for PLSF&lt;/p&gt;
+&lt;/div&gt;
+
+Generally, ice on/off dates are moving to the top left corner of the plot suggesting later ice-on dates and earlier ice-off dates. But there is some variability in this limited time-series. 
+* Could remote sensing data be used to fill in the data gaps? 
+
+---
+name: ice cover2
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_IceCover_dur.png" alt="Comparison of ice coverage duration" width="80%" /&gt;
+&lt;p class="caption"&gt;Comparison of ice coverage duration&lt;/p&gt;
+&lt;/div&gt;
+
+When comparing more recent data to the reference period of 1975 - 1977 (and 1982) the median ice cover duration has declined (not statistically significant) and become more variable. This could suggests a more dynamic/variable climate.
+
+---
+name: P_ice period
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_SeaComp_P.png" alt="Comparison of average phosphorus concentrations between ice coverage period" width="80%" /&gt;
+&lt;p class="caption"&gt;Comparison of average phosphorus concentrations between ice coverage period&lt;/p&gt;
+&lt;/div&gt;
+
+* Asterisk indicates statistically significant ( `\(\rho\)` -value&lt;0.05 based on Kruskal-Walllis Test).
+* Based on Year starting in May. 
+
+---
+name: N_ice period
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_SeaComp_N.png" alt="Comparison of average nitrogen concentrations between ice coverage period" width="80%" /&gt;
+&lt;p class="caption"&gt;Comparison of average nitrogen concentrations between ice coverage period&lt;/p&gt;
+&lt;/div&gt;
+
+* Asterisk indicates statistically significant ( `\(\rho\)` -value&lt;0.05 based on Kruskal-Walllis Test).
+* Based on Year starting in May. 
+
+---
+name: N_ice period2
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_SeaComp_N2.png" alt="Comparison of average inorganic nitrogen concentrations between ice coverage period" width="80%" /&gt;
+&lt;p class="caption"&gt;Comparison of average inorganic nitrogen concentrations between ice coverage period&lt;/p&gt;
+&lt;/div&gt;
+
+
+* Lake Outlet comparison of NO_x_ is consistent with Powers et al 2017 indicating an accumulation of NO_x_ during the ice-cover period.
+* But we also see an increase in NO_x_ concentration from the watershed via Lake Inlet. 
+  * Denitrification reactions are slow down in winter? (changes in loading?)
+  
+---
+name: N_ice period2
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_SeaComp_Algae.png" alt="Comparison of average algal pigment concentrations between ice coverage period" width="80%" /&gt;
+&lt;p class="caption"&gt;Comparison of average algal pigment concentrations between ice coverage period&lt;/p&gt;
+&lt;/div&gt;
+
+* Limited period of record (2016 - 2021)
+* Obviously algal pigments decline during Ice period (limited light attenuation, below optimum temp, etc.)
+
+---
+name: pdo_v_wq
+
+### PDO vs WQ
+
+
+&lt;template id="f5f1ae28-c13c-4ac4-9a07-6af23bab0328"&gt;&lt;style&gt;
+.tabwid table{
+  border-collapse:collapse;
+  line-height:1;
+  margin-left:auto;
+  margin-right:auto;
+  border-width: 0;
+  display: table;
+  margin-top: 1.275em;
+  margin-bottom: 1.275em;
+  border-spacing: 0;
+  border-color: transparent;
+}
+.tabwid_left table{
+  margin-left:0;
+}
+.tabwid_right table{
+  margin-right:0;
+}
+.tabwid td {
+    padding: 0;
+}
+.tabwid a {
+  text-decoration: none;
+}
+.tabwid thead {
+    background-color: transparent;
+}
+.tabwid tfoot {
+    background-color: transparent;
+}
+.tabwid table tr {
+background-color: transparent;
+}
+&lt;/style&gt;&lt;div class="tabwid"&gt;&lt;style&gt;.cl-d317feaa{border-collapse:collapse;}.cl-d30e1a3e{font-family:'Times New Roman';font-size:12pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-d30e1a3f{font-family:'Times New Roman';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-d30e4126{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-d30e4127{margin:0;text-align:center;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:1.5pt;padding-top:1.5pt;padding-left:1.5pt;padding-right:1.5pt;line-height: 1;background-color:transparent;}.cl-d30e4128{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:1.5pt;padding-top:1.5pt;padding-left:1.5pt;padding-right:1.5pt;line-height: 1;background-color:transparent;}.cl-d30e4129{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:1.5pt;padding-top:1.5pt;padding-left:1.5pt;padding-right:1.5pt;line-height: 1;background-color:transparent;}.cl-d30e8f14{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f15{width:72pt;background-color:transparent;vertical-align: top;border-bottom: 1pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f16{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f17{width:72pt;background-color:transparent;vertical-align: top;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f18{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f19{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 1pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f1a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f1b{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 1pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f1c{width:72pt;background-color:transparent;vertical-align: top;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 1pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f1d{width:72pt;background-color:transparent;vertical-align: top;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30e8f1e{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30eb606{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30eb607{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30eb608{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(255, 255, 255, 0.00);border-top: 0 solid rgba(255, 255, 255, 0.00);border-left: 0 solid rgba(255, 255, 255, 0.00);border-right: 0 solid rgba(255, 255, 255, 0.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30eb609{width:72pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-d30eb60a{width:54pt;background-color:transparent;vertical-align: middle;border-bottom: 2pt solid rgba(102, 102, 102, 1.00);border-top: 2pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}&lt;/style&gt;&lt;table class='cl-d317feaa'&gt;&lt;thead&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td  colspan="4"class="cl-d30eb607"&gt;&lt;p class="cl-d30e4126"&gt;&lt;span class="cl-d30e1a3e"&gt;Spearman's correlation results comparing water quality parameters with monthly PDO values during winter months (Dec - Feb)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30eb609"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3e"&gt;Site&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30eb609"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3e"&gt;Parameter&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30eb60a"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3e"&gt;r&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30eb60a"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3e"&gt;ρ-value&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td  rowspan="4"class="cl-d30e8f15"&gt;&lt;p class="cl-d30e4128"&gt;&lt;span class="cl-d30e1a3f"&gt;Lake Inlet&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f14"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;TP (μg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;-0.18&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;&amp;lt; 0.05&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30e8f14"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;SRP (μg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.28&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;&amp;lt; 0.01&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30e8f14"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;TN (mg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;-0.29&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;&amp;lt; 0.01&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30e8f19"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;DIN (mg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f18"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;-0.14&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f18"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.24&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td  rowspan="4"class="cl-d30e8f1c"&gt;&lt;p class="cl-d30e4128"&gt;&lt;span class="cl-d30e1a3f"&gt;Lake Outlet&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f1b"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;TP (μg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f1a"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.25&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f1a"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;&amp;lt; 0.01&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30e8f14"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;SRP (μg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.59&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;&amp;lt; 0.01&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30e8f14"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;TN (mg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.12&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f16"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.27&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr style="overflow-wrap:break-word;"&gt;&lt;td class="cl-d30eb606"&gt;&lt;p class="cl-d30e4129"&gt;&lt;span class="cl-d30e1a3f"&gt;DIN (mg L⁻¹)&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f1e"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;-0.05&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;td class="cl-d30e8f1e"&gt;&lt;p class="cl-d30e4127"&gt;&lt;span class="cl-d30e1a3f"&gt;0.67&lt;/span&gt;&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/template&gt;
+&lt;div class="flextable-shadow-host" id="a16547c5-962e-42a4-879e-3f7397acb6e1"&gt;&lt;/div&gt;
+&lt;script&gt;
+var dest = document.getElementById("a16547c5-962e-42a4-879e-3f7397acb6e1");
+var template = document.getElementById("f5f1ae28-c13c-4ac4-9a07-6af23bab0328");
+var caption = template.content.querySelector("caption");
+if(caption) {
+  caption.style.cssText = "display:block;text-align:center;";
+  var newcapt = document.createElement("p");
+  newcapt.appendChild(caption)
+  dest.parentNode.insertBefore(newcapt, dest.previousSibling);
+}
+var fantome = dest.attachShadow({mode: 'open'});
+var templateContent = template.content;
+fantome.appendChild(templateContent);
+&lt;/script&gt;
+
+
+* Inlet and Outlet driven by different processes.
+
+* Might need to evaluate discharge values to provide some clarity?
+  * Use monthly FWM concentrations vs PDO to remove the effect of run-off/snow melt dilution? 
+  * Negative PDO climate has a tendency to bring above normal precipitation 
+
+* SRP correlation driven by non-detects
+  
+---
+name: pdo_v_wq2
+
+### PDO vs WQ
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_PDOWQ_winter.png" alt="Correlation of WQ vs monthly PDO during winter months" width="80%" /&gt;
+&lt;p class="caption"&gt;Correlation of WQ vs monthly PDO during winter months&lt;/p&gt;
+&lt;/div&gt;
+
+
+---
+name: daysIce
+
+### Days of Ice vs WQ
+
+
+&lt;div class="figure" style="text-align: center"&gt;
+&lt;img src="./plots/winter/PLSF_IceOn.png" alt="Correlation of WQ vs number of days since Ice On during the POR" width="80%" /&gt;
+&lt;p class="caption"&gt;Correlation of WQ vs number of days since Ice On during the POR&lt;/p&gt;
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current%",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

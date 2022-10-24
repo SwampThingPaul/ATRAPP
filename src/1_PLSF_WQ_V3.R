@@ -201,6 +201,20 @@ wq.dat$time=as.numeric(wq.dat$Date)/100; # From .../PLSF/code/biophysical parame
 wq.dat$WY=WY(wq.dat$Date,WY.type='Fed')
 wq.dat$CY.d=lubridate::decimal_date(wq.dat$Date)
 
+
+## Double checking the 62-day dataset
+# test=subset(wq.dat,Site=="In_Lake"&Date%in%seq(date.fun("2019-04-30"),date.fun("2019-10-29"),"1 days"))
+# plot(TP.ugL~Date,test)
+# plot(SRP.ugL~Date,test)
+# 
+# nrow(test[,c("Date","SRP.ugL")])
+# nrow(dat.xtab2[,c("Date","SRP.ugL")])
+# 
+# test2=merge(test[,c("Date","SRP.ugL")],dat.xtab2[,c("Date","SRP.ugL")],"Date",all.x=T)
+# 
+# plot(SRP.ugL.x~SRP.ugL.y,test2);abline(0,1)
+
+
 ### Need MDL values for parameters
 summary(wq.dat)
 unique(wq.dat$SRP.mgL)
@@ -1332,8 +1346,8 @@ lmtest::bgtest(DO.per~CY.d,data=dat.in)
 
 m.DO.per.in=gam(DO.per~
                 s(DOY, bs = "cc",k=10) + 
-                s(CY,k=12)+
-                ti(DOY,CY,bs = c('cc', 'tp'), k = c(35,11)),
+                s(CY,k=7)+
+                ti(DOY,CY,bs = c('cc', 'tp'), k = c(35,7)),
               data = dat.in, method = "REML")
 summary(m.DO.per.in)
 
@@ -2427,8 +2441,8 @@ lmtest::bgtest(DO.per~CY.d,data=dat.out)
 
 m.DO.per.out=gam(DO.per~
                   s(DOY, bs = "cc",k=10) + 
-                  s(CY,k=11)+
-                  ti(DOY,CY,bs = c('cc', 'tp'), k = c(35,11)),
+                  s(CY,k=8)+
+                  ti(DOY,CY,bs = c('cc', 'tp'), k = c(40,8)),
                 data = dat.out, method = "REML")
 summary(m.DO.per.out)
 
@@ -2835,7 +2849,7 @@ rbind(gam.other.in.rslt[,vars],gam.other.out.rslt[,vars])%>%
            value=as_paragraph("Sonde measured pigments"))%>%
   font(fontname="Times New Roman",part="all")%>%
   fontsize(size=10,part="all")%>%
-  fontsize(size=11,part="header") #%>%print("docx")
+  fontsize(size=11,part="header") %>%print("docx")
 
 
 # sum stats ---------------------------------------------------------------
@@ -3833,7 +3847,7 @@ rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
 
-
+{
 # TP
 {
   plot(0:1,0:1,axes=F,ann=F,type="n")
@@ -4165,7 +4179,7 @@ rmp.bot=0.2
   mtext(side=3,adj=0,"s(Year)",cex=labs.cex)
   mtext(side=1,line=2,"Year",cex=labs.cex)
 }
-
+}
 dev.off()
 
 
@@ -4183,7 +4197,7 @@ rmp.x.max=-2
 rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
-
+{
 TN.in.pdat=subset(TN.in.pdat,CY>=2011)
 TN.out.pdat=subset(TN.out.pdat,CY>=2011)
 # TN
@@ -4969,7 +4983,7 @@ DIN.out.pdat=subset(DIN.out.pdat,CY>=2013)
        cex=yaxs.cex,adj=0,pos=4,offset=0.5,xpd=NA)
   text(x=mid.val,y=top.val,"Effect",pos=3,cex=labs.cex,xpd=NA)
 }
-
+}
 dev.off()
 
 # png(filename=paste0(plot.path,"PLSF_GAM_weekly_N_v2.png"),width=12,height=9,units="in",res=200,type="windows",bg="white")
@@ -4985,7 +4999,7 @@ rmp.x.max=-2
 rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
-
+{
 TN.in.pdat=subset(TN.in.pdat,CY>=2011)
 TN.out.pdat=subset(TN.out.pdat,CY>=2011)
 # TN
@@ -5393,6 +5407,7 @@ DIN.out.pdat=subset(DIN.out.pdat,CY>=2013)
   mtext(side=3,adj=0,"s(Year)",cex=labs.cex)
   mtext(side=1,line=2,"Year",cex=labs.cex)
 }
+}
 dev.off()
 
 # png(filename=paste0(plot.path,"PLSF_GAM_weekly_ratios.png"),width=12,height=9.5,units="in",res=200,type="windows",bg="white")
@@ -5408,7 +5423,7 @@ rmp.x.max=-2
 rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
-
+{
 TN_TP.in.pdat=subset(TN_TP.in.pdat,CY>=2011)
 TN_TP.out.pdat=subset(TN_TP.out.pdat,CY>=2011)
 # TN_TP
@@ -6319,6 +6334,7 @@ NOx_TN.out.pdat=subset(NOx_TN.out.pdat,CY>=2012)
        cex=yaxs.cex,adj=0,pos=4,offset=0.5,xpd=NA)
   text(x=mid.val,y=top.val,"Effect",pos=3,cex=labs.cex,xpd=NA)
 }
+}
 dev.off()
 
 # png(filename=paste0(plot.path,"PLSF_GAM_weekly_ratios_v2.png"),width=12,height=9.5,units="in",res=200,type="windows",bg="white")
@@ -6334,7 +6350,7 @@ rmp.x.max=-2
 rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
-
+{
 TN_TP.in.pdat=subset(TN_TP.in.pdat,CY>=2011)
 TN_TP.out.pdat=subset(TN_TP.out.pdat,CY>=2011)
 # TN_TP
@@ -6683,7 +6699,7 @@ NH4_TN.out.pdat=subset(NH4_TN.out.pdat,CY>=2013)
   axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
   axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
   mtext(side=3,adj=0,"s(DOY)",cex=labs.cex)
-  mtext(side=2,line=1.5,"%NH\u2084 of TN\nEffect",cex=labs.cex)
+  mtext(side=2,line=1.5,"%NH\u2084\u207B of TN\nEffect",cex=labs.cex)
   
   ylim.val=c(-5,15);by.y=10;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
   xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
@@ -6801,6 +6817,7 @@ NOx_TN.out.pdat=subset(NOx_TN.out.pdat,CY>=2012)
   mtext(side=3,adj=0,"s(Year)",cex=labs.cex)
   mtext(side=1,line=2,"Year",cex=labs.cex)
 }
+}
 dev.off()
 
 
@@ -6817,7 +6834,7 @@ rmp.x.max=-2
 rmp.x.min=-4
 rmp.top=0.8
 rmp.bot=0.2
-
+{
 Colour_PCU.in.pdat=subset(Colour_PCU.in.pdat,CY>=2017)
 Colour_PCU.out.pdat=subset(Colour_PCU.out.pdat,CY>=2017)
 # Colour_PCU
@@ -7728,7 +7745,7 @@ TChl.ugL.out.pdat=subset(TChl.ugL.out.pdat,CY>=2016)
        cex=yaxs.cex,adj=0,pos=4,offset=0.5,xpd=NA)
   text(x=mid.val,y=top.val,"Effect",pos=3,cex=labs.cex,xpd=NA)
 }
-
+}
 dev.off()
 
 
@@ -8511,6 +8528,92 @@ xlim.val=date.fun(c("2010-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2]
            pt.cex=1,ncol=1,cex=0.75,bty="n",y.intersp=1.25,x.intersp=0.75,xpd=NA,xjust=0.5,yjust=1)
 dev.off()
 
+
+# png(filename=paste0(plot.path,"PLSF_weekly_TNTP.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,1,0.5,0.5),oma=c(1.5,2.5,0.5,0.25));
+layout(matrix(1:2,2,1))
+yaxs.cex=0.8
+labs.cex=0.9
+cols=viridisLite::viridis(4,alpha=0.4,option="E")[2:3]
+
+ylim.val=c(0,400);by.y=50;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=date.fun(c("2010-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2],"2 years");xmin=seq(xlim.val[1],xlim.val[2],"1 years")
+
+param.val="TN_TP"
+axes.lab="TN:TP (molar ratio)"
+for(i in 1:length(sites.vals)){
+plot(TP.ugL~Date,wq.dat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+# abline(h=ymaj,v=xmaj,lty=3,col="grey")
+with(subset(wq.dat,Site==sites.vals[i]),pt_line(Date,TN_TP,2,cols[i],1,21,cols[i],cex=0.75,pt.col=cols[i]))
+axis_fun(1,xmaj,xmin,format(xmaj,"%Y"),line=-0.75,cex=yaxs.cex);
+
+# if(i==1){axis_fun(2,ymaj,ymin,format(round(ymaj,2),digits=2),cex=yaxs.cex)}else{axis_fun(2,ymaj,ymin,NA)}
+axis_fun(2,ymaj,ymin,format(round(ymaj,2),digits=2),cex=yaxs.cex)
+box(lwd=1)
+# if(i==1){mtext(side=2,line=2.5,axes.lab,cex=labs.cex)}
+mtext(side=3,paste("Lake",c("Inlet ","Outlet "))[i],font=2,line=-1.25,adj=1)
+if(i==1){legend("topleft",legend = c("Weekly Samples"),
+       pch=c(21),lty=c(NA),lwd=c(0.1),
+       col=c("grey"),pt.bg=c("black"),
+       pt.cex=1,ncol=1,cex=0.75,bty="n",y.intersp=1.25,x.intersp=0.75,xpd=NA,xjust=0.5,yjust=1)}
+}
+mtext(side=1,line=1.25,"Date",cex=labs.cex)
+mtext(side=2,line=1.5,outer=T,axes.lab,cex=labs.cex)
+dev.off()
+
+sum(subset(wq.dat,Site==sites.vals[2])$TN_TP>20,na.rm=T)
+wq.dat$TN_TP_gt20=wq.dat$TN_TP>20
+wq.dat$TN_TP_lt20=wq.dat$TN_TP<20
+
+ylim.val=c(0,1.5);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=date.fun(c("2010-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2],"2 years");xmin=seq(xlim.val[1],xlim.val[2],"1 years")
+
+plot(TP.ugL~Date,wq.dat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+points(TN_TP_gt20~Date,subset(wq.dat,Site==sites.vals[2]))
+
+
+
+# png(filename=paste0(plot.path,"PLSF_weekly_outlet_TNTPfreq.png"),width=5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,1,0.5,0.5),oma=c(1.5,2.5,0.5,0.25));
+ylim.val=c(0,100);by.y=20;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=date.fun(c("2010-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2],"2 years");xmin=seq(xlim.val[1],xlim.val[2],"1 years")
+
+plot(TP.ugL~Date,wq.dat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+# with(subset(wq.dat,Site==sites.vals[2]),cumsum(ifelse(is.na(TN_TP_lt20),0,TN_TP_lt20)))
+with(subset(wq.dat,Site==sites.vals[2]),
+     lines(Date,cumsum(ifelse(is.na(TN_TP_lt20),0,TN_TP_lt20)),lwd=2,col="red"))
+axis_fun(1,xmaj,xmin,format(xmaj,"%Y"),line=-0.75,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(round(ymaj,2),digits=2),cex=yaxs.cex)
+box(lwd=1)
+mtext(side=3,paste("Lake",c("Inlet ","Outlet "))[2],font=2,line=-1.25,adj=1)
+mtext(side=1,line=1.25,"Date",cex=labs.cex)
+mtext(side=2,line=1.5,"Cumulative Count\nTN:TP < 20")
+dev.off()
+
+# png(filename=paste0(plot.path,"PLSF_weekly_outlet_TNTPSeasonal.png"),width=5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,1,0.5,0.5),oma=c(1.5,2.5,0.5,0.25));
+ylim.val=c(0,100);by.y=20;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(0,365);by.x=90;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/3)
+
+plot(TN_TP~DOY,wq.dat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+with(subset(wq.dat,Site==sites.vals[2]),points(TN_TP~DOY,
+                                               pch=21,bg=adjustcolor("dodgerblue1",0.5),
+                                               lwd=0.1,col=adjustcolor("black",0.5)))
+mod=loess(TN_TP~DOY,subset(wq.dat,Site==sites.vals[2]))
+x.val=with(subset(wq.dat,Site==sites.vals[2]),seq(min(DOY),max(DOY),length.out=100))
+pred=predict(mod,data.frame(DOY=x.val))
+lines(x.val,pred,lwd=2,col=adjustcolor("red",0.5))
+abline(h=20,col="red",lty=2)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.75,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,ymaj,cex=yaxs.cex)
+box(lwd=1)
+mtext(side=3,paste("Lake",c("Inlet ","Outlet "))[2],font=2,line=-1.25,adj=1)
+mtext(side=1,line=1.25,"DOY",cex=labs.cex)
+mtext(side=2,line=1.75,"TN:TP (molar ratio)")
+dev.off()
+
+
+
 # Ice/Bloom period comparison ---------------------------------------------
 ## median bloom/no bloom and ice/no ice with KW test stats for inflow and outflow
 
@@ -9060,7 +9163,6 @@ med.val.ice%>%
 
 # Trend Detection ---------------------------------------------------------
 
-
 tmp.dat=subset(month.mean.dat,Site=="Lake_Outlet"&variable=="TP.ugL")
 
 sort(unique(tmp.dat$CY))
@@ -9553,7 +9655,13 @@ axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
 axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
 
 
+head(wx.dat.mean)
+range(wx.dat.mean$CY)
+with(wx.dat.mean,cor.test(CY,mean.min_temp,method="kendall"))
+with(wx.dat.mean,cor.test(CY,sum.total_precip,method="kendall"))
 
+pettitt.test(wx.dat.mean$sum.total_precip)
+wx.dat.mean[42,]
 
 # etc ---------------------------------------------------------------------
 
@@ -9594,3 +9702,54 @@ wq.dat$WY=WY(wq.dat$Date,WY.type = "Fed")
 tmp=ddply(wq.dat,c("WY","Site"),summarise,TSI_mean=mean(TSI_mean,na.rm=T))
 
 plot(TSI_mean~WY,tmp,ylim=c(0,100),xlim=xlim.val)
+
+
+
+
+# exploring hystersis ---------------------------------------------------------------
+## check out https://rpubs.com/tbiggs/GEOG576_Exercise_8_QC_hysteresis
+## https://cran.r-project.org/web/packages/hysteresis/vignettes/index.html
+library(smwrBase)
+tmp=subset(wq.dat,Site=="Lake_Outlet")
+tmp$TP.hyst=hysteresis(tmp$TP.ugL)
+
+plot(TP.hyst~TP.ugL,tmp,type="l")
+
+
+tmp.mean=ddply(tmp,c("CY"),summarise,mean.val=mean(TP.ugL,na.rm=T))
+tmp.mean=subset(tmp.mean,CY%in%seq(2010,2020,1))
+tmp.mean$TP.hyst=hysteresis(tmp.mean$mean.val)
+
+
+
+plot(TP.hyst~mean.val,tmp.mean,type="l")
+with(tmp.mean,text(mean.val,TP.hyst,CY))
+
+
+
+tmp2=subset(wq.dat,Site=="Godbout")
+
+tmp.mean2=ddply(tmp2,c("CY"),summarise,mean.val=mean(TP.ugL,na.rm=T))
+tmp.mean2$TP.hyst=hysteresis(tmp.mean2$mean.val)
+
+
+plot(TP.hyst~mean.val,tmp.mean2,type="l")
+with(tmp.mean2,text(mean.val,TP.hyst,CY))
+
+
+# png(filename=paste0(plot.path,"PLSF_LakeOulet_hyster.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.5,2),oma=c(3,2,1.5,0.25));
+
+xlim.val=c(100,210);by.x=25;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/2)
+ylim.val=c(-100,100);by.y=50;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+
+plot(TP.hyst~mean.val,tmp.mean,ylim=ylim.val,xlim=xlim.val,axes=F,ann=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+with(tmp.mean,pt_line(mean.val,TP.hyst,2,"dodgerblue1",1,21,"dodgerblue1"))
+with(tmp.mean,text(mean.val,TP.hyst,CY,pos=2))
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Hysteresis effect")
+mtext(side=1,line=2,"Annual Mean TP (\u03BCg L\u207B\u00B9)")
+mtext(side=3,adj=1,"Lake Outlet")
+dev.off()

@@ -56,9 +56,11 @@ library(weathercan)
 # weather_dl(station_ids=42203,start = "2017-01-06", end = "2017-01-10")
 
 # dates=date.fun(c("2010-10-01","2021-09-30"))
-dates=date.fun(c("1979-10-01","2021-09-30"))
+dates=date.fun(c("1978-10-01","2021-09-30"))
 
 subset(stations(),station_name=="BROMPTONVILLE")
+subset(stations(),station_id%in%c(5327,5322))
+
 # subset(stations(),station_name=="BONSECOURS")
 # subset(stations(),climate_id==7024440)
 weathercan:::get_html(station_id=5327,interval="day")
@@ -206,6 +208,7 @@ with(ENSO.winter,cor.test(WY,ENSO.mean,method="kendall"))
 with(subset(ENSO.winter,WY>=2010),cor.test(WY,ENSO.mean,method="kendall"))
 
 
+
 # Iceon/off ---------------------------------------------------------------
 ice.dat=read.xlsx(paste0(data.path,"PLSF Ice-On Ice-Off Dates.xlsx"),
                   cols=1:3,rows=1:46)
@@ -238,6 +241,9 @@ plot(Ice_cum~Date,ice_period)
 # for(i in 1:length(iceon_period$ends)){
 #   ice_period[iceon_period$ends[i],]$sum.ice=with(ice_period[c(iceon_period$starts[i]:iceon_period$ends[i]),],sum(ice,na.rm=T))
 # }
+
+plot(duration~year,ice.dat2)
+with(ice.dat2,cor.test(year, duration,method="kendall" ))
 
 
 
@@ -328,6 +334,24 @@ wq.dat.melt$month=as.numeric(format(wq.dat.melt$Date,"%m"))
 wq.dat.melt=subset(wq.dat.melt,is.na(value)==F)
 # Ice period comparison ---------------------------------------------
 ## median ice/no ice with KW test stats for inflow and outflow
+
+plot(value~Date,subset(wq.dat.melt, variable=="Temp.C"& Site=="Godbout"))
+tmp=subset(wq.dat.melt, variable=="Temp.C"& Site=="Godbout")
+tmp$yr=as.numeric(format(tmp$Date,"%Y"))
+tmp$month=as.numeric(format(tmp$Date,"%m"))
+tmp$WY=WY(tmp$Date,WY.type="Fed")
+test=ddply(tmp,"yr",summarise,
+      min.date=as.POSIXct(min(ifelse(value<=0.5,Date,NA),na.rm=T),origin="1970-01-01",tz="EST"))
+
+plot(value~month,tmp)
+
+tmp$autumn=with(tmp,ifelse(month%in%seq(9,12,1),1,0))
+
+test=ddply(subset(tmp,autumn==1),"yr",summarise,
+      mean.temp=mean(value,na.rm=T))
+
+test2=merge(ice.dat2,test,by.x="year",by.y="yr")
+plot(mean.temp~Ice_On,test2)
 
 ## FWM rather than grab concentration
 ## or compare when flowing?
