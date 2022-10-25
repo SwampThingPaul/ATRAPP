@@ -452,6 +452,11 @@ wq.dat$Turb.NTU=with(wq.dat,MDL_func(Turb.NTU,Turb.MDL))
 
 wq.dat$DIN.mgL=with(wq.dat,NOx.mgL+NH4.mgL)
 
+## From Cavaliere and Baulch (2021)
+wq.dat$diff.temp=with(wq.dat,ave(Temp.C,Site,FUN=function(x) c(NA,diff(x))))
+wq.dat$diff.day=with(wq.dat,ave(as.numeric(Date),Site,FUN=function(x) c(NA,diff(x*1/60*1/60*1/24))))
+wq.dat$TCI=with(wq.dat,diff.temp/diff.day)
+
 ## Finding high sediment outliers (as communicated by Barry)
 plot(TP.ugL~Turb.NTU,wq.dat)
 plot(TN.mgL~Turb.NTU,wq.dat)
@@ -486,12 +491,19 @@ wq.dat=subset(wq.dat,TPReversal==0|TNReversal==0)
 
 pre.out.screen-nrow(wq.dat)
 
+## Explore TCI 
+plot(DIN.mgL~TCI,subset(wq.dat,Site=="Lake_Outlet"))
+mod=lm(DIN.mgL~TCI,subset(wq.dat,Site=="Lake_Outlet"))
+library(segmented)
+seg.mod=segmented(mod,~TCI)
+plot(seg.mod,add=T)
+plot(SRP.ugL~TCI,subset(wq.dat,Site=="Lake_Outlet"),log="y")
 
 idvars=c("Date","Site")
 paramvars=c(paste(c("TP","SRP","DP"),"ugL",sep="."),
             paste(c("TN","NOx",'NH4',"DIN"),"mgL",sep="."),
             "Chla.ugL","Phyco.ugL", "TChl.ugL",
-            "Temp.C","DO.per")
+            "Temp.C","DO.per","TCI")
 
 wq.dat.melt=melt(wq.dat[,c(idvars,paramvars)],id.vars = idvars)
 wq.dat.melt$month=as.numeric(format(wq.dat.melt$Date,"%m"))
@@ -1175,281 +1187,90 @@ cor.val=with(tmp.dat,cor.test(value,Ice_cum,method="spearman"))
 txt.val=with(cor.val,paste("r =",round(estimate,2),"; \u03C1-value",ifelse(p.value<0.01,"<0.01 ",ifelse(p.value<0.05,"<0.05 ",paste0("=",round(p.value,2)," ")))))
 mtext(side=3,adj=1,cex=0.75,line=-1.25,txt.val)
 
-#### No trend analysis ... data too variable and POR too short for meaningful results.
-# Winter trend ------------------------------------------------------------
-
-sites.vals=c("Godbout","Lake_Outlet")
-## "In_Lake" not sampled during winter
-winter.mean=ddply(subset(wq.dat.melt,winter==1&Site%in%sites.vals),c("Site","WY","winter","variable"),summarise,
-                  mean.val=mean(value,na.rm=T),
-                  GM.val=exp(mean(log(value),na.rm=T)),
-                  N.val=N.obs(value))
-
-# winter.mean=ddply(subset(wq.dat.melt,ice.sea=="Ice"&Site%in%sites.vals),c("Site","WY","variable"),summarise,
-#                   mean.val=mean(value,na.rm=T),
-#                   GM.val=exp(mean(log(value),na.rm=T)),
-#                   N.val=N.obs(value))
-
-trend.scr=ddply(winter.mean,c("Site","variable"),summarise,N.Yrs=N.obs(mean.val))
-trend.scr$trend.scrn=with(trend.scr,ifelse(N.Yrs>=3,1,0))
-winter.mean=merge(winter.mean,trend.scr,c("Site","variable"))
-
-winter.mean=winter.mean[order(winter.mean$WY,winter.mean$Site,winter.mean$variable),]
-
-winter.mean.trendrslt=ddply(subset(winter.mean,trend.scrn==1),c("Site","variable"),summarise,
-      N.val=N.obs(mean.val),
-      est=cor.test(mean.val,WY,method="kendall")$estimate,
-      pval=cor.test(mean.val,WY,method="kendall")$p.value,
-      sen.slope=coef(mblm(mean.val~WY,repeated=F))[2],
-      sen.inter=coef(mblm(mean.val~WY,repeated=F))[1])
 
 
-xlim.val=c(2010,2020);by.x=4;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+# TCI vs WQ ---------------------------------------------------------------
+wq.xtab1=dcast(wq.dat.melt,Date+Site+ice.period~variable,value.var = "value",mean)
 
+tmp=subset(wq.xtab1,Site=="Lake_Outlet")
+cols=adjustcolor(c("white","dodgerblue1"),0.75)
+ci.val=0.95
+# png(filename=paste0(plot.path,"PLSF_WQ_TCI.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2.5,0.5,1),oma=c(2.5,2,1.5,0.25));
+layout(matrix(1:4,2,2,byrow = F),widths=c(1,1))
 
-var.val=paramvars=c(paste(c("TP","SRP","DP"),"ugL",sep="."),
-                    paste(c("TN","NOx",'NH4',"DIN"),"mgL",sep="."),
-                    "Phyco.ugL", "TChl.ugL",
-                    "Temp.C","DO.per")
-var.val.labs=c(paste(c("TP","SRP","DP"),"(\u03BCg L\u207B\u00B9)"),
-               paste(c("TN","NOx",'NH4',"DIN"),"(mg L\u207B\u00B9)"),
-               "Phyco. (\u03BCg L\u207B\u00B9)",
-               "Chl (\u03BCg L\u207B\u00B9)",
-               "Temp (\u2103)","DO (% Sat)")
-par(family="serif",mar=c(1,2.5,0.5,2),oma=c(3,2,1.5,0.25));
-layout(matrix(1:12,3,4,byrow = T))
+xlim.val=c(-1.5,1.5);by.x=0.5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/2)
+ylim.val=c(0.2,20);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+plot(TN.mgL~TCI,tmp,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+abline(v=0)
+points(TN.mgL~TCI,tmp,
+       pch=21,bg=cols[ice.period],col="grey",lwd=0.01,cex=1.25)
+mod=lm(TN.mgL~TCI,tmp)
+mod.seg=segmented(mod,~TCI)
+x.val=seq(min(tmp$TCI,na.rm=T),max(tmp$TCI,na.rm=T),length.out=50)
+mod.pred=predict.segmented(mod.seg,data.frame(TCI=x.val),se.fit=T)
+lines(x.val,mod.pred$fit,col="indianred1")
+lines(x.val,mod.pred$fit-qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+lines(x.val,mod.pred$fit+qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+axis_fun(1,xmaj,xmin,format(xmaj),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"TN (mg L\u207B\u00B9)")
+legend("topleft",legend=c("No Ice","Ice"),
+       pch=c(21),pt.bg=c(cols),pt.cex=c(2),
+       lty=c(NA),lwd=c(0.01),col=c("grey"),
+       ncol=1,cex=0.75,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
 
-ylim.min_max=ddply(winter.mean,"variable",summarise,min.val=min(mean.val)-min(mean.val)*0.2,max.val=max(mean.val)+max(mean.val)*0.2)
-for(i in 1:length(var.val)){
+ylim.val=c(0.001,2);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+plot(DIN.mgL~TCI,tmp,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+abline(v=0)
+points(DIN.mgL~TCI,tmp,
+       pch=21,bg=cols[ice.period],col="grey",lwd=0.01,cex=1.25)
+mod=lm(DIN.mgL~TCI,tmp)
+mod.seg=segmented(mod,~TCI)
+x.val=seq(min(tmp$TCI,na.rm=T),max(tmp$TCI,na.rm=T),length.out=50)
+mod.pred=predict.segmented(mod.seg,data.frame(TCI=x.val),se.fit=T)
+lines(x.val,mod.pred$fit,col="indianred1")
+lines(x.val,mod.pred$fit-qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+lines(x.val,mod.pred$fit+qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+axis_fun(1,xmaj,xmin,format(xmaj),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"DIN (mg L\u207B\u00B9)")
 
-ylim.val=with(subset(ylim.min_max,variable==var.val[i]),c(min.val,max.val));
-ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+ylim.val=c(10,2000);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+plot(TP.ugL~TCI,tmp,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+abline(v=0)
+points(TP.ugL~TCI,tmp,
+       pch=21,bg=cols[ice.period],col="grey",lwd=0.01,cex=1.25)
+mod=lm(TP.ugL~TCI,tmp)
+mod.seg=segmented(mod,~TCI)
+x.val=seq(min(tmp$TCI,na.rm=T),max(tmp$TCI,na.rm=T),length.out=50)
+mod.pred=predict.segmented(mod.seg,data.frame(TCI=x.val),se.fit=T)
+lines(x.val,mod.pred$fit,col="indianred1")
+lines(x.val,mod.pred$fit-qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+lines(x.val,mod.pred$fit+qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+axis_fun(1,xmaj,xmin,format(xmaj),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"TP (\u03BCg L\u207B\u00B9)")
 
-tmp.dat=subset(winter.mean,variable==var.val[i])
-plot(mean.val~WY,winter.mean,xlim=xlim.val,ylim=ylim.val,axes=F,ann=F,log="y",type="n")
-abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.5)
-with(subset(tmp.dat,Site%in%sites.vals[1]),pt_line(WY,mean.val,2,"dodgerblue1",1,21,"dodgerblue1",cex=1.25))
-tmp.trend=with(subset(winter.mean.trendrslt,variable==var.val[i]&Site%in%sites.vals[1]),sen.slope*range(tmp.dat$WY)+sen.inter)
-lines(range(tmp.dat$WY),tmp.trend,lwd=2,col="dodgerblue1")
-with(subset(tmp.dat,Site%in%sites.vals[2]),pt_line(WY,mean.val,2,"indianred1",1,21,"indianred1",cex=1.25))
-tmp.trend=with(subset(winter.mean.trendrslt,variable==var.val[i]&Site%in%sites.vals[2]),sen.slope*range(tmp.dat$WY)+sen.inter)
-lines(range(tmp.dat$WY),tmp.trend,lwd=2,col="indianred1")
-axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
-axis_fun(2,ymaj,ymin,format(ymaj,scientific = F));box(lwd=1)
-mtext(side=2,line=3,var.val.labs[i])
-}
+ylim.val=c(1,300);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+plot(SRP.ugL~TCI,tmp,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+abline(v=0)
+points(SRP.ugL~TCI,tmp,
+       pch=21,bg=cols[ice.period],col="grey",lwd=0.01,cex=1.25)
+mod=lm(SRP.ugL~TCI,tmp)
+mod.seg=segmented(mod,~TCI)
+x.val=seq(min(tmp$TCI,na.rm=T),max(tmp$TCI,na.rm=T),length.out=50)
+mod.pred=predict.segmented(mod.seg,data.frame(TCI=x.val),se.fit=T)
+lines(x.val,mod.pred$fit,col="indianred1")
+lines(x.val,mod.pred$fit-qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+lines(x.val,mod.pred$fit+qt(1-(1-ci.val)/2,mod.pred$df)*mod.pred$se.fit,lty=2,col="indianred1")
+axis_fun(1,xmaj,xmin,format(xmaj),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"SRP (\u03BCg L\u207B\u00B9)")
 
-
-
-## A loop to run trend analysis and store data
-paramvars
-paramvars2=c("TP.ugL", "SRP.ugL", "DP.ugL", "TN.mgL", "NOx.mgL", "NH4.mgL","DIN.mgL")
-winter.sea.mean=ddply(subset(wq.dat.melt,Site%in%sites.vals&variable%in%paramvars2),c("Site","WY","ice.sea","variable"),summarise,
-                      mean.val=mean(value,na.rm=T),
-                      GM.val=exp(mean(log(value),na.rm=T)),
-                      N.val=N.obs(value))
-trend.scr=ddply(winter.sea.mean,c("Site","variable"),summarise,N.Yrs=N.obs(mean.val))
-trend.scr$trend.scrn=with(trend.scr,ifelse(N.Yrs>=3,1,0))
-winter.sea.mean=merge(winter.sea.mean,trend.scr,c("Site","variable"))
-winter.sea.mean=subset(winter.sea.mean,trend.scrn==1&N.val>2)
-# winter.sea.mean=subset(winter.sea.mean,!variable%in%paramvars[8:12])
-
-trend.rslt=data.frame()
-for(i in 1:length(paramvars2)){
-  tmp=subset(winter.sea.mean,variable==paramvars2[i])
-  for(j in 1:length(sites.vals)){
-    tmp2=subset(tmp,Site==sites.vals[j])
-  trend.test=with(tmp2,kendallSeasonalTrendTest(mean.val,ice.sea,WY))
-  rslt=data.frame(Site=sites.vals[j],season="ice",param=paramvars[i],
-                  N.val=as.numeric(trend.test$sample.size["Total"]),
-                  chisq.stat=as.numeric(trend.test$statistic[1]),
-                  chisq.pval=as.numeric(trend.test$p.value[1]),
-                  z.stat=as.numeric(trend.test$statistic[2]),
-                  tau=as.numeric(trend.test$estimate[1]),
-                  z.pval=as.numeric(trend.test$p.value[2]),
-                  sen.slope=as.numeric(trend.test$estimate[2])
-                  # sen.int=as.numeric(trend.test$estimate[3])
-  )
-  trend.rslt=rbind(trend.rslt,rslt)
-  }
-}
-trend.rslt
-
-winter.sea.mean=ddply(subset(wq.dat.melt,Site%in%sites.vals&variable%in%paramvars2),c("Site","WY","winter.txt","variable"),summarise,
-                      mean.val=mean(value,na.rm=T),
-                      GM.val=exp(mean(log(value),na.rm=T)),
-                      N.val=N.obs(value))
-trend.scr=ddply(winter.sea.mean,c("Site","variable"),summarise,N.Yrs=N.obs(mean.val))
-trend.scr$trend.scrn=with(trend.scr,ifelse(N.Yrs>=3,1,0))
-winter.sea.mean=merge(winter.sea.mean,trend.scr,c("Site","variable"))
-winter.sea.mean=subset(winter.sea.mean,trend.scrn==1&N.val>2)
-
-trend.rslt2=data.frame()
-for(i in 1:length(paramvars2)){
-  tmp=subset(winter.sea.mean,variable==paramvars2[i])
-  for(j in 1:length(sites.vals)){
-    tmp2=subset(tmp,Site==sites.vals[j])
-    trend.test=with(tmp2,kendallSeasonalTrendTest(mean.val,winter.txt,WY))
-    rslt=data.frame(Site=sites.vals[j],season="winter.txt",param=paramvars[i],
-                    N.val=as.numeric(trend.test$sample.size["Total"]),
-                    chisq.stat=as.numeric(trend.test$statistic[1]),
-                    chisq.pval=as.numeric(trend.test$p.value[1]),
-                    z.stat=as.numeric(trend.test$statistic[2]),
-                    tau=as.numeric(trend.test$estimate[1]),
-                    z.pval=as.numeric(trend.test$p.value[2]),
-                    sen.slope=as.numeric(trend.test$estimate[2])
-                    # sen.int=as.numeric(trend.test$estimate[3])
-    )
-    trend.rslt2=rbind(trend.rslt2,rslt)
-  }
-}
-trend.rslt2
-
-
-## correlations
-tmp.NOx=dcast(subset(winter.sea.mean,variable=="NOx.mgL"&winter.txt=="winter"),WY~Site,value.var="mean.val",mean)
-# tmp.NOx=subset(tmp.NOx,WY>2012)
-
-tmp.dat=merge(tmp.NOx,ENSO.winter,all.x=T,"WY")
-tmp.dat=merge(tmp.dat,fdd.winter,all.x=T,"WY")
-
-
-plot(Godbout~ENSO.mean,tmp.dat)
-with(tmp.dat,cor.test(Godbout,ENSO.mean,method="spearman"))
-plot(Lake_Outlet~ENSO.mean,tmp.dat)
-with(tmp.dat,cor.test(Lake_Outlet,ENSO.mean,method="spearman"))
-
-plot(Godbout~FDD,tmp.dat)
-plot(Lake_Outlet~FDD,tmp.dat)
-with(tmp.dat,cor.test(Godbout,FDD,method="spearman"))
-with(tmp.dat,cor.test(Lake_Outlet,FDD,method="spearman"))
-
-plot(Godbout~mean.temp,tmp.dat)
-plot(Lake_Outlet~mean.temp,tmp.dat)
-
-plot(Godbout~Tprep,tmp.dat)
-plot(Lake_Outlet~Tprep,tmp.dat)
-
-tmp.lm1=lm(Godbout~ENSO.mean+FDD+mean.temp+Tprep,tmp.dat)
-summary(tmp.lm1)
-gvlma::gvlma(tmp.lm1)
-car::vif(tmp.lm1)
-layout(matrix(1:4,2,2));plot(tmp.lm1)
-
-library(nlme)
-tmp.gls1=gls(Godbout~ENSO.mean+FDD+mean.temp+Tprep,subset(tmp.dat,WY>2012))
-summary(tmp.gls1)
-plot(tmp.gls1)
-
-tmp.lm2=lm(Lake_Outlet~ENSO.mean+FDD+mean.temp+Tprep,tmp.dat)
-summary(tmp.lm2)
-gvlma::gvlma(tmp.lm2)
-car::vif(tmp.lm2)
-layout(matrix(1:4,2,2));plot(tmp.lm2)
-
-## Linear mixed models
-## https://m-clark.github.io/mixed-models-with-R/random_intercepts.html
-tmp.NOX=subset(winter.sea.mean,variable=="NOx.mgL"&winter.txt=="winter")
-tmp.NOX=subset(tmp.NOX,WY>2012)
-tmp.dat=merge(tmp.NOX,ENSO.winter,all.x=T,"WY")
-tmp.dat=merge(tmp.dat,fdd.winter,all.x=T,"WY")
-
-
-library(lme4)
-lme1=lmer(mean.val~WY+as.factor(Site)+(1|Site)+(1|WY),tmp.dat)
-summary(lme1)
-
-ranef(lme1)
-coef(lme1)
-
-library(merTools)
-tmp.dat2=cbind(tmp.dat,predictInterval(lme1))
-
-plot(fit~WY,subset(tmp.dat2,Site=="Godbout"),ylim=c(0,1.5))
-lines(lwr~WY,subset(tmp.dat2,Site=="Godbout"))
-lines(upr~WY,subset(tmp.dat2,Site=="Godbout"))
-
-plot(fit~WY,subset(tmp.dat2,Site=="Lake_Outlet"),ylim=c(0,1.5))
-lines(lwr~WY,subset(tmp.dat2,Site=="Lake_Outlet"))
-lines(upr~WY,subset(tmp.dat2,Site=="Lake_Outlet"))
-
-REsim(lme1) 
-plotREsim(REsim(lme1)) 
-
-## GAMM
-library(mgcv)
-b=gamm(log(mean.val)~s(WY,k=7)+s(ENSO.mean,k=4),data=tmp.dat,random=list(Site=~1))
-# summary(b)
-summary(b$gam)
-summary(b$lme)
-
-gam.check(b$gam)
-
-gratia::draw(b)
-# plot(b$gam)
-plot(b$lme)
-
-# MARSS -------------------------------------------------------------------
-# https://atsa-es.github.io/atsa-labs/chap-msscov.html
-
-library(MARSS)
-
-
-tmp.NOx=dcast(subset(winter.sea.mean,variable=="NOx.mgL"&winter.txt=="winter"),WY~Site,value.var="mean.val",mean)
-tmp.NOx=subset(tmp.NOx,WY>2012)
-
-tmp.TN=dcast(subset(winter.sea.mean,variable=="TN.mgL"&winter.txt=="winter"),WY~Site,value.var="mean.val",mean)
-ENSO.winter
-fdd.winter
-
-tmp.dat=merge(tmp.NOx,ENSO.winter,all.x=T,"WY")
-tmp.dat=merge(tmp.dat,fdd.winter,all.x=T,"WY")
-
-years=tmp.dat[,'WY']
-marss.dat=t(tmp.dat[,c("Godbout","Lake_Outlet")])
-covar.dat=t(tmp.dat[,c("ENSO.mean","FDD","mean.temp")])
-
-## Observation-error only model
-Q <- U <- x0 <- "zero"
-B <- Z <- "identity"
-d <- covar.dat
-A <- "zero"
-D <- "unconstrained"
-y <- marss.dat  # to show relationship between dat & the equation
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, D = D, 
-                   d = d, x0 = x0)
-kem <- MARSS(y, model = model.list)
-
-
-# Process-error only model
-R <- A <- U <- "zero"
-B <- Z <- "identity"
-Q <- "equalvarcov"
-C <- "unconstrained"
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R, 
-                   C = C, c = covar.dat)
-kem <- MARSS(marss.dat, model = model.list)
-
-model.list$B <- "diagonal and unequal"
-kem <- MARSS(marss.dat, model = model.list)
-
-
-x0 <- marss.dat[, 1, drop = FALSE]
-model.list$tinitx <- 1
-model.list$x0 <- x0
-kem <- MARSS(marss.dat, model = model.list)
-
-
-# Both process- and observation-error
-D <- d <- A <- U <- "zero"
-Z <- "identity"
-B <- "diagonal and unequal"
-Q <- "equalvarcov"
-C <- "unconstrained"
-c <- covar.dat
-R <- diag(0.16, 2)
-x0 <- "unequal"
-tinitx <- 1
-model.list <- list(B = B, U = U, Q = Q, Z = Z, A = A, R = R, 
-                   D = D, d = d, C = C, c = c, x0 = x0, tinitx = tinitx)
-kem <- MARSS(marss.dat, model = model.list)
+mtext(side=1,line=1,outer=T,"Temp Change Index (\u2103 d\u207B\u00B9)")
+dev.off()

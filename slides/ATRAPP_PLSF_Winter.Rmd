@@ -235,10 +235,13 @@ winter.pdo.wq%>%
 
 * Might need to evaluate discharge values to provide some clarity?
   * Use monthly FWM concentrations vs PDO to remove the effect of run-off/snow melt dilution? 
-  * Negative PDO climate has a tendency to bring above normal precipitation 
-
-* SRP correlation driven by non-detects
+  * Negative PDO climate has a tendency to bring above normal precipitation  
   
+* SRP correlation driven by non-detects
+
+???
+https://climateimpactcompany.com/february-2022-pdo-amo-outlook-2-2/#:~:text=%2DPDO%20has%20a%20tendency%20to,conditions%20in%20the%20Southeast%20States.
+
 ---
 name: pdo_v_wq2
 
@@ -260,4 +263,15 @@ name: daysIce
 ```{r,out.width="80%",fig.align="center",fig.cap="Correlation of WQ vs number of days since Ice On during the POR" }
 
 knitr::include_graphics("./plots/winter/PLSF_IceOn.png")
+```
+
+---
+name: TCI
+
+### Temperature Change Index 
+
+
+```{r,out.width="80%",fig.align="center",fig.cap="Total and dissolved inorganic nutrients vs temperature change index with segmented regression (i.e. change points)" }
+
+knitr::include_graphics("./plots/winter/PLSF_WQ_TCI.png")
 ```
