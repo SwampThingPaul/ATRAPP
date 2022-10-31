@@ -499,6 +499,22 @@ seg.mod=segmented(mod,~TCI)
 plot(seg.mod,add=T)
 plot(SRP.ugL~TCI,subset(wq.dat,Site=="Lake_Outlet"),log="y")
 
+plot(DO.per~TCI,subset(wq.dat,Site=="Lake_Outlet"))
+
+wq.dat$WY.may=WY(wq.dat$Date)
+wq.dat$hydro.doy=hydro.day(wq.dat$Date)
+wq.dat$winter=with(wq.dat,ifelse(as.numeric(format(Date,"%m"))%in%c(12,1:2),1,0))
+
+plot(DO.per~hydro.doy,subset(wq.dat,winter==1&Site=="Lake_Outlet"))
+
+mod=lm(DO.per~hydro.doy,subset(wq.dat,winter==1&Site=="Lake_Outlet"))
+seg.mod=segmented(mod,~hydro.doy)
+plot(seg.mod,add=T)
+
+
+
+###
+
 idvars=c("Date","Site")
 paramvars=c(paste(c("TP","SRP","DP"),"ugL",sep="."),
             paste(c("TN","NOx",'NH4',"DIN"),"mgL",sep="."),

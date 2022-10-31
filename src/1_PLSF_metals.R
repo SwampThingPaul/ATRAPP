@@ -88,6 +88,7 @@ dat.melt=merge(dat.melt,mdls,"variable")
 dat.melt$HalfMDL=with(dat.melt,ifelse(HalfMDL<=MDL,MDL/2,HalfMDL))
 
 dat.melt=subset(dat.melt,is.na(HalfMDL)==F)
+range(subset(dat.melt,variable=="Ba")$value)
 
 ddply(subset(dat.melt,SITE=="PLSF-OUTLET"),c('SITE',"variable"),summarise,
       N.val=N.obs(HalfMDL),
@@ -202,13 +203,13 @@ subset(dat.melt3,variable=="K"&HalfMDL>5)
 # dat.melt3$HalfMDL=with(dat.melt3,ifelse(variable=="K"&HalfMDL>7.5,NA,HalfMDL))
 ddply(dat.melt3,"variable",summarise,max.val=max(HalfMDL,na.rm=T))
 
-# png(filename=paste0(plot.path,"PLSF_InLakeMetals.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+# png(filename=paste0(plot.path,"PLSF_InLakeMetals_v2.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
 par(family="serif",mar=c(1,3.5,0.5,2),oma=c(3,2,1.5,0.25));
 layout(matrix(1:8,4,2,byrow = F))
 
 col.val=wesanderson::wes_palette("Zissou1",1)
 max.lim.var=data.frame(variable=c("Al","Ba","Ca","Fe","Mg","Mn","K","Na"),
-                       max.lim=c(0.3,0.02,30,3,15,0.4,6,10))
+                       max.lim=c(0.3,0.02,30,1.5,15,0.4,3,10))
 xlim.val=date.fun(c("2017-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2],"1 years");xmin=seq(xlim.val[1],xlim.val[2],"6 months")
 for(i in 1:length(metals.outlet)){
   ylim.val=c(0,subset(max.lim.var,variable==metals.outlet[i])$max.lim)
@@ -228,3 +229,50 @@ for(i in 1:length(metals.outlet)){
 }
 mtext(side=1,line=1.25,"Date (Month-Year)",outer=T)
 dev.off()
+
+
+# png(filename=paste0(plot.path,"PLSF_InLakeHardness.png"),width=5,height=3,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,3.5,0.5,0.5),oma=c(3,2,0.5,0.25));
+
+tmp.dat=subset(dat.melt,SITE=="PLSF-IL"&variable%in%c("Hardness","Ca","Mg"))
+tmp.dat=dcast(tmp.dat,Date~variable,value.var = "HalfMDL")
+tmp.dat$hard.recalc=with(tmp.dat,(2.497*Ca) + (4.119*Mg))
+
+fill.date=seq(date.fun("2017-05-01"),date.fun("2020-09-01"),"1 month")
+fill=data.frame(expand.grid(Date2=fill.date,variable="Hardness"))
+fill$MonYr=format(fill$Date2,"%Y-%m")
+
+tmp.dat$MonYr=format(tmp.dat$Date,"%Y-%m")
+tmp.dat=merge(tmp.dat,fill,c("MonYr"),all.y=T)
+
+col.val=wesanderson::wes_palette("Zissou1",1)
+xlim.val=date.fun(c("2017-01-01","2020-12-31"));xmaj=seq(xlim.val[1],xlim.val[2],"1 years");xmin=seq(xlim.val[1],xlim.val[2],"6 months")
+ylim.val=c(0,150);by.y=50;ymaj=ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(Hardness~Date,tmp.dat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+with(tmp.dat,pt_line(Date,Hardness,2,"grey",1,21,col.val,1,0.01))
+with(tmp.dat,pt_line(Date,hard.recalc,2,adjustcolor("grey",0.5),1,21,adjustcolor("indianred1",0.5),1,0.01,pt.col = adjustcolor("black",0.5)))
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5)
+mtext(side=2,line=3.5,"Hardness (mg L\u207B\u00B9)")
+mtext(side=3,adj=1,"In-Lake",font=3)
+mtext(side=1,line=1.25,"Date (Month-Year)",outer=T)
+legend("topright",legend=c("Provided","Recalculated"),
+       pch=c(21),pt.bg=c(col.val,adjustcolor("indianred1",0.5)),pt.cex=c(1),
+       lty=c(NA),lwd=c(0.01),col=c("grey"),
+       ncol=1,cex=0.75,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
+
+dev.off()
+
+
+
+par(family="serif",mar=c(1,3.5,0.5,0.5),oma=c(3,2,0.5,0.25));
+
+tmp.dat=subset(dat.melt,SITE=="PLSF-IL"&variable%in%c("Hardness","Ca","Mg",'Ba',"Mn"))
+tmp.dat=dcast(tmp.dat,Date~variable,value.var = "HalfMDL")
+tmp.dat$hard.recalc=with(tmp.dat,(2.497*Ca) + (4.119*Mg))
+tmp.dat$Ba_WQS=with(tmp.dat,exp(1.0629*log(hard.recalc)+2.2354)/1000)
+tmp.dat$Mn_WQS=with(tmp.dat,exp(0.8784*log(hard.recalc)+4.2889)/1000)
+
+with(tmp.dat,sum(Ba>Ba_WQS))
+with(tmp.dat,sum(Mn>Mn_WQS))

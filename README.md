@@ -19,3 +19,14 @@ Assessment, Prediction and Prevention Through Genomics
 Contact: Paul Julian ([email](mailto:pauljulianphd@gmail.com))
 
 ------------------------------------------------------------------------
+
+## PLSF WQ Trends
+
+-   In development
+
+## PLSF Winter Limno
+
+-   In development
+
+-   Slide Deck -
+    [link](https://swampthingecology.org/ATRAPP/slides/ATRAPP_PLSF_Winter)
