@@ -108,7 +108,7 @@ mtext(side=2,line=2.75,'Phytoplankton Species Richness')
 mtext(side=1,line=1.5,"Date (Month-Year)")
 dev.off()
 
-
+plot(Phyto_Even~Date,bio.dat_div2,type="b")
 
 
 
