@@ -75,9 +75,44 @@ bio.dat_div$dec.date=lubridate::decimal_date(bio.dat_div$Date)
 
 
 ## Trend Phytoplankton Richness -------------------------------------------
+library(mblm)
 bio.dat_div2=subset(bio.dat_div,CY>2011)
 plot(Phyto_rich~Date,bio.dat_div2)
 with(bio.dat_div2,cor.test(dec.date,Phyto_rich,method="kendall"))
+
+pt.rslt=trend::pettitt.test(bio.dat_div2$Phyto_rich)
+abline(v=bio.dat_div2[pt.rslt$estimate,])
+
+# png(filename=paste0(plot.path,"PLSF_PhytoRich.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.5,0.5),oma=c(3,3,0.5,0.25));
+
+xlim.val=date.fun(c("2012-06-01","2020-12-31"));by.x=10;xmaj=seq(xlim.val[1],xlim.val[2],"2 year");xmin=seq(xlim.val[1],xlim.val[2],"1 years")
+ylim.val=c(0,120);by.y=50;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+
+plot(Phyto_rich~Date,bio.dat_div2,type="n",ylim=ylim.val,xlim=xlim.val,ann=F,axes=F)
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.5)
+points(Phyto_rich~Date,bio.dat_div2,pch=21,bg="darkolivegreen2",lwd=0.1)
+abline(v=bio.dat_div2[pt.rslt$estimate,],lty=2,lwd=2)
+
+mod=mblm::mblm(Phyto_rich~dec.date,bio.dat_div2)
+x.vals=data.frame(dec.date=seq(min(bio.dat_div2$dec.date),max(bio.dat_div2$dec.date),length.out=100))
+x.vals2=date.fun(lubridate::date_decimal(x.vals$dec.date))
+mod.pred=predict(mod,x.vals,interval="confidence")
+
+lines(x.vals2,mod.pred[,1],col="indianred1",lwd=2)
+lines(x.vals2,mod.pred[,2],lty=2,col="indianred1")
+lines(x.vals2,mod.pred[,3],lty=2,col="indianred1")
+axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5);
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.75,'Phytoplankton Species Richness')
+mtext(side=1,line=1.5,"Date (Month-Year)")
+dev.off()
+
+
+
+
+
+
 
 ## quant mod (idea from - LTER pulse dynamics working group, July 2022, Jennifer Rudgers)
 library(quantmod)
