@@ -864,6 +864,78 @@ legend("topleft",legend=c(date.cat.labs.leg,"Microcystin spp > 50%"),
        pt.cex=c(2,2,2,1),ncol=1,cex=0.8,bty="n",y.intersp=0.9,x.intersp=0.75,xpd=NA,xjust=0.5,yjust=1)
 dev.off()
 
+
+consec.day.vals=(top_abund2.wq$Date-consec.event[1])/86400
+cols=viridis::magma(length(consec.day.vals),alpha=0.75,direction=-1)
+## make legend 
+
+xlim.val=c(-0.6,0.6);by.x=0.2;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/2);
+ylim.val=c(-0.4,0.4);by.y=0.2;ymaj=c(0,seq(ylim.val[1],ylim.val[2],by.y));ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
+plot(xlim.val,ylim.val,type="n",axes=F,ann=F);
+abline(h=0,v=0,lty=3,col="grey");
+# x=ordiellipse(pco1,date.cat,col=time.cols,draw="polygon",alpha=0.25*255,border="grey")
+points(scrs[,c(1,2)],pch=21,bg=cols,col="grey40",cex=1,lwd=0.5);
+# points(scrs[,c(1,2)],pch=21,bg="grey80",col="grey40",cex=1,lwd=0.5);
+# points(scrs[,c(1,2)],pch=21,bg=with(top_abund2.wq,ifelse(Microcystis>0.5,"lightgreen","grey80")),col="grey40",cex=1,lwd=0.5);
+text(spp_scrs,row.names(spp_scrs),cex=0.8,font=2,col="black")
+# text(scrs[,1],scrs[,2],consec.day.vals)
+axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj),1);
+axis_fun(2,ymaj,ymin,format(ymaj),1); 
+mtext(side=1,line=1.5,"Dim 1");
+mtext(side=2,line=2.25,"Dim 2");
+
+
+# https://rpubs.com/Bury/ClusteringOnPcaResults
+
+hopkins::hopkins(top_abund2.wq[,3:7])
+## Hopkin index indicate the data is clustered
+
+pcoa_clust=factoextra::fviz_nbclust(scrs[,c(1,2)],FUNcluster=kmeans, k.max = 5)
+plot(y~clusters,pcoa_clust$data,type="b")
+
+eclust.rslt=factoextra::eclust(scrs[,c(1,2)], "kmeans", hc_metric="eucliden",k=3)
+eclust.rslt$cluster
+
+
+xlim.val=c(-0.6,0.6);by.x=0.2;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/2);
+ylim.val=c(-0.6,0.4);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
+plot(xlim.val,ylim.val,type="n",axes=F,ann=F);
+abline(h=0,v=0,lty=3,col="grey");
+x=ordiellipse(pco1,eclust.rslt$cluster,col=time.cols,draw="polygon",alpha=0.25*255,border="grey",conf=0.95)
+x=ordiellipse(pco1,date.cat,col=NA,draw="polygon",alpha=0*255,border=time.cols)
+points(scrs[,c(1,2)],pch=21,bg="grey",col="grey40",cex=1,lwd=0.5);
+text(spp_scrs,row.names(spp_scrs),cex=0.8,font=2,col="black")
+# text(scrs[,1],scrs[,2],consec.day.vals)
+axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj),1);
+axis_fun(2,ymaj,ymin,format(ymaj),1); 
+mtext(side=1,line=1.5,"Dim 1");
+mtext(side=2,line=2.25,"Dim 2");
+
+
+
+top_abund2.wq$PCoA_clust=eclust.rslt$cluster
+tmp=dcast(melt(top_abund2.wq[,8:ncol(top_abund2.wq)],id.vars = "PCoA_clust"),PCoA_clust~variable,value.var = "value",mean)
+
+barplot(tmp$TN_TP)
+
+barplot(tmp[,2])
+barplot(tmp[,3])
+barplot(tmp[,4])
+barplot(tmp[,5])
+barplot(tmp[,6])
+barplot(tmp[,7])
+barplot(tmp[,8])
+barplot(tmp[,9])
+barplot(tmp[,10])
+barplot(tmp[,11])
+
+
+
+
+
+# https://www.datanovia.com/en/lessons/cluster-validation-statistics-must-know-methods/
+factoextra::fviz_silhouette(eclust.rslt) 
+
 ## hierarchical clustering
 
 top_abund.clust=hclust(top_abund.dist,method="average")
