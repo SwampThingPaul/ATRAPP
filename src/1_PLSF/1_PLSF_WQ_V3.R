@@ -6323,8 +6323,8 @@ txt.offset.val=-0.01
 # text(x=x.max, y = c(bot.val,mid.v.val,top.val), labels = format(c(min(b2),0,max(b2))),cex=0.75,adj=0,pos=4,offset=0.5)
 bx.val= seq(bot.val,top.val,(top.val-bot.val)/n.bks)
 rect(x.min,bx.val[1:n.bks],x.max,bx.val[2:(n.bks+1)],col=rev(col.rmp),lty=0)
-text(y=bx.val[2:(n.bks+1)]-c(mean(diff(bx.val[2:(n.bks+1)]))/2), x = x.max, labels = rev(labs),cex=0.75,xpd=NA,pos=4,adj=0)
-text(x=mid.val,y=top.val,"Trend \u03C1-value",adj=0,cex=0.8,pos=3,xpd=NA)
+text(y=bx.val[2:(n.bks+1)]-c(mean(diff(bx.val[2:(n.bks+1)]))/2), x = x.max, labels = rev(labs),cex=1,xpd=NA,pos=4,adj=0)
+text(x=mid.val+0.1,y=top.val,"Trend \u03C1-value",adj=0,cex=1.2,pos=3,xpd=NA)
 dev.off()
 
 
