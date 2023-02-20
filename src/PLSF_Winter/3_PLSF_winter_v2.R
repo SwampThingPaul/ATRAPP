@@ -96,6 +96,8 @@ dates=date.fun(c("1978-10-01","2021-09-30"))
 subset(stations(),station_name=="BROMPTONVILLE")
 subset(stations(),station_id%in%c(5327,5322))
 
+wx.sites=subset(stations(),station_id%in%c(5327,5322)&interval=="day")
+
 # subset(stations(),station_name=="BONSECOURS")
 # subset(stations(),climate_id==7024440)
 weathercan:::get_html(station_id=5327,interval="day")
