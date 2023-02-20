@@ -413,9 +413,143 @@ unique(proto.dat.all$date)
 
 
 
-write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
-          paste0(export.path,"PLSF_microscope_data_phyto.csv"),row.names = F)
-write.csv(zoo.dat.all[,c("Taxa", "conc.numbL", "tot.biomass.ugL", "date")],
-          paste0(export.path,"PLSF_microscope_data_zoo.csv"),row.names = F)
-write.csv(proto.dat.all[,c("Taxa", "conc.numbL", "tot.biovol.um3L", "date")],
-          paste0(export.path,"PLSF_microscope_data_proto.csv"),row.names = F)
+# write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
+#           paste0(export.path,"PLSF_microscope_data_phyto.csv"),row.names = F)
+# write.csv(zoo.dat.all[,c("Taxa", "conc.numbL", "tot.biomass.ugL", "date")],
+#           paste0(export.path,"PLSF_microscope_data_zoo.csv"),row.names = F)
+# write.csv(proto.dat.all[,c("Taxa", "conc.numbL", "tot.biovol.um3L", "date")],
+#           paste0(export.path,"PLSF_microscope_data_proto.csv"),row.names = F)
+
+
+head(phyto.dat.all)
+
+phyto.dat.biovol=ddply(phyto.dat.all,c("date"),summarise,T.biovol=sum(totbiovol.um3mL,na.rm=T))
+
+plot(T.biovol~date,phyto.dat.biovol,log="y")
+
+
+phyto.dat.conc.xtab=dcast(phyto.dat.all,date~GenusSpp,value.var = "Conc.cellsmL",sum)
+
+phyto.dat.conc.xtab[1,]
+
+# vegan::specnumber(phyto.dat.conc.xtab[1,2:ncol(phyto.dat.conc.xtab)])
+library(vegan)
+## proportional abundance
+phyto.dat.conc.xtab.prop=phyto.dat.conc.xtab
+x.val=apply(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab.prop)],1,sum)
+phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)]=sweep(phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)],1,x.val,"/")
+
+## Diversity (alpha) Indices
+# Shannon Index
+shannon=-phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)]*log(phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)])
+shannon_H=apply(shannon,1,sum,na.rm=T)
+
+# Simpson
+simpson_D=1-apply(phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)]^2,1,sum,na.rm=T)
+simpson_invD=1/apply(phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)]^2,1,sum,na.rm=T)
+
+plot(simpson_D)
+
+#species richness
+richness=specnumber(phyto.dat.conc.xtab.prop[,2:ncol(phyto.dat.conc.xtab.prop)])
+plot(richness)
+
+# Pielou's evenness J' #https://www.rpubs.com/roalle/mres_2019
+pielou_even=shannon_H/log(richness)
+
+phyto.metric=data.frame(date=phyto.dat.conc.xtab$date,
+           shannon_H=shannon_H,
+           simpson_D=simpson_D,
+           simpson_invD=simpson_invD,
+           richness=richness,
+           pielou_even=pielou_even)
+
+## zooplankton
+zoo.dat.conc.xtab=dcast(zoo.dat.all,date~Taxa,value.var = "conc.numbL",sum)
+
+## proportional abundance
+zoo.dat.conc.xtab.prop=zoo.dat.conc.xtab
+x.val=apply(zoo.dat.conc.xtab[,2:ncol(zoo.dat.conc.xtab.prop)],1,sum)
+zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)]=sweep(zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)],1,x.val,"/")
+
+## Diversity (alpha) Indices
+# Shannon Index
+shannon=-zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)]*log(zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)])
+shannon_H=apply(shannon,1,sum,na.rm=T)
+
+# Simpson
+simpson_D=1-apply(zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)]^2,1,sum,na.rm=T)
+simpson_invD=1/apply(zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)]^2,1,sum,na.rm=T)
+
+plot(simpson_D)
+
+#species richness
+richness=specnumber(zoo.dat.conc.xtab.prop[,2:ncol(zoo.dat.conc.xtab.prop)])
+plot(richness)
+
+# Pielou's evenness J' #https://www.rpubs.com/roalle/mres_2019
+pielou_even=shannon_H/log(richness)
+
+zoo.metric=data.frame(date=zoo.dat.conc.xtab$date,
+                        shannon_H=shannon_H,
+                        simpson_D=simpson_D,
+                        simpson_invD=simpson_invD,
+                        richness=richness,
+                        pielou_even=pielou_even)
+
+# write.csv(phyto.metric,
+#            paste0(export.path,"PLSF_microscope_phyto_mertrics.csv"),row.names = F)
+# write.csv(zoo.metric,
+#            paste0(export.path,"PLSF_microscope_zoo_mertrics.csv"),row.names = F)
+
+
+# -------------------------------------------------------------------------
+# library(taxizedb)
+# GenusSpp.list=unique(trimws(phyto.dat.all$GenusSpp))
+# GenusSpp.list[is.na(name2taxid(GenusSpp.list,db="itis"))==T]
+# tmp1=name2taxid(GenusSpp.list[1],db="itis")
+# classification(tmp1, db='itis')
+# subset(phyto.dat.all,GenusSpp==GenusSpp.list[1])
+
+
+
+# library(taxize)
+# gnr_resolve(sci=c("Helianthus annuus"))
+# specieslist <- c("Abies procera","Pinus contorta")
+# classification(specieslist, db = 'itis')
+# classification(specieslist, db = 'ncbi')
+# 
+# 
+# GenusSpp.list=unique(trimws(phyto.dat.all$GenusSpp))
+# # GenusSpp.list[is.na(name2taxid(GenusSpp.list,db="itis"))==T]
+# 
+# GenusSpp.list2=GenusSpp.list[grepl("Unid|Mis",GenusSpp.list)==F]
+# SppList.tree=data.frame()
+# for(i in 1:length(GenusSpp.list2)){
+# tmp=gnr_resolve(GenusSpp.list[i])
+# # head(tmp)
+# # tmp$matched_name[1]
+# rslt=classification(tmp$submitted_name[1],db='ncbi')
+# if(is.na(rslt[tmp$submitted_name[1]])==T){
+#   rslt=classification(tmp$matched_name[2],db='ncbi')  
+#   rslt2=as.data.frame(rslt[tmp$matched_name[2]])
+# }else{
+# rslt=classification(tmp$submitted_name[1],db='ncbi')
+# rslt2=as.data.frame(rslt[tmp$submitted_name[1]])
+# }
+# 
+# colnames(rslt2)=c("name","rank","id")
+# vars=c("order",'class',"genus","species")
+# rslt3=subset(rslt2,rank%in%vars)
+# rslt3=tidyr::spread(rslt3[,1:2],rank,name)
+# 
+# vars.fill=vars[vars%in%names(rslt3)==F]
+# rslt3[,vars.fill]=NA
+# rslt3[,vars]
+# 
+# rslt3$GenusSpp=GenusSpp.list[i]
+# SppList.tree=rbind(SppList.tree,rslt3)
+# }
+# 
+# SppList.tree
+## loop species class, etc info doesn't work. Supplied names don't match 
