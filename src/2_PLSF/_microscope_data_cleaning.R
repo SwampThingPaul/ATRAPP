@@ -24,6 +24,7 @@ data.path=paths[3]
 # -------------------------------------------------------------------------
 
 files.all=list.files(data.path,full.names=T)
+files.all=files.all[grepl("Phytoplankton 2009-2015",files.all)==F]
 
 tmp=lapply(files.all,getSheetNames)
 
@@ -283,7 +284,9 @@ zoo.dat3=subset(zoo.dat3,Order%in%order.vals)
 ### combine phyto and zoo data
 phyto.dat.all=rbind(phyto.dat,phyto.dat2)
 zoo.dat.all=rbind(zoo.dat,zoo.dat2,zoo.dat3)
+is.na(zoo.dat.all$conc.numbL)
 
+is.na(zoo.dat.all$tot.biomass.ugL)
 
 ## quick check of data
 subset(phyto.dat.all,is.na(date))
@@ -410,7 +413,40 @@ proto.dat.all=subset(proto.dat.all,Taxa%in%proto.taxa)
 
 unique(proto.dat.all$date)
 
+### 2009 - 2015 phytoplankton data
+head(phyto.dat.all)
+unique(phyto.dat.all$Class)
 
+phyto_20092015=read.xlsx(paste0(data.path,"PLSF Phytoplankton 2009-2015 (condensed).xlsx"))
+phyto_20092015=subset(phyto_20092015,is.na(Sampling.Date)==F)
+phyto_20092015$date=with(phyto_20092015,ifelse(grepl("-",Sampling.Date)==F,
+                                               as.character(convertToDate(as.numeric(Sampling.Date))),
+                                               Sampling.Date))
+
+phyto_20092015$date=as.Date(phyto_20092015$date)
+
+
+
+
+unique(phyto_20092015$Algal.Group)
+
+head(phyto_20092015,1L)
+phyto_20092015$GenusSpp=with(phyto_20092015, paste(Genus,Species))
+vars=c("Algal.Group","GenusSpp","Species.Cells/mL","Species.Biovolume/mL","date")
+
+phyto_20092015=phyto_20092015[,vars]
+
+colnames(phyto_20092015)=names(phyto.dat.all)
+
+## Combine all phyto data
+phyto.dat.all=rbind(phyto.dat.all,phyto_20092015)
+
+unique(phyto_20092015$Class)
+unique(phyto.dat.all$Class)
+
+range(phyto.dat.all$date)
+
+##
 
 
 # write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
@@ -423,7 +459,7 @@ unique(proto.dat.all$date)
 
 head(phyto.dat.all)
 
-phyto.dat.biovol=ddply(phyto.dat.all,c("date"),summarise,T.biovol=sum(totbiovol.um3mL,na.rm=T))
+phyto.dat.biovol=ddply(subset(phyto.dat.all,as.numeric(format(date,"%Y"))>2009),c("date"),summarise,T.biovol=sum(totbiovol.um3mL,na.rm=T))
 
 plot(T.biovol~date,phyto.dat.biovol,log="y")
 
