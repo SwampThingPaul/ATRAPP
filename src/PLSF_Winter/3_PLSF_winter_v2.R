@@ -315,7 +315,7 @@ plot(ecdf(fdd.winter$FDD))
 
 with(subset(fdd.winter,WY%in%seq(2010,2020,1)),cor.test(WY,FDD,method="kendall"))
 range(subset(fdd.winter,WY%in%seq(2010,2020,1))$FDD)
-
+range(fdd.winter$FDD)
 # winter precip
 with(fdd.winter,cor.test(WY,Tprep,method="kendall"))
 mblm(FDD~WY,fdd.winter)
@@ -372,6 +372,11 @@ ENSO.dat$Phase = factor(ENSO.dat$Phase, levels = c("Cool Phase/La Nina",
                                            "Neutral Phase",
                                            "Warm Phase/El Nino"), ordered = TRUE)
 ENSO.dat$month.num=as.numeric(format(ENSO.dat$Date,"%m"))
+
+ENSO.dat$WY=with(ENSO.dat,ifelse(Month%in%c("ON",'ND'),Year+1,Year))
+
+ENSO.winter=ddply(subset(ENSO.dat,Month%in%c("DJ","JF","FM")),"WY",summarise,ENSO.mean=mean(MEI,na.rm=T))
+plot(ENSO.mean~WY,ENSO.winter,type="b")
 
 # AMO ---------------------------------------------------------------------
 ## AMO https://psl.noaa.gov/data/timeseries/AMO/
@@ -516,12 +521,15 @@ nao.dat = read.fwf(nao_link,
 
 nao.dat$Year=as.numeric(nao.dat$Year)
 nao.dat=melt(nao.dat,id.var="Year")
+nao.dat=subset(nao.dat,is.na(value)==F)
 nao.dat$month.num=with(nao.dat,as.numeric(match(variable,month.abb)))
 nao.dat$winter=with(nao.dat,ifelse(as.numeric(month.num)%in%c(12,1:2),1,0))
 nao.dat$date.val=with(nao.dat,date.fun(paste(Year,month.num,"01",sep="-")))
 nao.dat$WY=with(nao.dat,WY(date.val,'Fed'))
+nao.dat=subset(nao.dat,is.na(Year)==F)
 nao.dat=nao.dat[order(nao.dat$date.val),]
-nao.dat.winter.mean=ddply(subset(nao.dat,winter==1&WY<2023),c("WY","winter"),summarise,mean.val=mean(value,na.rm=T))
+nao.dat$value=as.numeric(nao.dat$value)
+nao.dat.winter.mean=ddply(subset(nao.dat,winter==1&WY<2023),c("WY","winter"),summarise,mean.val=mean(value ,na.rm=T))
 nao.dat.mean=ddply(subset(nao.dat,WY<2023),c("WY"),summarise,mean.val=mean(value,na.rm=T))
 
 plot(mean.val~WY,subset(nao.dat.winter.mean,WY%in%seq(2009,2020,1)),type="l")
@@ -1182,26 +1190,25 @@ wq.dat.melt.bimonth$month.period=factor(wq.dat.melt.bimonth$month.period,level=m
 
 dcast(subset(wq.dat.melt.bimonth,variable=="TP.ugL"),MEI.yr~month.period,value.var = "mean.val",mean)
 
-wq.dat.melt.bimonth=merge(wq.dat.melt.bimonth,ENSO.dat.melt[,c('YR',"variable","value")],by.x=c("MEI.yr","month.period"),by.y=c("YR","variable"))
+wq.dat.melt.bimonth=merge(wq.dat.melt.bimonth,ENSO.dat[,c('Year',"Month","MEI","month.num")],by.x=c("MEI.yr","month.period"),by.y=c("Year","Month"))
 head(wq.dat.melt.bimonth)
-wq.dat.melt.bimonth=rename(wq.dat.melt.bimonth,c("value"="MEI.ENSO"))
 
 subset(wq.dat.melt.bimonth,variable=="TP.ugL"&mean.val>200)
 subset(wq.dat.melt.bimonth,N.val==1)
 
 wq.dat.melt.bimonth$mean.val=with(wq.dat.melt.bimonth,ifelse(N.val==1,NA,mean.val))
 
-plot(mean.val~MEI.ENSO,subset(wq.dat.melt.bimonth,variable=="TP.ugL"&Site%in%sites.vals[1]),log="y")
-plot(mean.val~MEI.ENSO,subset(wq.dat.melt.bimonth,variable=="TP.ugL"&month.period%in%c("SO","ON",'ND')&Site%in%sites.vals[1]),log="y")
+plot(mean.val~MEI,subset(wq.dat.melt.bimonth,variable=="TP.ugL"&Site%in%sites.vals[1]),log="y")
+plot(mean.val~MEI,subset(wq.dat.melt.bimonth,variable=="TP.ugL"&month.period%in%c("SO","ON",'ND')&Site%in%sites.vals[1]),log="y")
 
-plot(mean.val~MEI.ENSO,subset(wq.dat.melt.bimonth,variable=="TN.mgL"&Site%in%sites.vals[1]))
-plot(mean.val~MEI.ENSO,subset(wq.dat.melt.bimonth,variable=="TN.mgL"&month.period%in%c("ON",'ND')&Site%in%sites.vals[2]))
+plot(mean.val~MEI,subset(wq.dat.melt.bimonth,variable=="TN.mgL"&Site%in%sites.vals[1]))
+plot(mean.val~MEI,subset(wq.dat.melt.bimonth,variable=="TN.mgL"&month.period%in%c("ON",'ND')&Site%in%sites.vals[2]))
 
 
 ddply(subset(wq.dat.melt.bimonth,Site%in%sites.vals&variable%in%c("TN.mgL","DIN.mgL","TP.ugL","SRP.ugL")),
       c("Site","variable"),summarise,
-      r.val=cor.test(mean.val,MEI.ENSO,method="spearman")$estimate,
-      p.val=round(cor.test(mean.val,MEI.ENSO,method="spearman")$p.value,3))
+      r.val=cor.test(mean.val,MEI,method="spearman")$estimate,
+      p.val=round(cor.test(mean.val,MEI,method="spearman")$p.value,3))
 
 
 ### AMO -------------------------------------------------------------------
