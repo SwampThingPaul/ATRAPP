@@ -127,7 +127,7 @@ for(i in 1:length(vals2)){
   
   tmp=tmp[,tmp.col.vars]
   colnames(tmp)=colnm.vals
-  tmp$date=convertToDate(read.xlsx(vals2[i],sheet=2,startRow =1)[2,ncol.vals])
+  tmp$date=convertToDate(read.xlsx(vals2[i],sheet=2,startRow =1)[1,ncol.vals])
   
   zoo.dat=rbind(zoo.dat,tmp)
   }
@@ -218,7 +218,7 @@ for(i in 1:length(vals3)){
     
     tmp=tmp[,tmp.col.vars]
     colnames(tmp)=colnm.vals
-    tmp$date=convertToDate(read.xlsx(vals3[i],sheet=2,startRow =1)[2,ncol.vals])
+    tmp$date=convertToDate(read.xlsx(vals3[i],sheet=2,startRow =1)[1,ncol.vals])
     
     zoo.dat2=rbind(zoo.dat2,tmp)
   }
@@ -270,7 +270,7 @@ for(i in 1:length(vals4)){
     
     tmp=tmp[,tmp.col.vars]
     colnames(tmp)=colnm.vals
-    tmp$date=convertToDate(read.xlsx(vals4[i],sheet=1,startRow =1)[2,ncol.vals])
+    tmp$date=convertToDate(read.xlsx(vals4[i],sheet=1,startRow =1)[1,ncol.vals])
     
     zoo.dat3=rbind(zoo.dat3,tmp)
   }
@@ -350,7 +350,7 @@ for(i in 1:length(vals5)){
     
     tmp=tmp[,tmp.col.vars]
     colnames(tmp)=colnm.vals
-    tmp$date=convertToDate(read.xlsx(vals5[i],sheet=3,startRow =1)[2,ncol.vals])
+    tmp$date=convertToDate(read.xlsx(vals5[i],sheet=3,startRow =1)[1,ncol.vals])
     
     proto.dat=rbind(proto.dat,tmp)
   print(i)
@@ -396,7 +396,7 @@ for(i in 1:3){
   
   tmp=tmp[,tmp.col.vars]
   colnames(tmp)=colnm.vals
-  tmp$date=convertToDate(read.xlsx(vals6,sheet=i,startRow =1)[2,ncol.vals])
+  tmp$date=convertToDate(read.xlsx(vals6,sheet=i,startRow =1)[1,ncol.vals])
   
   proto.dat2=rbind(proto.dat2,tmp)
   print(i)
@@ -426,8 +426,6 @@ phyto_20092015$date=with(phyto_20092015,ifelse(grepl("-",Sampling.Date)==F,
 phyto_20092015$date=as.Date(phyto_20092015$date)
 
 
-
-
 unique(phyto_20092015$Algal.Group)
 
 head(phyto_20092015,1L)
@@ -448,6 +446,25 @@ range(phyto.dat.all$date)
 
 ##
 
+subset(phyto.dat.all,date%in%as.Date("2017-07-11"))
+subset(zoo.dat.all,date%in%as.Date("2017-07-11"))
+subset(zoo.dat.all,date%in%as.Date("2015-08-16"))
+
+
+subset(zoo.dat.all,is.na(date))
+subset(phyto.dat.all,is.na(date))
+
+length(unique(zoo.dat.all$date))
+length(unique(phyto.dat.all$date))
+
+sort(unique(zoo.dat.all$date))
+sort(unique(phyto.dat.all$date))
+
+
+
+length(unique(subset(phyto.dat.all,date%in%zoo.dat.all$date)$date))
+
+range(unique(subset(phyto.dat.all,date%in%zoo.dat.all$date)$date))
 
 # write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
 #           paste0(export.path,"PLSF_microscope_data_phyto.csv"),row.names = F)
@@ -456,6 +473,11 @@ range(phyto.dat.all$date)
 # write.csv(proto.dat.all[,c("Taxa", "conc.numbL", "tot.biovol.um3L", "date")],
 #           paste0(export.path,"PLSF_microscope_data_proto.csv"),row.names = F)
 
+phyto.dat.all.zoo=subset(phyto.dat.all,date%in%zoo.dat.all$date)
+write.csv(phyto.dat.all.zoo[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
+          paste0(export.path,"PLSF_microscope_data_phyto_zooperiod.csv"),row.names = F)
+
+####
 
 head(phyto.dat.all)
 
