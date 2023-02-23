@@ -1466,6 +1466,15 @@ tmp=ddply(wq.dat.melt6,c("Site","Date","WY","variable","month","winter",'ice.per
           mean.oni=mean(ONI,na.rm=T),
           mean.enso=mean(MEI,na.rm=T))
 
+tmp2=ddply(wq.dat.melt6,c("Site","WY","month","variable","winter"),summarise,
+          mean.val=mean(value,na.rm=T),N.val=N.obs(value),
+          mean.amo=mean(AMO,na.rm=T),
+          mean.nao=mean(NAO,na.rm=T),
+          mean.pdo=mean(PDO,na.rm=T),
+          mean.soi=mean(SOI,na.rm=T),
+          mean.oni=mean(ONI,na.rm=T),
+          mean.enso=mean(MEI,na.rm=T))
+
 with(subset(tmp,Site==sites.vals[1]&winter==1&WY!=2011),
      cor.test(mean.val,mean.enso,method="spearman"))
 ddply(subset(tmp,
@@ -1475,6 +1484,67 @@ ddply(subset(tmp,
       r.val=cor.test(mean.val,mean.enso,method="spearman")$estimate,
       p.val=round(cor.test(mean.val,mean.enso,method="spearman")$p.value,3))
 
+
+## Synchrony  -------------------------------------------------------------
+library(synchrony)
+
+test.sync=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[1]),phase.sync(mean.val,mean.pdo))
+# Distribution of phase difference
+hist(test.sync$deltaphase$mod_phase_diff_2pi)
+
+# Compute concordant peaks
+p=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[1]&winter==1),peaks(mean.val, mean.pdo, nrands=100))
+# Find proportion of time steps where both time series peak together
+p$peaks
+# Plot (null) distribution of proportion of time steps where both time
+# series peak together
+hist(p$rand)
+# p-value of observed value
+p$pval
+
+var.vals1=c("TN.mgL","DIN.mgL","TP.ugL","SRP.ugL")
+clim.ind=paste("mean",c("amo","nao","pdo","soi","oni","enso"),sep=".")
+sync.rslt=data.frame()
+for(i in 1:length(sites.vals)){
+  tmp.dat=subset(tmp2,Site==sites.vals[i]&winter==1)
+  for(j in 1:length(var.vals1)){
+    for(k in 1:length(clim.ind)){
+    p.concord=peaks(tmp.dat[tmp.dat$variable==var.vals1[j],"mean.val"],
+                    tmp.dat[tmp.dat$variable==var.vals1[j],clim.ind[k]], nrands=100,type=1,quiet=T)
+    rslt=data.frame(Site=sites.vals[i],
+                    variable=var.vals1[j],
+                    climate.index=clim.ind[k],
+                    obs=p.concord$obs,
+                    p.val=p.concord$pval)
+    sync.rslt=rbind(rslt,sync.rslt)
+    
+    
+    }
+  }
+}
+sync.rslt
+subset(sync.rslt,p.val<0.05)
+
+plot(mean.val~mean.nao,subset(tmp2,Site==sites.vals[2]&variable=="SRP.ugL"))
+plot(mean.val~mean.nao,subset(tmp2,Site==sites.vals[2]&variable=="DIN.mgL"))
+
+kendall.w(subset(tmp2,Site==sites.vals[2]&variable=="DIN.mgL")[,c("mean.val",clim.ind)],nrand=100)
+
+w.val=kendall.w(subset(tmp2,Site==sites.vals[2]&variable=="TN.mgL")[,c("mean.val",clim.ind)],nrand=100)
+
+
+
+# time lagged cross correlation
+## https://online.stat.psu.edu/stat510/lesson/8/8.2
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.amo,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[1]),ccf(mean.nao,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.pdo,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.soi,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.oni,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.enso,mean.val))
+
+
+##
 
 tele.wq=tmp
 tele.wq.winter=rbind(
@@ -1514,7 +1584,6 @@ ddply(subset(tmp,
       c("Site","variable"),summarise,Index="ENSO",
       r.val=cor.test(mean.val,mean.enso,method="spearman")$estimate,
       p.val=round(cor.test(mean.val,mean.enso,method="spearman")$p.value,3))
-
 )
 
 rval.bks=seq(-1,1,0.2)
