@@ -1466,7 +1466,7 @@ tmp=ddply(wq.dat.melt6,c("Site","Date","WY","variable","month","winter",'ice.per
           mean.oni=mean(ONI,na.rm=T),
           mean.enso=mean(MEI,na.rm=T))
 
-tmp2=ddply(wq.dat.melt6,c("Site","WY","month","variable","winter"),summarise,
+tmp2=ddply(wq.dat.melt6,c("Site","WY","CY","month","variable","winter"),summarise,
           mean.val=mean(value,na.rm=T),N.val=N.obs(value),
           mean.amo=mean(AMO,na.rm=T),
           mean.nao=mean(NAO,na.rm=T),
@@ -1537,11 +1537,55 @@ w.val=kendall.w(subset(tmp2,Site==sites.vals[2]&variable=="TN.mgL")[,c("mean.val
 # time lagged cross correlation
 ## https://online.stat.psu.edu/stat510/lesson/8/8.2
 with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.amo,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[1]),ccf(mean.nao,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.pdo,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.soi,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.oni,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.enso,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.nao,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.pdo,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.soi,mean.val))
+with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.oni,mean.val))
+x=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.enso,mean.val))
+
+tmp.dat=subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])
+astsa::lag2.plot(tmp.dat$mean.enso,tmp.dat$mean.val,max.lag = 11)
+
+h=-11
+length(lag(tmp$mean.enso,h))
+
+lagged=lag(zoo::as.zoo(tmp.dat$mean.enso),h,na.pad=T)
+tmp.val=zoo::as.zoo(tmp.dat$mean.val)
+
+plot(lagged,tmp.val)
+cor.test(lagged,tmp.val)
+
+
+
+library(testcorr)
+test=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),cc.test(mean.amo,mean.val,max.lag = 24))
+test$lag
+test$cc
+test$t #standard t-value
+test$pvt 
+test$ttilde #robust t-value
+test$pvttilde
+
+test$lag[test$pvt<0.05]
+test$lag[test$pvttilde<0.05]
+
+plot(test$lag,test$pvttilde)
+
+plot(lag(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.val,1)~subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.amo)
+cor.test(lag(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.val,1),subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.amo)
+
+test=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.oni,mean.val,max.lag = 10))
+test=with(subset(tmp2,variable=="TN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.oni,mean.val,max.lag = 10))
+test=with(subset(tmp2,variable=="TN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.pdo,mean.val,max.lag = 10))
+
+
+layout(matrix(1:24,4,6))
+for(i in 1:length(clim.ind)){
+  for(j in 1:length(var.vals1)){
+    ccf(subset(tmp2,variable==var.vals1[j]&Site==sites.vals[1]&winter==1)[,clim.ind[i]],
+        subset(tmp2,variable==var.vals1[j]&Site==sites.vals[1]&winter==1)$mean.val)
+  }
+}
 
 
 ##
