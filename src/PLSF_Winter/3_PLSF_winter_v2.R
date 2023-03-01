@@ -1475,6 +1475,24 @@ tmp2=ddply(wq.dat.melt6,c("Site","WY","CY","month","variable","winter"),summaris
           mean.oni=mean(ONI,na.rm=T),
           mean.enso=mean(MEI,na.rm=T))
 
+month.mean.WQ.tele=ddply(wq.dat.melt6,c("Site","WY","CY","month","variable","winter"),summarise,
+           mean.val=mean(value,na.rm=T),N.val=N.obs(value),
+           mean.amo=mean(AMO,na.rm=T),
+           mean.nao=mean(NAO,na.rm=T),
+           mean.pdo=mean(PDO,na.rm=T),
+           mean.soi=mean(SOI,na.rm=T),
+           mean.oni=mean(ONI,na.rm=T),
+           mean.enso=mean(MEI,na.rm=T))
+
+mean.WQ.tele.winter=ddply(wq.dat.melt6,c("Site","WY","variable","winter"),summarise,
+                         mean.val=mean(value,na.rm=T),N.val=N.obs(value),
+                         mean.amo=mean(AMO,na.rm=T),
+                         mean.nao=mean(NAO,na.rm=T),
+                         mean.pdo=mean(PDO,na.rm=T),
+                         mean.soi=mean(SOI,na.rm=T),
+                         mean.oni=mean(ONI,na.rm=T),
+                         mean.enso=mean(MEI,na.rm=T))
+
 with(subset(tmp,Site==sites.vals[1]&winter==1&WY!=2011),
      cor.test(mean.val,mean.enso,method="spearman"))
 ddply(subset(tmp,
@@ -1534,58 +1552,185 @@ w.val=kendall.w(subset(tmp2,Site==sites.vals[2]&variable=="TN.mgL")[,c("mean.val
 
 
 
-# time lagged cross correlation
+## time lagged cross correlation ------------------------------------------
 ## https://online.stat.psu.edu/stat510/lesson/8/8.2
 with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.amo,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.nao,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.pdo,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.soi,mean.val))
-with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),ccf(mean.oni,mean.val))
-x=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),ccf(mean.enso,mean.val))
 
-tmp.dat=subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])
-astsa::lag2.plot(tmp.dat$mean.enso,tmp.dat$mean.val,max.lag = 11)
+## by hand comparing ccf and cor.test function
+tmp.dat.test=subset(month.mean.WQ.tele,variable=="DIN.mgL"&Site==sites.vals[2])
+ccf.rslt=with(tmp.dat.test,ccf(mean.enso,mean.val))
+ccf.ci=qnorm((1+0.95)/2)/sqrt(nrow(tmp.dat.test))
 
-h=-11
-length(lag(tmp$mean.enso,h))
+ccf.pearsons=data.frame()
 
-lagged=lag(zoo::as.zoo(tmp.dat$mean.enso),h,na.pad=T)
-tmp.val=zoo::as.zoo(tmp.dat$mean.val)
+tmp.dat.test2=tmp.dat.test[,c("mean.enso","mean.val")]
+sampleT <- as.integer(nrow(tmp.dat.test2))
+nser <- as.integer(ncol(tmp.dat.test2))
+lag.max <- floor(10 * (log10(sampleT) - log10(nser)))
+lag.max <- as.integer(min(lag.max, sampleT - 1L))
+
+lag.vals=seq(lag.max*-1,lag.max,1)
+
+tmp.dat.test2.dm=sweep(tmp.dat.test2,2,colMeans(tmp.dat.test2,na.rm=T),check.margin = F) 
+for(h in 1:length(lag.vals)){
+  lagged=lag(zoo::as.zoo(tmp.dat.test2$mean.enso),lag.vals[h],na.pad=T)
+  tmp.dat=zoo::as.zoo(tmp.dat.test2$mean.val)
+  stat=with(data.frame(lag=lagged,dat=tmp.dat),cor.test(lag,dat,method="pearson"))
+  cor2.vals=with(data.frame(lag=lagged,dat=tmp.dat),cor(lag,dat,use="complete.obs"))
+  ccf.pearsons=rbind(ccf.pearsons,data.frame(lag=lag.vals[h],estimate=as.numeric(stat$estimate),pval=stat$p.value,cor2=cor2.vals))
+}
+ccf.pearsons
+plot(ccf.pearsons$estimate,ccf.rslt$acf);abline(0,1)
+
+x.dat1=tmp.dat.test[,c("mean.enso","mean.val")]
+x.dat.demean=sweep(x.dat1, 2, colMeans(x.dat1, na.rm = TRUE), check.margin = FALSE)
+
+lagged=lag(zoo::as.zoo(x.dat.demean$mean.enso),h,na.pad=T)
+tmp.val=zoo::as.zoo(x.dat.demean$mean.val)
 
 plot(lagged,tmp.val)
-cor.test(lagged,tmp.val)
+cor.test(tmp.val,lagged)
 
 
+unique(month.mean.WQ.tele$Site)
+unique(month.mean.WQ.tele$variable)
+range(month.mean.WQ.tele$CY)
 
-library(testcorr)
-test=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]),cc.test(mean.amo,mean.val,max.lag = 24))
-test$lag
-test$cc
-test$t #standard t-value
-test$pvt 
-test$ttilde #robust t-value
-test$pvttilde
+fill.dat=data.frame(expand.grid(CY=as.numeric(2009:2020),month=as.numeric(1:12),Site=as.character(sites.vals),variable=unique(month.mean.WQ.tele$variable)))
 
-test$lag[test$pvt<0.05]
-test$lag[test$pvttilde<0.05]
-
-plot(test$lag,test$pvttilde)
-
-plot(lag(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.val,1)~subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.amo)
-cor.test(lag(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.val,1),subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2])$mean.amo)
-
-test=with(subset(tmp2,variable=="DIN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.oni,mean.val,max.lag = 10))
-test=with(subset(tmp2,variable=="TN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.oni,mean.val,max.lag = 10))
-test=with(subset(tmp2,variable=="TN.mgL"&Site==sites.vals[2]&winter==1),cc.test(mean.pdo,mean.val,max.lag = 10))
+month.mean.WQ.tele2=merge(subset(month.mean.WQ.tele,Site!="In_Lake"),fill.dat,c("CY","month","Site","variable"),all.y=T)
 
 
-layout(matrix(1:24,4,6))
-for(i in 1:length(clim.ind)){
+month.mean.WQ.tele2=month.mean.WQ.tele2[order(month.mean.WQ.tele2$variable,
+                          month.mean.WQ.tele2$Site,month.mean.WQ.tele2$CY,month.mean.WQ.tele2$month),]
+
+var.vals1=c("TN.mgL","DIN.mgL","TP.ugL","SRP.ugL")
+clim.ind=paste("mean",c("amo","nao","pdo","soi","oni","enso"),sep=".")
+ccf.rslt=data.frame()
+for(i in 1:length(sites.vals)){
+  tmp.dat=subset(month.mean.WQ.tele2,Site==sites.vals[i]&winter==1)
   for(j in 1:length(var.vals1)){
-    ccf(subset(tmp2,variable==var.vals1[j]&Site==sites.vals[1]&winter==1)[,clim.ind[i]],
-        subset(tmp2,variable==var.vals1[j]&Site==sites.vals[1]&winter==1)$mean.val)
+    for(k in 1:length(clim.ind)){
+      sampleT <- as.integer(nrow(tmp.dat))
+      nser <- as.integer(ncol(tmp.dat))
+      lag.max <- floor(10 * (log10(sampleT) - log10(nser)))
+      lag.max <- as.integer(min(lag.max, sampleT - 1L))
+      
+      lag.vals=seq(lag.max*-1,lag.max,1)
+      
+      for(h in 1:length(lag.vals)){
+        lagged=lag(zoo::as.zoo(tmp.dat[tmp.dat$variable==var.vals1[j],clim.ind[k]]),lag.vals[h],na.pad=T)
+        tmp.dat.val=zoo::as.zoo(tmp.dat[tmp.dat$variable==var.vals1[j],"mean.val"])
+        stat=with(data.frame(lag=lagged,dat=tmp.dat.val),cor.test(lag,dat,method="spearman"))
+        
+        ccf.rslt=rbind(ccf.rslt,
+                       data.frame(lag=lag.vals[h],
+                                  estimate=as.numeric(stat$estimate),
+                                  pval=stat$p.value,
+                                  Site=sites.vals[i],
+                                  variable=var.vals1[j],
+                                  climate.index=clim.ind[k],
+                                  ccf.CI=qnorm((1+0.95)/2)/sqrt(length(tmp.dat.val))
+                                  ))
+      }
+      
+      
+    }
   }
 }
+ccf.rslt
+
+ccf.winter.rslt=data.frame()
+for(i in 1:length(sites.vals)){
+  tmp.dat=subset(mean.WQ.tele.winter,Site==sites.vals[i]&winter==1)
+  for(j in 1:length(var.vals1)){
+    for(k in 1:length(clim.ind)){
+      sampleT <- as.integer(nrow(tmp.dat[tmp.dat$variable==var.vals1[j],]))
+      nser <- 2;#as.integer(ncol(tmp.dat))
+      lag.max <- floor(10 * (log10(sampleT) - log10(nser)))
+      lag.max <- as.integer(min(lag.max, sampleT - 1L))
+      
+      lag.vals=seq(lag.max*-1,lag.max,1)
+      
+      for(h in 1:length(lag.vals)){
+        lagged=lag(zoo::as.zoo(tmp.dat[tmp.dat$variable==var.vals1[j],clim.ind[k]]),lag.vals[h],na.pad=T)
+        tmp.dat.val=zoo::as.zoo(tmp.dat[tmp.dat$variable==var.vals1[j],"mean.val"])
+        stat=with(data.frame(lag=lagged,dat=tmp.dat.val),cor.test(lag,dat,method="spearman"))
+        
+        ccf.winter.rslt=rbind(ccf.winter.rslt,
+                       data.frame(lag=lag.vals[h],
+                                  estimate=as.numeric(stat$estimate),
+                                  pval=stat$p.value,
+                                  Site=sites.vals[i],
+                                  variable=var.vals1[j],
+                                  climate.index=clim.ind[k],
+                                  ccf.CI=qnorm((1+0.95)/2)/sqrt(length(tmp.dat.val))
+                       ))
+      }
+      
+      
+    }
+  }
+}
+ccf.winter.rslt
+
+####
+####
+####
+
+
+clim.ind2=paste("mean",c("nao","soi","amo","pdo","enso"),sep=".") # mean.amo/mean.pdo and mean.enso? 
+# png(filename=paste0(plot.path,"PLSF_CCF_teleconnect.png"),width=6.5,height=7,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1.25,2,0.5,0.5),oma=c(2,2.25,1.5,0.25));
+layout(matrix(c(1:20,rep(21,5),22:41),9,5,byrow=T),heights=c(1,1,1,1,0.2,1,1,1,1))
+ylim.val=c(-1,1);by.y=0.5;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(-20,0);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+
+for(j in 1:length(var.vals1)){
+for(i in 1:length(clim.ind2)){
+  tmp.dat.ccf=subset(ccf.rslt,variable==var.vals1[j]&climate.index==clim.ind2[i]&Site==sites.vals[1])
+  plot(estimate~lag,tmp.dat.ccf,ylim=ylim.val,xlim=xlim.val,axes=F,ann=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=2,col="grey")
+  segments(tmp.dat.ccf$lag,rep(0,length(tmp.dat.ccf$lag)),
+           tmp.dat.ccf$lag,tmp.dat.ccf$estimate,lwd=1.5)
+  points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25)
+  abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
+  abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
+  if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1[j]),adj=0,cex=0.8,font=3)}
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+  axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+  if(i==1&j==1){mtext(side=3,adj=0,"Lake Inlet",font=2)}
+}
+}
+
+par(mar=c(0.25,0,0.25,0))
+plot(0:1,0:1,ann=F,axes=F,type="0")
+abline(h=0.5,lwd=2)
+
+par(mar=c(1.25,2,0.5,0.5))
+ylab=paste("Lagged",c("NAO","SOI","AMO","PDO","MEI ENSO"))
+for(j in 1:length(var.vals1)){
+  for(i in 1:length(clim.ind2)){
+    tmp.dat.ccf=subset(ccf.rslt,variable==var.vals1[j]&climate.index==clim.ind2[i]&Site==sites.vals[2])
+    plot(estimate~lag,tmp.dat.ccf,ylim=ylim.val,xlim=xlim.val,axes=F,ann=F,type="n")
+    abline(h=ymaj,v=xmaj,lty=2,col="grey")
+    segments(tmp.dat.ccf$lag,rep(0,length(tmp.dat.ccf$lag)),
+             tmp.dat.ccf$lag,tmp.dat.ccf$estimate,lwd=1.5)
+    points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25)
+    abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
+    abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
+    if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1[j]),adj=0,cex=0.8,font=3)}
+    axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+    axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+    if(j==4){mtext(side=1,line=1.5,ylab[i])}
+    if(i==1&j==1){mtext(side=3,adj=0,"Lake Outlet",font=2)}
+  }
+  
+}
+mtext(side=2,outer=T,line=0.5,expression(paste("CCF ",italic("r")["Spearman"])))
+dev.off()
+
+
 
 
 ##
