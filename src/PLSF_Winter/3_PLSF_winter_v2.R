@@ -616,7 +616,6 @@ ice.dat$Ice_Off=date.fun(convertToDate(ice.dat$Ice_Off))
 ice.dat$duration=with(ice.dat,as.numeric(Ice_Off - Ice_On))
 ice.dat$year=as.numeric(substr(ice.dat$Year,1,4))
 
-
 ice.dat2=subset(ice.dat,Ice_On>date.fun("2010-12-01"))
 ice_period=data.frame()
 for(i in 1:nrow(ice.dat2)){
@@ -624,6 +623,8 @@ for(i in 1:nrow(ice.dat2)){
   ice_period=rbind(ice_period,data.frame(Date=tmp,ice=1))
   print(i)
 }
+range(ice.dat2$duration)
+
 
 ice_period=merge(data.frame(Date=seq(date.fun("2010-10-01"),date.fun("2021-09-29"),"1 days")),
                  ice_period,all.x=T)
@@ -1608,7 +1609,7 @@ var.vals1=c("TN.mgL","DIN.mgL","TP.ugL","SRP.ugL")
 clim.ind=paste("mean",c("amo","nao","pdo","soi","oni","enso"),sep=".")
 ccf.rslt=data.frame()
 for(i in 1:length(sites.vals)){
-  tmp.dat=subset(month.mean.WQ.tele2,Site==sites.vals[i]&winter==1)
+  tmp.dat=subset(month.mean.WQ.tele2,Site==sites.vals[i])
   for(j in 1:length(var.vals1)){
     for(k in 1:length(clim.ind)){
       sampleT <- as.integer(nrow(tmp.dat))
@@ -1639,6 +1640,139 @@ for(i in 1:length(sites.vals)){
   }
 }
 ccf.rslt
+
+
+### Table
+range(subset(ccf.rslt,climate.index%in%c("mean.nao","mean.pdo")&lag%in%seq(-20,0,1))$estimate)
+
+climate.index=paste("mean",c("nao","soi","amo","pdo","enso"),sep=".")
+var.vals1=c("TN.mgL","DIN.mgL","TP.ugL","SRP.ugL")
+params=sapply(strsplit(var.vals1,"\\."),'[',1)
+
+vars=c("Site","lag","estimate","pval")
+vars.rename=c("Site","lag",paste0(params[1],".est"),paste0(params[1],".pval"))
+tmp1=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.nao"&variable==var.vals1[1])
+tmp1=tmp1[,vars]
+colnames(tmp1)=vars.rename
+vars=c("estimate","pval")
+vars.rename=c(paste0(params[2],".est"),paste0(params[2],".pval"))
+tmp2=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.nao"&variable==var.vals1[2])
+tmp2=tmp2[,vars]
+colnames(tmp2)=vars.rename
+vars.rename=c(paste0(params[3],".est"),paste0(params[3],".pval"))
+tmp3=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.nao"&variable==var.vals1[3])
+tmp3=tmp3[,vars]
+colnames(tmp3)=vars.rename
+vars.rename=c(paste0(params[4],".est"),paste0(params[4],".pval"))
+tmp4=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.nao"&variable==var.vals1[4])
+tmp4=tmp4[,vars]
+colnames(tmp4)=vars.rename
+
+cbind(tmp1,tmp2,tmp3,tmp4)%>%
+  flextable()%>%
+  colformat_double(j=3:10,digits=2,na_str = "---")%>%
+  compose(j="TN.pval",i=~TN.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="TN.pval",i=~TN.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="TN.pval",i=~TN.pval<0.05)%>%
+  compose(j="DIN.pval",i=~DIN.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="DIN.pval",i=~DIN.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="DIN.pval",i=~DIN.pval<0.05)%>%
+  compose(j="TP.pval",i=~TP.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="TP.pval",i=~TP.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="TP.pval",i=~TP.pval<0.05)%>%
+  compose(j="SRP.pval",i=~SRP.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="SRP.pval",i=~SRP.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="SRP.pval",i=~SRP.pval<0.05)%>%
+  compose(j="Site",i=~Site=="Godbout",value=as_paragraph('Lake Inlet'))%>%
+  compose(j="Site",i=~Site=="Lake_Outlet",value=as_paragraph('Lake Outlet'))%>%
+  merge_v(j="Site")%>%
+  set_header_labels("Site"="Site",
+                    "lag"="Lag\n(Month)",
+                    "TN.est" = "r-value","TN.pval" = "\u03C1-value",
+                    "DIN.est" = "r-value","DIN.pval" = "\u03C1-value",
+                    "TP.est" = "r-value","TP.pval" = "\u03C1-value",
+                    "SRP.est" = "r-value","SRP.pval" = "\u03C1-value")%>%
+  add_header("TN.est" = "TN","TN.pval" = "TN",
+             "DIN.est" = "DIN","DIN.pval" = "DIN",
+             "TP.est" = "TP","TP.pval" = "TP",
+             "SRP.est" = "SRP","SRP.pval" = "SRP")%>%
+  merge_h(part="header")%>%align(align="center",part="header")%>%
+  width(width=c(0.5,0.8,0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75))%>%
+  align(align="center",part="header")%>%
+  align(j=2:10,align="center",part="body")%>%
+  padding(padding=0.75,part="all")%>%
+  hline(i=21)%>%
+  valign(i=1,valign="top")%>%
+  vline(j=c(2,4,6,8,10),border=officer::fp_border(color="grey"))%>%
+  fix_border_issues()%>%
+  font(fontname="Times New Roman",part="all")%>%
+  fontsize(size=9,part="all")%>%
+  fontsize(size=11,part="header")# %>%print("docx")
+
+vars=c("Site","lag","estimate","pval")
+vars.rename=c("Site","lag",paste0(params[1],".est"),paste0(params[1],".pval"))
+tmp1=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[1])
+tmp1=tmp1[,vars]
+colnames(tmp1)=vars.rename
+vars=c("estimate","pval")
+vars.rename=c(paste0(params[2],".est"),paste0(params[2],".pval"))
+tmp2=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[2])
+tmp2=tmp2[,vars]
+colnames(tmp2)=vars.rename
+vars.rename=c(paste0(params[3],".est"),paste0(params[3],".pval"))
+tmp3=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[3])
+tmp3=tmp3[,vars]
+colnames(tmp3)=vars.rename
+vars.rename=c(paste0(params[4],".est"),paste0(params[4],".pval"))
+tmp4=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[4])
+tmp4=tmp4[,vars]
+colnames(tmp4)=vars.rename
+
+cbind(tmp1,tmp2,tmp3,tmp4)%>%
+  flextable()%>%
+  colformat_double(j=3:10,digits=2,na_str = "---")%>%
+  compose(j="TN.pval",i=~TN.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="TN.pval",i=~TN.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="TN.pval",i=~TN.pval<0.05)%>%
+  compose(j="DIN.pval",i=~DIN.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="DIN.pval",i=~DIN.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="DIN.pval",i=~DIN.pval<0.05)%>%
+  compose(j="TP.pval",i=~TP.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="TP.pval",i=~TP.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="TP.pval",i=~TP.pval<0.05)%>%
+  compose(j="SRP.pval",i=~SRP.pval<0.05,value=as_paragraph('< 0.05'))%>%
+  compose(j="SRP.pval",i=~SRP.pval<0.01,value=as_paragraph('< 0.01'))%>%
+  italic(j="SRP.pval",i=~SRP.pval<0.05)%>%
+  compose(j="Site",i=~Site=="Godbout",value=as_paragraph('Lake Inlet'))%>%
+  compose(j="Site",i=~Site=="Lake_Outlet",value=as_paragraph('Lake Outlet'))%>%
+  merge_v(j="Site")%>%
+  set_header_labels("Site"="Site",
+                    "lag"="Lag\n(Month)",
+                    "TN.est" = "r-value","TN.pval" = "\u03C1-value",
+                    "DIN.est" = "r-value","DIN.pval" = "\u03C1-value",
+                    "TP.est" = "r-value","TP.pval" = "\u03C1-value",
+                    "SRP.est" = "r-value","SRP.pval" = "\u03C1-value")%>%
+  add_header("TN.est" = "TN","TN.pval" = "TN",
+             "DIN.est" = "DIN","DIN.pval" = "DIN",
+             "TP.est" = "TP","TP.pval" = "TP",
+             "SRP.est" = "SRP","SRP.pval" = "SRP")%>%
+  merge_h(part="header")%>%align(align="center",part="header")%>%
+  width(width=c(0.5,0.8,0.75,0.75,0.75,0.75,0.75,0.75,0.75,0.75))%>%
+  align(align="center",part="header")%>%
+  align(j=2:10,align="center",part="body")%>%
+  padding(padding=0.75,part="all")%>%
+  hline(i=21)%>%
+  valign(i=1,valign="top")%>%
+  vline(j=c(2,4,6,8,10),border=officer::fp_border(color="grey"))%>%
+  fix_border_issues()%>%
+  font(fontname="Times New Roman",part="all")%>%
+  fontsize(size=9,part="all")%>%
+  fontsize(size=11,part="header")# %>%print("docx")
+
+
+
+
+
 
 ccf.winter.rslt=data.frame()
 for(i in 1:length(sites.vals)){
@@ -1680,11 +1814,12 @@ ccf.winter.rslt
 
 
 clim.ind2=paste("mean",c("nao","soi","amo","pdo","enso"),sep=".") # mean.amo/mean.pdo and mean.enso? 
+var.vals1.labs=c("TN","DIN","TP","SRP")
 # png(filename=paste0(plot.path,"PLSF_CCF_teleconnect.png"),width=6.5,height=7,units="in",res=200,type="windows",bg="white")
 par(family="serif",mar=c(1.25,2,0.5,0.5),oma=c(2,2.25,1.5,0.25));
 layout(matrix(c(1:20,rep(21,5),22:41),9,5,byrow=T),heights=c(1,1,1,1,0.2,1,1,1,1))
 ylim.val=c(-1,1);by.y=0.5;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
-xlim.val=c(-20,0);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+xlim.val=c(-20,0);by.x=10;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
 
 for(j in 1:length(var.vals1)){
 for(i in 1:length(clim.ind2)){
@@ -1696,7 +1831,7 @@ for(i in 1:length(clim.ind2)){
   points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25)
   abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
   abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
-  if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1[j]),adj=0,cex=0.8,font=3)}
+  if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1.labs[j]),adj=0,cex=0.8,font=3)}
   axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
   axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
   if(i==1&j==1){mtext(side=3,adj=0,"Lake Inlet",font=2)}
@@ -1708,7 +1843,7 @@ plot(0:1,0:1,ann=F,axes=F,type="0")
 abline(h=0.5,lwd=2)
 
 par(mar=c(1.25,2,0.5,0.5))
-ylab=paste("Lagged",c("NAO","SOI","AMO","PDO","MEI ENSO"))
+ylab=paste("Lagged",c("NAO","SOI","AMO","PDO","MEI"))
 for(j in 1:length(var.vals1)){
   for(i in 1:length(clim.ind2)){
     tmp.dat.ccf=subset(ccf.rslt,variable==var.vals1[j]&climate.index==clim.ind2[i]&Site==sites.vals[2])
@@ -1719,7 +1854,7 @@ for(j in 1:length(var.vals1)){
     points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25)
     abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
     abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
-    if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1[j]),adj=0,cex=0.8,font=3)}
+    if(i==1){mtext(side=3,line=-1,paste0(" ",var.vals1.labs[j]),adj=0,cex=0.8,font=3)}
     axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
     axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
     if(j==4){mtext(side=1,line=1.5,ylab[i])}
@@ -1730,6 +1865,71 @@ for(j in 1:length(var.vals1)){
 mtext(side=2,outer=T,line=0.5,expression(paste("CCF ",italic("r")["Spearman"])))
 dev.off()
 
+
+rm(oldpar)
+clim.ind2=paste("mean",c("nao","pdo"),sep=".") # mean.amo/mean.pdo and mean.enso? 
+ylab=paste("Lagged",c("NAO","PDO"))
+
+var.vals.labs=c("TN","DIN","TP","SRP")
+# png(filename=paste0(plot.path,"PLSF_CCF_teleconnect_select.png"),width=6.5,height=6,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1.25,2,0.5,0.5),oma=c(2,2.25,0.5,0.25),xpd=F);
+layout(matrix(c(1,3:6,1,7:10,rep(11,5),2,12:15,2,16:19),5,5,byrow = F),heights=c(0.25,1,1,1,1),widths=c(1,1,0.1,1,1))
+ylim.val=c(-1,1);by.y=0.5;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(-20,0);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+
+par(mar=c(0.1,2,0.1,0.5))
+plot(0:1,0:1,ann=F,axes=F,type="n");text(0.5,0.5,"North Atlantic\nOscilliation",cex=1.25)
+plot(0:1,0:1,ann=F,axes=F,type="n");text(0.5,0.5,"Pacific Decadal\nOscilliation",cex=1.25)
+
+# par(mar=oldpar$mar)
+par(mar=c(1.25,2,0.5,0.5))
+for(j in 1:2){
+for(i in 1:4){
+  
+  tmp.dat.ccf=subset(ccf.rslt,variable==var.vals1[i]&climate.index==clim.ind2[1]&Site==sites.vals[j])
+  plot(estimate~lag,tmp.dat.ccf,ylim=ylim.val,xlim=xlim.val,axes=F,ann=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=2,col="grey",lwd=0.5)
+  segments(tmp.dat.ccf$lag,rep(0,length(tmp.dat.ccf$lag)),
+           tmp.dat.ccf$lag,tmp.dat.ccf$estimate,lwd=1.5)
+  points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25,lwd=0.1)
+  abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
+  abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
+  if(j==1){mtext(side=3,line=-1,paste0(" ",var.vals.labs[i]),adj=0,cex=0.8,font=3)}
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+  axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+  if(i==4){mtext(side=1,line=1.5,ylab[1])}
+  if(i==1){mtext(side=3,c("Lake Inlet","Lake Outlet")[j])}
+}
+}
+
+par(mar=c(0.25,0,0.25,0),xpd=F)
+plot(0:1,0:1,ann=F,axes=F,type="n")
+# abline(v=0.5,lwd=2)
+lines(c(0.5,0.5),y=c(-0.08,1.05),lwd=2,xpd=NA)
+
+# par(mar=oldpar$mar,xpd=F)
+par(mar=c(1.25,2,0.5,0.5),xpd=F)
+for(j in 1:2){
+  for(i in 1:4){
+    
+    tmp.dat.ccf=subset(ccf.rslt,variable==var.vals1[i]&climate.index==clim.ind2[2]&Site==sites.vals[j])
+    plot(estimate~lag,tmp.dat.ccf,ylim=ylim.val,xlim=xlim.val,axes=F,ann=F,type="n")
+    abline(h=ymaj,v=xmaj,lty=2,col="grey",lwd=0.5)
+    segments(tmp.dat.ccf$lag,rep(0,length(tmp.dat.ccf$lag)),
+             tmp.dat.ccf$lag,tmp.dat.ccf$estimate,lwd=1.5)
+    points(estimate~lag,tmp.dat.ccf,pch=21,bg=ifelse(tmp.dat.ccf$pval<0.05,"red","grey"),cex=1.25,lwd=0.1)
+    abline(h=c(tmp.dat.ccf$ccf.CI,tmp.dat.ccf$ccf.CI*-1),lty=2,col="red")
+    abline(h=0,v=0,col=c("black","grey"),lty=c(1,2))
+    # if(j==1){mtext(side=3,line=-1,paste0(" ",var.vals.labs[i]),adj=0,cex=0.8,font=3)}
+    axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+    axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+    if(i==4){mtext(side=1,line=1.5,ylab[2])}
+    if(i==1){mtext(side=3,c("Lake Inlet","Lake Outlet")[j])}
+  }
+}
+mtext(side=2,outer=T,line=0.5,expression(paste("CCF ",italic("r")["Spearman"])))
+rm(oldpar)
+dev.off()
 
 
 
@@ -2771,55 +2971,114 @@ dev.off()
 # bio.dat2$WY=WY(bio.dat2$Date)
 
 ## From "Phyto-Cyano-Zoop-Proto" PLSF database
-bio.dat.head=read.xlsx(paste0(data.path,"PLSF Database Phyto-Cyano-Zoop-Proto.xlsx"))[1:2,]
-bio.dat.head=t(bio.dat.head)
-bio.dat.head=cbind(data.frame(spp=rownames(bio.dat.head)),bio.dat.head)
-colnames(bio.dat.head)=c("spp","col1","col2")
-unique(bio.dat.head$col1)
-bio.dat.head$col1=with(bio.dat.head,ifelse(col1=="Concentration","Conc",
-                                           ifelse(col1=="Total biovolume","biovol",
-                                                  ifelse(col1=="Total biomass","biomass",NA))))
-unique(bio.dat.head$col2)
-unit.xwalk=data.frame(col2=c(NA, "cells/ml", "µm3/mL", "#/L", "µg/L"),
-           col2a=c(NA,"cells.mL","um3.mL","num.L","ug.L"))
-bio.dat.head$col2=with(bio.dat.head,ifelse(col2=="cells/ml","cells.mL",
-                                           ifelse(col2=="µm3/mL","um3.mL",
-                                                  ifelse(col2=="#/L","num.L",
-                                                         ifelse(col2== "µg/L","ug.L",NA)))))
-# bio.dat.head=merge(bio.dat.head,unit.xwalk,"col2",all.x=T,sort=F)
-bio.dat.head$head.val=with(bio.dat.head,ifelse(spp=="Date","Date",paste(spp,col1,col2,sep="_")))
+# bio.dat.head=read.xlsx(paste0(data.path,"PLSF Database Phyto-Cyano-Zoop-Proto.xlsx"))[1:2,]
+# bio.dat.head=t(bio.dat.head)
+# bio.dat.head=cbind(data.frame(spp=rownames(bio.dat.head)),bio.dat.head)
+# colnames(bio.dat.head)=c("spp","col1","col2")
+# unique(bio.dat.head$col1)
+# bio.dat.head$col1=with(bio.dat.head,ifelse(col1=="Concentration","Conc",
+#                                            ifelse(col1=="Total biovolume","biovol",
+#                                                   ifelse(col1=="Total biomass","biomass",NA))))
+# unique(bio.dat.head$col2)
+# unit.xwalk=data.frame(col2=c(NA, "cells/ml", "µm3/mL", "#/L", "µg/L"),
+#            col2a=c(NA,"cells.mL","um3.mL","num.L","ug.L"))
+# bio.dat.head$col2=with(bio.dat.head,ifelse(col2=="cells/ml","cells.mL",
+#                                            ifelse(col2=="µm3/mL","um3.mL",
+#                                                   ifelse(col2=="#/L","num.L",
+#                                                          ifelse(col2== "µg/L","ug.L",NA)))))
+# # bio.dat.head=merge(bio.dat.head,unit.xwalk,"col2",all.x=T,sort=F)
+# bio.dat.head$head.val=with(bio.dat.head,ifelse(spp=="Date","Date",paste(spp,col1,col2,sep="_")))
+# 
+# spp.check=strsplit(bio.dat.head$spp,"\\.")
+# # write.csv(data.frame(val=unique(sapply(spp.check,"[",1))),paste0(export.path,"PLSF_botia_genera.csv"),row.names = F)
+# 
+# 
+# bio.dat=read.xlsx(paste0(data.path,"PLSF Database Phyto-Cyano-Zoop-Proto.xlsx"),startRow = 4,colNames=F)
+# colnames(bio.dat)=bio.dat.head$head.val
+# bio.dat$Date=date.fun(convertToDate(bio.dat$Date))
+# bio.dat$Site="Lake_Outlet"
+# 
+# vars=c('Date',"Site",
+#        "Phytoplankton.total_biovol_um3.mL",
+#        "Zooplankton.total_biomass_ug.L",
+#        "Protozoa.total_biomass_ug.L")
+# bio.dat2=bio.dat[,vars]
 
-spp.check=strsplit(bio.dat.head$spp,"\\.")
-# write.csv(data.frame(val=unique(sapply(spp.check,"[",1))),paste0(export.path,"PLSF_botia_genera.csv"),row.names = F)
+## From raw data, species level
+plsf.phyto=read.csv(paste0(export.path,"PLSF_microscope_data_phyto.csv"))
+plsf.phyto$date=date.fun(plsf.phyto$date)
+plsf.phyto$month=as.numeric(format(plsf.phyto$date,"%m"))
+plsf.phyto$CY=as.numeric(format(plsf.phyto$date,"%Y"))
+plsf.phyto.biovol.mon=ddply(plsf.phyto,c("CY","month"),summarise,
+                            phyto.biovol.um3mL=sum(totbiovol.um3mL ,na.rm=T),
+                            N.samp=N.obs(totbiovol.um3mL))
 
+plsf.zoo=read.csv(paste0(export.path,"PLSF_microscope_data_zoo.csv"))
+plsf.zoo$date=date.fun(plsf.zoo$date)
+plsf.zoo$month=as.numeric(format(plsf.zoo$date,"%m"))
+plsf.zoo$CY=as.numeric(format(plsf.zoo$date,"%Y"))
+plsf.zoo.biomass.mon=ddply(plsf.zoo,c("CY","month"),summarise,
+                            zoo.biomass.ugL=sum(tot.biomass.ugL ,na.rm=T))
 
-bio.dat=read.xlsx(paste0(data.path,"PLSF Database Phyto-Cyano-Zoop-Proto.xlsx"),startRow = 4,colNames=F)
-colnames(bio.dat)=bio.dat.head$head.val
-bio.dat$Date=date.fun(convertToDate(bio.dat$Date))
-bio.dat$Site="Lake_Outlet"
+plsf.proto=read.csv(paste0(export.path,"PLSF_microscope_data_proto.csv"))
+plsf.proto$date=date.fun(plsf.proto$date)
+plsf.proto$month=as.numeric(format(plsf.proto$date,"%m"))
+plsf.proto$CY=as.numeric(format(plsf.proto$date,"%Y"))
+plsf.proto.biovol.mon=ddply(plsf.proto,c("CY","month"),summarise,
+                             proto.biovol.um3L=sum(tot.biovol.um3L ,na.rm=T))
 
-vars=c('Date',"Site",
-       "Phytoplankton.total_biovol_um3.mL",
-       "Zooplankton.total_biomass_ug.L",
-       "Protozoa.total_biomass_ug.L")
-bio.dat2=bio.dat[,vars]
+fill.dat=data.frame(expand.grid(month=1:12,CY=2010:2020))
+
+bio.dat2=merge(fill.dat,
+               plsf.phyto.biovol.mon[,c("CY","month","phyto.biovol.um3mL")],
+               c("CY","month"),all.x=T)
+bio.dat2=merge(bio.dat2,
+               plsf.zoo.biomass.mon,
+               c("CY","month"),all.x=T)
+bio.dat2=merge(bio.dat2,
+               plsf.proto.biovol.mon,
+               c("CY","month"),all.x=T)
+bio.dat2$Date=with(bio.dat2,date.fun(paste(CY,month,"01",sep="-")))
+
 
 bio.dat2$winter=with(bio.dat2,ifelse(as.numeric(format(Date,"%m"))%in%c(12,1:2),1,0))
 bio.dat2$ice.period=with(bio.dat2,ifelse(as.numeric(format(Date,"%m"))%in%c(12,1:4),"Ice","NoIce"))
 bio.dat2$WY=WY(bio.dat2$Date)
+
+bio.dat2$Site="Lake_Outlet"
+
+
+###  
+phyto.metrics=read.csv(paste0(export.path,"PLSF_microscope_phyto_mertrics.csv"))
+phyto.metrics$date=date.fun(phyto.metrics$date)
+phyto.metrics$winter=with(phyto.metrics,ifelse(as.numeric(format(date,"%m"))%in%c(12,1:2),1,0))
+phyto.metrics$ice.period=with(phyto.metrics,ifelse(as.numeric(format(date,"%m"))%in%c(12,1:4),"Ice","NoIce"))
+phyto.metrics$WY=WY(phyto.metrics$date)
+phyto.metrics$dec.Date=lubridate::decimal_date(phyto.metrics$date)
+
+
+with(phyto.metrics,cor.test(dec.Date,richness,method="kendall"))
+with(subset(phyto.metrics,winter==1),cor.test(dec.Date,richness,method="kendall"))
+
+plot(richness~date,phyto.metrics)
+
+phyto.metrics.winter.mean=ddply(subset(phyto.metrics,winter==1),"WY",summarise,mean.val=mean(richness,na.rm=T))
+with(phyto.metrics.winter.mean,cor.test(WY,mean.val,method="kendall"))
+
+
 ### 
 
-kruskal.test(Phytoplankton.total_biovol_um3.mL~ice.period,bio.dat2)
-kruskal.test(Zooplankton.total_biomass_ug.L~ice.period,bio.dat2)
-kruskal.test(Protozoa.total_biomass_ug.L~ice.period,bio.dat2);#very limited data
+kruskal.test(phyto.biovol.um3mL~ice.period,bio.dat2)
+kruskal.test(zoo.biomass.ugL~ice.period,bio.dat2)
+kruskal.test(proto.biovol.um3L~ice.period,bio.dat2);#very limited data
 
-kruskal.test(Phytoplankton.total_biovol_um3.mL~ice.period,subset(bio.dat2,WY>2016))
-kruskal.test(Zooplankton.total_biomass_ug.L~ice.period,subset(bio.dat2,WY>2016))
+kruskal.test(phyto.biovol.um3mL~ice.period,subset(bio.dat2,WY>2016))
+kruskal.test(zoo.biomass.ugL~ice.period,subset(bio.dat2,WY>2016))
 
 mean.ice=ddply(bio.dat2,c("Site","ice.period","WY"),summarise,
-               mean.phyto=mean(Phytoplankton.total_biovol_um3.mL,na.rm=T),
-               mean.zoo=mean(Zooplankton.total_biomass_ug.L,na.rm=T),
-               mean.proto=mean(Protozoa.total_biomass_ug.L,na.rm=T))
+               mean.phyto=mean(phyto.biovol.um3mL,na.rm=T),
+               mean.zoo=mean(zoo.biomass.ugL,na.rm=T),
+               mean.proto=mean(proto.biovol.um3L,na.rm=T))
 
 plot(mean.phyto~WY,subset(mean.ice,Site=="Lake_Outlet"&ice.period=="NoIce"))
 points(mean.phyto~WY,subset(mean.ice,Site=="Lake_Outlet"&ice.period=="Ice"),pch=21,bg="blue")
@@ -2838,18 +3097,20 @@ bio.dat2.outlet[bio.dat2.outlet$zoo_biomass_ugL%in%0,]=NA
 bio.dat2.outlet$month=as.numeric(format(bio.dat2.outlet$Date,'%m'))
 bio.dat2.outlet$CY=as.numeric(format(bio.dat2.outlet$Date,'%Y'))
 
-range(subset(bio.dat2.outlet,is.na(phyto_biovol_um3mL)==F)$Date)
-range(subset(bio.dat2.outlet,is.na(zoo_biomass_ugL)==F)$Date)
-range(subset(bio.dat2.outlet,is.na(proto_biomass_ugL)==F)$Date)
+bio.dat2.outlet=bio.dat2
 
-range(bio.dat2.outlet$Phytoplankton.total_biovol_um3.mL,na.rm=T)/1e6; # mm2/L
-range(bio.dat2.outlet$Zooplankton.total_biomass_ug.L,na.rm=T)/1e3
-range(bio.dat2.outlet$Protozoa.total_biomass_ug.L,na.rm=T)/1e6
+range(subset(bio.dat2.outlet,is.na(phyto.biovol.um3mL)==F)$Date)
+range(subset(bio.dat2.outlet,is.na(zoo.biomass.ugL)==F)$Date)
+range(subset(bio.dat2.outlet,is.na(proto.biovol.um3L)==F)$Date)
 
-bio.dat2.outlet=subset(bio.dat2.outlet,
-       is.na(Phytoplankton.total_biovol_um3.mL)==F|is.na(Zooplankton.total_biomass_ug.L)==F|is.na(Protozoa.total_biomass_ug.L)==F)
-
-bio.dat2.outlet=merge(bio.dat2.outlet,data.frame(expand.grid(CY=2009:2020,month=1:12)),c("CY","month"),all.y=T)
+range(bio.dat2.outlet$phyto.biovol.um3mL,na.rm=T)/1e6; # mm2/L from (um3/mL)
+range(bio.dat2.outlet$zoo.biomass.ugL,na.rm=T)/1e3
+range(bio.dat2.outlet$proto.biovol.um3L,na.rm=T)/1e9; #mm2/L (from um3/L)
+# 
+# bio.dat2.outlet=subset(bio.dat2.outlet,
+#        is.na(Phytoplankton.total_biovol_um3.mL)==F|is.na(Zooplankton.total_biomass_ug.L)==F|is.na(Protozoa.total_biomass_ug.L)==F)
+# 
+# bio.dat2.outlet=merge(bio.dat2.outlet,data.frame(expand.grid(CY=2009:2020,month=1:12)),c("CY","month"),all.y=T)
 
 cols=c("olivedrab3","seashell3","black")
 # png(filename=paste0(plot.path,"PLSF_Biota.png"),width=6.5,height=4.5,units="in",res=200,type="windows",bg="white")
@@ -2860,7 +3121,7 @@ xlim.val=date.fun(c("2009-12-01","2020-12-1"));by.x=0.5;xmaj=seq(xlim.val[1],xli
 xlim.val2=c(1,12);by.x=3;xmaj2=seq(xlim.val2[1],xlim.val2[2],by.x);xmin2=seq(xlim.val2[1],xlim.val2[2],by.x/by.x)
 
 ylim.val=c(1e4,5e8);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
-plot(Phytoplankton.total_biovol_um3.mL~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+plot(phyto.biovol.um3mL~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
 yr.val=seq(2008,2021,1)
 for(i in 1:length(yr.val)){
@@ -2870,19 +3131,19 @@ for(i in 1:length(yr.val)){
   yy=c(1e3,1e3,5e9,5e9)
   polygon(xx,yy,col=adjustcolor("lightblue",0.5),border="grey")
 }
-with(bio.dat2.outlet,pt_line(Date,Phytoplankton.total_biovol_um3.mL,2,cols[1],1,21,cols[1],pt.lwd=0.01))
+with(bio.dat2.outlet,pt_line(Date,phyto.biovol.um3mL,2,cols[1],1,21,cols[1],pt.lwd=0.01))
 # axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5)
 axis_fun(1,xmaj,xmin,NA,line=-0.5)
 axis_fun(2,ymaj,ymin,format(ymaj/1e6,scientific=F));box(lwd=1)
 mtext(side=2,line=4,"Phytoplankton\nBiovolume (mm\u00B3 L\u207B\u00B9)",cex=0.8)
 
-plot(Phytoplankton.total_biovol_um3.mL~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
+plot(phyto.biovol.um3mL~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
 xx1=c(11.5,12.5)
 xx2=c(0,4.5)
 polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.5),border="grey")
 polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.5),border="grey")
-points(Phytoplankton.total_biovol_um3.mL~month,bio.dat2.outlet,pch=21,bg=cols[1],lwd=0.01)
+points(phyto.biovol.um3mL~month,bio.dat2.outlet,pch=21,bg=cols[1],lwd=0.01)
 # axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
 axis_fun(1,xmaj2,xmin2,NA,line=-0.5)
 axis_fun(2,ymaj,ymin,NA);box(lwd=1)
@@ -2892,7 +3153,7 @@ axis_fun(2,ymaj,ymin,NA);box(lwd=1)
 # lines(mod.pred~x.val,lwd=2,col=adjustcolor("red",0.5))
 
 ylim.val=c(1,3e4);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
-plot(Zooplankton.total_biomass_ug.L~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+plot(zoo.biomass.ugL~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
 yr.val=seq(2008,2021,1)
 for(i in 1:length(yr.val)){
@@ -2902,25 +3163,25 @@ for(i in 1:length(yr.val)){
   yy=c(0.01,0.01,3e5,3e5)
   polygon(xx,yy,col=adjustcolor("lightblue",0.5),border="grey")
 }
-with(bio.dat2.outlet,pt_line(Date,Zooplankton.total_biomass_ug.L,2,cols[2],1,21,cols[2],pt.lwd=0.01))
+with(bio.dat2.outlet,pt_line(Date,zoo.biomass.ugL,2,cols[2],1,21,cols[2],pt.lwd=0.01))
 # axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5)
 axis_fun(1,xmaj,xmin,NA,line=-0.5)
 axis_fun(2,ymaj,ymin,format(ymaj/1e3,scientific=F));box(lwd=1)
 mtext(side=2,line=4,"Zooplankton\nBiomass (mg L\u207B\u00B9)",cex=0.8)
 
-plot(Zooplankton.total_biomass_ug.L~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
+plot(zoo.biomass.ugL~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
 xx1=c(11.5,12.5)
 xx2=c(0,4.5)
 polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.5),border="grey")
 polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.5),border="grey")
-points(Zooplankton.total_biomass_ug.L~month,bio.dat2.outlet,pch=21,bg=cols[2],lwd=0.01)
+points(zoo.biomass.ugL~month,bio.dat2.outlet,pch=21,bg=cols[2],lwd=0.01)
 # axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
 axis_fun(1,xmaj2,xmin2,NA,line=-0.5)
 axis_fun(2,ymaj,ymin,NA);box(lwd=1)
 
 ylim.val=c(1e5,1e9);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
-plot(Protozoa.total_biomass_ug.L~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+plot(proto.biovol.um3L~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
 yr.val=seq(2008,2021,1)
 for(i in 1:length(yr.val)){
@@ -2930,19 +3191,19 @@ for(i in 1:length(yr.val)){
   yy=c(0.01,0.01,1e10,1e10)
   polygon(xx,yy,col=adjustcolor("lightblue",0.5),border="grey")
 }
-with(bio.dat2.outlet,pt_line(Date,Protozoa.total_biomass_ug.L,2,cols[3],1,21,cols[3],pt.lwd=0.01))
+with(bio.dat2.outlet,pt_line(Date,proto.biovol.um3L,2,cols[3],1,21,cols[3],pt.lwd=0.01))
 axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5)
-axis_fun(2,ymaj,ymin,format(ymaj/1e6,scientific=F));box(lwd=1);# convert um3/L to mm3/L
+axis_fun(2,ymaj,ymin,format(ymaj/1e9,scientific=F));box(lwd=1);# convert um3/L to mm3/L
 mtext(side=2,line=4,"Protozoa\nBiovolume (mm\u00B3 L\u207B\u00B9)",cex=0.8)
 mtext(side=1,line=1.75,"Date (Month-Year)")
 
-plot(Protozoa.total_biomass_ug.L~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
+plot(proto.biovol.um3L~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
 abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
 xx1=c(11.5,12.5)
 xx2=c(0,4.5)
 polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.5),border="grey")
 polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.5),border="grey")
-points(Protozoa.total_biomass_ug.L~month,bio.dat2.outlet,pch=21,bg=cols[3],lwd=0.01)
+points(proto.biovol.um3L~month,bio.dat2.outlet,pch=21,bg=cols[3],lwd=0.01)
 axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
 axis_fun(2,ymaj,ymin,NA);box(lwd=1)
 mtext(side=1,line=1.75,"Month")

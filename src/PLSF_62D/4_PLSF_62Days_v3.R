@@ -729,7 +729,7 @@ MC.dom=with(top_abund2.wq,ifelse(Microcystis>0.75,"MCDom","other"))
 tmp=top_abund2.wq$Date# seq(consec.event[1],consec.event[2],"1 days")
 i1=length(tmp)/3
 # date.cat=split(tmp, rep(1:3, c(ceiling(i1), round(i1), floor(i1))))
-date.cat=sort((seq_along(top_abund2.wq$Date)-1)%%3)
+date.cat=sort((seq_along(top_abund2.wq$Date)-1)%%3)+1
 date.cat.labs=ddply(data.frame(Date=top_abund2.wq$Date,cat=date.cat),"cat",summarise,
                     min.val=min(Date),max.val=max(Date))
 
@@ -780,7 +780,9 @@ legend("topleft",legend=c(date.cat.labs.leg,"Microcystin spp > 0.5"),
 
 dev.off()
 
-# PCoA
+
+## PCoA --------------------------------------------------------------------
+
 # from https://archetypalecology.wordpress.com/2018/02/19/principal-coordinates-analysis-pcoa-in-r/
 library(ecodist)
 
@@ -896,6 +898,8 @@ plot(y~clusters,pcoa_clust$data,type="b")
 eclust.rslt=factoextra::eclust(scrs[,c(1,2)], "kmeans", hc_metric="eucliden",k=3)
 eclust.rslt$cluster
 
+# png(filename=paste0(plot.path,"PLSF_62d_PCoA_clusters.png"),width=6.5,height=4.5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.75,0.5),oma=c(2,2,0.25,0.5));
 
 xlim.val=c(-0.6,0.6);by.x=0.2;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/2);
 ylim.val=c(-0.6,0.4);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
@@ -907,13 +911,40 @@ points(scrs[,c(1,2)],pch=21,bg="grey",col="grey40",cex=1,lwd=0.5);
 text(spp_scrs,row.names(spp_scrs),cex=0.8,font=2,col="black")
 # text(scrs[,1],scrs[,2],consec.day.vals)
 axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj),1);
-axis_fun(2,ymaj,ymin,format(ymaj),1); 
+axis_fun(2,ymaj,ymin,format(ymaj),1); box(lwd=1)
 mtext(side=1,line=1.5,"Dim 1");
 mtext(side=2,line=2.25,"Dim 2");
+
+date.cat.labs.leg=c(with(date.cat.labs,paste0(c("Beginning","Middle","End")," (",format(min.val,"%d %b")," - ",format(max.val,"%d %b"),')')),
+                       paste0("k-means cluster ",1:3))
+legend("bottomleft",legend=c(date.cat.labs.leg),
+       pch=21,pt.bg=c(rep(NA,3),adjustcolor(time.cols,0.25)),
+       lty=NA,lwd=c(1.5,1.5,1.5,0.1,0.1,0.1),col=c(time.cols,rep("grey",3)),
+       pt.cex=c(2),ncol=2,cex=0.8,bty="n",y.intersp=0.9,x.intersp=0.75,xpd=NA,xjust=0.5,yjust=1)
+dev.off()
 
 
 
 top_abund2.wq$PCoA_clust=eclust.rslt$cluster
+# png(filename=paste0(plot.path,"PLSF_62d_PCoA_kmeancluster_ts.png"),width=6.5,height=3.5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.75,0.5),oma=c(2,2,0.25,0.5));
+xlim.val=date.fun(c("2019-06-15","2019-08-20"));xmaj=seq(xlim.val[1],xlim.val[2],"4 weeks");xmin=seq(xlim.val[1],xlim.val[2],"1 week")
+ylim.val=c(1,3);by.y=1;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
+
+plot(PCoA_clust~Date,top_abund2.wq,ylim=ylim.val,xlim=xlim.val,type="n",axes=F,ann=F)
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.5)
+# points(PCoA_clust~Date,top_abund2.wq,pch=21,bg=time.cols[top_abund2.wq$PCoA_clust],lwd=0.01)
+abline(v=c(date.cat.labs[1:3,3],date.cat.labs[1,2]),lty=2)
+with(top_abund2.wq,pt_line(Date,PCoA_clust,1,adjustcolor("grey",0.5),1.5,
+                           21,time.cols[top_abund2.wq$PCoA_clust],
+                           pt.lwd=0.01,cex=1.5))
+
+axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj,"%m-%d"),1);
+axis_fun(2,ymaj,ymin,format(ymaj),1); box(lwd=1)
+mtext(side=1,line=1.5,"Date (Month-Day 2019)");
+mtext(side=2,line=2.25,"k-mean cluster");
+dev.off()
+
 tmp=dcast(melt(top_abund2.wq[,8:ncol(top_abund2.wq)],id.vars = "PCoA_clust"),PCoA_clust~variable,value.var = "value",mean)
 
 barplot(tmp$TN_TP)

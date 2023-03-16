@@ -1,0 +1,449 @@
+ID,GenusSpp,GenusSpp_clean
+1,Asterionella formosa,Asterionella formosa
+2,Aulacoseira sp #1,Aulacoseira sp
+3,Cyclotella sp,Cyclotella sp
+4,Coelastrum sp,Coelastrum sp
+5,Cosmarium sp,Cosmarium sp
+6,Crucigenia tetrapedia,Crucigenia tetrapedia
+7,Crucigeniella crucifera,Crucigeniella crucifera
+8,Desmodesmus communis,Desmodesmus communis
+9,Elakatothrix genevensis,Elakatothrix genevensis
+10,Golenkinia radiata ,Golenkinia radiata 
+11,Oocystis pusilla ,Oocystis pusilla 
+12,Oocystis solitaria,Oocystis solitaria
+13,Pediastrum biradiatum,Pediastrum biradiatum
+14,Pediastrum boryanum,Pediastrum boryanum
+15,Pediastrum duplex,Pediastrum duplex
+16,Pediastrum tetras,Pediastrum tetras
+17,Quadrigula closterioides,Quadrigula closterioides
+18,Scenedesmus ellipticus,Scenedesmus ellipticus
+19,Selenastrum capricornutum ,Selenastrum capricornutum 
+20,Sphaerocystis schroeteri ,Sphaerocystis schroeteri 
+21,Tetraedron caudata,Tetraedron caudata
+22,Tetraëdron minimum,Tetraëdron minimum
+23,Tetraëdron trigonum,Tetraëdron trigonum
+24,Cryptomonas erosa,Cryptomonas erosa
+25,Chroococcus minutus,Chroococcus minutus
+26,Dolichosprmum sp,Dolichosprmum sp
+27,Microcystis aeruginosa,Microcystis aeruginosa
+28,Ceratium sp,Ceratium sp
+29,Euglena sp,Euglena sp
+30,Trachelomonas sp,Trachelomonas sp
+31,Navicula,Navicula
+32,Chlamydomonas,Chlamydomonas
+33,Monoraphidium komarkovae,Monoraphidium komarkovae
+34,Kephyrion sp,Kephyrion sp
+35,Cryptomonas curvata,Cryptomonas curvata
+36,Cryptomonas marssonii,Cryptomonas marssonii
+37,Cryptomonas ovata  ,Cryptomonas ovata  
+38,Plagioselmis nannoplanctica,Plagioselmis nannoplanctica
+39,Pseudanabaena,Pseudanabaena
+40,Glenodinium,Glenodinium
+41,Euglena,Euglena
+42,Phacus,Phacus
+43,Nitzschia,Nitzschia
+44,Schroederia setigera ,Schroederia setigera 
+45,Peridinium sp,Peridinium sp
+46,Amphora sp,Amphora sp
+47,Navicula sp,Navicula sp
+48,Nitzschia sp,Nitzschia sp
+49,Gomphonema sp,Gomphonema sp
+50,Acutodesmus obliquus,Acutodesmus obliquus
+51,Cryptomonas sp,Cryptomonas sp
+52,Aulacoseira sp,Aulacoseira sp
+53,Cocconeis sp,Cocconeis sp
+54,Fragilaria sp,Fragilaria sp
+55,Navicula sp,Navicula sp
+56,Pennate diatoms(unid),diatom
+57,Synedra sp,Synedra sp
+58,Planktolyngbya limnetica,Planktolyngbya limnetica
+59,Glenodinium sp,Glenodinium sp
+60,Gymnodinium sp,Gymnodinium sp
+61,Lepocinclis sp,Lepocinclis sp
+62,Monomorphina sp,Monomorphina sp
+63,Phacus smulkowskianus,Phacus smulkowskianus
+64,Phacus sp,Phacus sp
+65,Cymbella sp,Cymbella sp
+66,Meridion sp,Meridion sp
+67,Nitzschia sp,Nitzschia sp
+68,Tabellaria sp,Tabellaria sp
+69,Tetrastrum glastrum,Tetrastrum glastrum
+70,Synura sp,Synura sp
+71,Cryptomonas reflexa,Cryptomonas reflexa
+72,Kateblepharis ovalis,Kateblepharis ovalis
+73,Chlamydomonas sp,Chlamydomonas sp
+74,Chromulina sp,Chromulina sp
+75,Kephyrion sp,Kephyrion sp
+76,Mallomonas sp,Mallomonas sp
+77,Asterionella sp,Asterionella sp
+78,Aulacoseira sp 1,Aulacoseira sp
+79,Aulacoseira sp 2,Aulacoseira sp
+80,Sellaphora sp,Sellaphora sp
+81,Acutodesmus dimorphus,Acutodesmus dimorphus
+82,Desmodesmus abundans,Desmodesmus abundans
+83,Desmodesmus armatus,Desmodesmus armatus
+84,Dictyospaerium pulchellum,Dictyospaerium pulchellum
+85,Kirchneriella obesa,Kirchneriella obesa
+86,Monoraphidium arcuatum,Monoraphidium arcuatum
+87,Tetraedron caudatum,Tetraedron caudatum
+88,Cryptomonas parapyrenoidifera,Cryptomonas parapyrenoidifera
+89,Aphanothece sp,Aphanothece sp
+90,Chroococcus sp,Chroococcus sp
+91,Sphaerocystis schroeteri,Sphaerocystis schroeteri
+92,Chroomonas nordstedtii,Chroomonas nordstedtii
+93,Cryptomonas brevis,Cryptomonas brevis
+94,Aphanizomenon flosaquae,Aphanizomenon flosaquae
+95,Cuspdothrix issatschenkoi,Cuspdothrix issatschenkoi
+96,Dolichosprmum crassum,Dolichosprmum crassum
+97,Dolichosprmum flosaquae,Dolichosprmum flosaquae
+98,Dolichosprmum mendotae,Dolichosprmum mendotae
+99,Stephanodiscus sp,Stephanodiscus sp
+100,Dichotomococcus curvatus,Dichotomococcus curvatus
+101,Dictyospaerium Ehrenbergianum,Dictyospaerium Ehrenbergianum
+102,Cryptomonas phaseolus,Cryptomonas phaseolus
+103,Dolichosprmum flos-aquae,Dolichosprmum flos-aquae
+104,Dolichosprmum sproides,Dolichosprmum sproides
+105,Ceratium hirundinella,Ceratium hirundinella
+106,Desmodesmus opoliensis,Desmodesmus opoliensis
+107,Goniochloris mutica,Goniochloris mutica
+108,Monoraphidium minutum,Monoraphidium minutum
+109,Oocystis parva,Oocystis parva
+110,Scenedesmus arcuatus,Scenedesmus arcuatus
+111,Cryptomonas pyrenoidifera,Cryptomonas pyrenoidifera
+112,Aphanocapsa holsatica,Aphanocapsa holsatica
+113,Aphanocapsa incerta,Aphanocapsa incerta
+114,Oscillatoria sp,Oscillatoria sp
+115,Planktothrix agardhii,Planktothrix agardhii
+116,Snowella lacustris,Snowella lacustris
+117,Woronichinia naegeliana,Woronichinia naegeliana
+118,Stephanodiscus,Stephanodiscus
+119,Coelastrum spaericum,Coelastrum spaericum
+120,Scenedesmus bijuga,Scenedesmus bijuga
+121,Aphanocapsa,Aphanocapsa
+122,Chroococcus,Chroococcus
+123,Dolichosprmum,Dolichosprmum
+124,Kirchneriella contorta,Kirchneriella contorta
+125,Dinobryon sp,Dinobryon sp
+126,Aphanocapsa sp,Aphanocapsa sp
+127,Oscillatoriales,Oscillatoriales
+128,Mallomonas,Mallomonas
+129,Microcystis wesenbergii,Microcystis wesenbergii
+130,Komvophoron sp,Komvophoron sp
+131,Melosira varians,Melosira varians
+132,Synedra ulna,Synedra ulna
+133,Tetraselmis cordiformis,Tetraselmis cordiformis
+134,Aulacoseira,Aulacoseira
+135,Cyclotella,Cyclotella
+136,Staurastrum,Staurastrum
+137,Closterium,Closterium
+138,Cryptomonas,Cryptomonas
+139,Coelospaerium kuetzingianum,Coelospaerium kuetzingianum
+140,Cosmarium,Cosmarium
+141,Desmodesmus costato-granulatus,Desmodesmus costato-granulatus
+142,Lagerheimia ciliata,Lagerheimia ciliata
+143,Nephrocytium agardhianum ,Nephrocytium agardhianum 
+144,Selenastrum bibraianum,Selenastrum bibraianum
+145,Tetrastrum glabrum,Tetrastrum glabrum
+146,Kephyrion,Kephyrion
+147,Aphanizomenon flos-aquae,Aphanizomenon flos-aquae
+148,Merismopedia punctata,Merismopedia punctata
+149,Romeria,Romeria
+150,Unidentified coccoid,UNK
+151,Oocystis borgei,Oocystis borgei
+152,Aphanocapsa conferta,Aphanocapsa conferta
+153,Chroococcus turgidus,Chroococcus turgidus
+154,Acutodesmus pectinatus,Acutodesmus pectinatus
+155,Desmodesmus brasiliensis,Desmodesmus brasiliensis
+156,Desmodesmus sp,Desmodesmus sp
+157,Monoraphidium griffithi,Monoraphidium griffithi
+158,Tetraspra sp,Tetraspra sp
+159,Aphanocapsa planctonica,Aphanocapsa planctonica
+160,Chroococcus limneticus,Chroococcus limneticus
+161,Snowella litoralis,Snowella litoralis
+162,Aulacoseira pusilla,Aulacoseira pusilla
+163,Closteriopsis acicularis,Closteriopsis acicularis
+164,Crucigenia truncata ,Crucigenia truncata 
+165,Pediastrum simplex,Pediastrum simplex
+166,Aphanizomenon sp,Aphanizomenon sp
+167,Chroococcus microscopicus,Chroococcus microscopicus
+168,Microcystis sp,Microcystis sp
+169,Kirchneriella irregularis,Kirchneriella irregularis
+170,Scenedesmus sp,Scenedesmus sp
+171,Tetrastrum staurogeniiforme,Tetrastrum staurogeniiforme
+172,Tetrastrum triangulare,Tetrastrum triangulare
+173,Strombomonas sp,Strombomonas sp
+174,Chrysochromulina parva,Chrysochromulina parva
+175,Fragilaria,Fragilaria
+176,Desmodesmus,Desmodesmus
+177,Oocystis,Oocystis
+178,Microcystis,Microcystis
+179,Cocconeis,Cocconeis
+180,Aphanothece,Aphanothece
+181,Misc. dinoflagellates,dinoflagellate
+182,Unidentified centric chain,UNK
+183,Acutodesmus acuminatus,Acutodesmus acuminatus
+184,Coenococcus planctonicus,Coenococcus planctonicus
+185,Crucigenia quadrata,Crucigenia quadrata
+186,Eudorina elegans,Eudorina elegans
+187,Gloeocystis sp,Gloeocystis sp
+188,"Green speres, solitary",UNK
+189,Kirchneriella lunaris,Kirchneriella lunaris
+190,Lagerheimia sp,Lagerheimia sp
+191,Micractinium pusillum ,Micractinium pusillum 
+192,Monoraphidium irregulare,Monoraphidium irregulare
+193,Oocystis sp,Oocystis sp
+194,Tetrabaena socialis,Tetrabaena socialis
+195,Dolichosprmum circinalis,Dolichosprmum circinalis
+196,Colonial greens,Colonial greens
+197,Crucigenia sp,Crucigenia sp
+198,Kirchneriella subsolitaria,Kirchneriella subsolitaria
+199,Pseudodidymocystis planctonica,Pseudodidymocystis planctonica
+200,Cryptomonas tetrapyrenoidosa,Cryptomonas tetrapyrenoidosa
+201,Cyanophyte colony,Cyanophyte colony
+202,Dolichosprmum circinale,Dolichosprmum circinale
+203,Green flagellate,Green flagellate
+204,Staurastrum sp,Staurastrum sp
+205,Aphanocapsa elegans,Aphanocapsa elegans
+206,Goniochloris sculpta,Goniochloris sculpta
+207,Microcystis flos aquae,Microcystis flos aquae
+208,Planktothrix sp,Planktothrix sp
+209,Woronichinia sp,Woronichinia sp
+210,Monoraphidium griffithii,Monoraphidium griffithii
+211,Chroococcus disprsus,Chroococcus disprsus
+212,Chlorogonium elongatum,Chlorogonium elongatum
+213,Aulacoseira sp #2,Aulacoseira sp
+214,Actinastrum gracillimum,Actinastrum gracillimum
+215,Closterium aciculare,Closterium aciculare
+216,Dictyospaerium pulchellum ,Dictyospaerium pulchellum 
+217,Monoraphidium contortum,Monoraphidium contortum
+218,Aphanocapsa delicatissima,Aphanocapsa delicatissima
+219,Merismopedia minima,Merismopedia minima
+220,Crucigenia fenestrata,Crucigenia fenestrata
+221,Desmodesmus armatus var. bicaudatus,Desmodesmus armatus
+222,Gloeocystis planctonica,Gloeocystis planctonica
+223,Lagerheimia quadriseta,Lagerheimia quadriseta
+224,Nephrochlamys rostrata,Nephrochlamys rostrata
+225,Oocystis parva ,Oocystis parva 
+226,Pediastrum angulosum,Pediastrum angulosum
+227,Pediastrum duplex gracilimum,Pediastrum
+228,Tetrastrum heteracanthum,Tetrastrum heteracanthum
+229,Desmodesmus subspcatus,Desmodesmus subspcatus
+230,Scenedesmus obtusus ,Scenedesmus obtusus 
+231,Sorastrum americanum ,Sorastrum americanum 
+232,Tetraedron trigonum ,Tetraedron trigonum 
+233,Merismopedia minima ,Merismopedia minima 
+234,Coelastrum microporum,Coelastrum microporum
+235,Crucigeniella rectangularis,Crucigeniella rectangularis
+236,Desmodesmus intermedius,Desmodesmus intermedius
+237,Lagerheimiella genevensis,Lagerheimiella genevensis
+238,Lagerheimiella longiseta,Lagerheimiella longiseta
+239,Ochromonas sp,Ochromonas sp
+240,Chroomonas nordstedtii ,Chroomonas nordstedtii 
+241,Aphanocapsa delicatissima ,Aphanocapsa delicatissima 
+242,Planktothrix agardhii ,Planktothrix agardhii 
+243,Actinastrum hantzschii,Actinastrum hantzschii
+244,Closteriiopsis longissima,Closteriiopsis longissima
+245,Coronastrum ellipsoideum,Coronastrum ellipsoideum
+246,Desmodesmus denticulatus,Desmodesmus denticulatus
+247,Scenedesmus quadricauda,Scenedesmus quadricauda
+248,Coelospaerium subarcticum,Coelospaerium subarcticum
+249,Pseudanabaena sp,Pseudanabaena sp
+250,Unid. Coccoids (<5µ),UNK
+251,Kirchneriella sp,Kirchneriella sp
+252,Oocystis solitaria Whitrock,Oocystis solitaria
+253,Tetraedron muticum,Tetraedron muticum
+254,Chrysococcus sp,Chrysococcus sp
+255,Rhodomonas lens,Rhodomonas lens
+256,Rhodomonas minuta,Rhodomonas minuta
+257,Chroococcus disprsus ,Chroococcus disprsus 
+258,Snowella sp,Snowella sp
+259,Synechocystis sp,Synechocystis sp
+260,Aulacoseira granulata v. angustissima,Aulacoseira granulata
+261,Aulacoseira ambigua,Aulacoseira ambigua
+262,centric diatom sp,diatom
+263,Epithemia sp,Epithemia sp
+264,pennate diatom sp,diatom
+265,Monoraphidium circinale,Monoraphidium circinale
+266,chlorophyte colony sp,chlorophyte
+267,Scenedesmus sempervirens,Scenedesmus sempervirens
+268,"chlorophyte unicell, spere  2.5-5um sp",chlorophyte
+269,Scenedesmus sp,Scenedesmus sp
+270,"chlorophyte unicell, oval  2.5-5um sp",chlorophyte
+271,Tetraedron minimum,Tetraedron minimum
+272,Tetrastrum staurogeniaeforme,Tetrastrum staurogeniaeforme
+273,"chlorophyte unicell, spere  5-7.5um sp",chlorophyte
+274,Lagerheimia subsalsa,Lagerheimia subsalsa
+275,Dictyospaerium ehrenbergianum,Dictyospaerium ehrenbergianum
+276,Cyanocatena sp,Cyanocatena sp
+277,cyanophyte tetrad sp,cyanophyte
+278,Cyanodictyon sp,Cyanodictyon sp
+279,cyanophyte colony sp,cyanophyte
+280,"cyanophyte unicell, spere  2.5-5um sp",cyanophyte
+281,"cyanophyte unicell, oval/rod  2.5-5um sp",cyanophyte
+282,Planktolyngyba limnetica,Planktolyngyba limnetica
+283,Microcystis botrys,Microcystis botrys
+284,Trachelomonas volvocina,Trachelomonas volvocina
+285,"unicell, spere  2.5-5um sp",UNK
+286,"unicell, spere  5-7.5um sp",UNK
+287,unknown flagellate sp,UNK
+288,unknown unicell sp,UNK
+289,Goniochloris sp,Goniochloris sp
+290,Pseudostaurastrum limneticum,Pseudostaurastrum limneticum
+291,Fragilaria capucina,Fragilaria capucina
+292,Gyrosigma sp,Gyrosigma sp
+293,chlorophyte unicell sp,chlorophyte
+294,Botryococcus braunii,Botryococcus braunii
+295,cryptophyte sp,cryptophyte sp
+296,Cryptomonas cf. ovata,Cryptomonas ovata
+297,Microcystis cf. smithii (colony),Microcystis smithii 
+298,Pseudanbaena mucicola,Pseudanbaena mucicola
+299,Aphanizomenon cf. klebahnii,Aphanizomenon klebahnii
+300,Anabaena sp,Anabaena sp
+301,Microcystis cf. smithii (unicell),Microcystis smithii 
+302,Microcystis cf. smithii (cell pair),Microcystis smithii 
+303,Cyanogranis ferruginea,Cyanogranis ferruginea
+304,Aphanizomenon issatschenkoi,Aphanizomenon issatschenkoi
+305,Phormidium sp,Phormidium sp
+306,Pseudanbaena sp,Pseudanbaena sp
+307,Trachelomonas hispda,Trachelomonas hispda
+308,microflagellate sp,microflagellate sp
+309,cf. Gymnodinium sp,Gymnodinium sp
+310,xanthophyte unicell sp,xanthophyte
+311,Scenedesmus disciformis,Scenedesmus disciformis
+312,Pandorina morum,Pandorina morum
+313,Didymocystis sp,Didymocystis sp
+314,Fusola viridis,Fusola viridis
+315,Cryptomonas ovata,Cryptomonas ovata
+316,Anabaena cf. crassa,Anabaena crassa
+317,Anabaena flos-aquae,Anabaena
+318,Microcystis cf. protocystis,Microcystis protocystis
+319,Microcystis sp,Microcystis sp
+320,Aphanizomenon cf. flos-aquae,Aphanizomenon
+321,Pseudanabaena mucicola,Pseudanabaena mucicola
+322,Coelomoron/Snowella sp,Snowella sp
+323,Cymbella/Encyonema sp,Encyonema sp
+324,Pinnularia sp,Pinnularia sp
+325,Coenochloris fottii,Coenochloris fottii
+326,Schroederia setigera,Schroederia setigera
+327,Oocystis sp,Oocystis sp
+328,Monoraphidium sp,Monoraphidium sp
+329,Closterium sp,Closterium sp
+330,Didymocystis fina,Didymocystis fina
+331,chlorophyte sp,chlorophyte sp
+332,Anabaena mendotae,Anabaena mendotae
+333,Microcystis sp(unicell),Microcystis sp
+334,Microcystis sp(cell pair),Microcystis sp
+335,Spirulina sp,Spirulina sp
+336,Cyanocatena planctonica,Cyanocatena planctonica
+337,Woronichinia naegeliana (unicell),Woronichinia naegeliana
+338,Woronichinia naegeliana (cell pair),Woronichinia naegeliana
+339,"cyanophyte unicelll, oval/rod  2.5-5um sp",cyanophyte
+340,Woronichinia naegeliana (colony),Woronichinia naegeliana
+341,"chlorophyte unicell, oval  5-7.5um sp",chlorophyte
+342,Monoraphidium nanum,Monoraphidium nanum
+343,Anabaena sproides,Anabaena sproides
+344,Nitzschia acicularis,Nitzschia acicularis
+345,Aphanizomenon klebahnii,Aphanizomenon klebahnii
+346,Planktolyngbya sp,Planktolyngbya sp
+347,cyanophyte cell pair sp,cyanophyte
+348,Synedra acus/ulna,Synedra acus
+349,Quadricoccus ellipticus,Quadricoccus ellipticus
+350,Dichotomococcus sp,Dichotomococcus sp
+351,"chlorophyte cell pair, oval sp",chlorophyte
+352,"chlorophyte cell pair, spere sp",chlorophyte
+353,Microcystis/Anabaena sp(cell pair),Anabaena sp
+354,Microcystis/Anabaena sp(unicell),Anabaena sp
+355,euglenophyte sp,euglenophyte sp
+356,Aulacoseira cf. italica,Aulacoseira italica
+357,Achnanthdium sp,Achnanthdium sp
+358,Aulacoseira granulata,Aulacoseira granulata
+359,Koliella/Monoraphidium sp,Monoraphidium sp
+360,cf. Coenocystis sp,Coenocystis sp
+361,Lagerheimia genevensis,Lagerheimia genevensis
+362,Closterium acutum v. variabile,Closterium acutum
+363,Treubaria schmidlei,Treubaria schmidlei
+364,Nephrocytium sp,Nephrocytium sp
+365,Anabaena cf. mendotae,Anabaena mendotae
+366,unknown flagellate sp,UNK
+367,Microcystis viridis,Microcystis viridis
+368,Anabaena lemmermannii,Anabaena lemmermannii
+369,chlorophyte cell pair sp,chlorophyte
+370,Crucigeniella sp,Crucigeniella sp
+371,Cyanodictyon imperfectum,Cyanodictyon imperfectum
+372,dinoflagellate sp,dinoflagellate
+373,Pseudostaurastrum sp,Pseudostaurastrum sp
+374,Dactylococcopsis irregularis,Dactylococcopsis irregularis
+375,Aulacoseira distans,Aulacoseira distans
+376,Amphiprora sp,Amphiprora sp
+377,Mucidospaerium pulchellum,Mucidospaerium pulchellum
+378,Tetrastrum elegans,Tetrastrum elegans
+379,Mucidospaerium sp,Mucidospaerium sp
+380,Pseudopediastrum boryanum,Pseudopediastrum boryanum
+381,Stauridium tetras,Stauridium tetras
+382,Desmodesmus sp,Desmodesmus sp
+383,Hindakia tetrachotoma,Hindakia tetrachotoma
+384,chlorophyte flagellate sp,chlorophyte
+385,Desmodesmus sempervirens,Desmodesmus sempervirens
+386,Oocystis lacustris,Oocystis lacustris
+387,Nephrochlamys subsolitaria,Nephrochlamys subsolitaria
+388,Pseudodidymocystis fina,Pseudodidymocystis fina
+389,Treubaria triappendiculata,Treubaria triappendiculata
+390,Tetraedron sp,Tetraedron sp
+391,Westella botryoides,Westella botryoides
+392,Scenedesmus ovalternus,Scenedesmus ovalternus
+393,Chroomonas/Rhodomonas sp,Rhodomonas sp
+394,nostocalean filament sp,nostocalean
+395,Dolichosprmum cf. mendotae,Dolichosprmum mendotae
+396,cyanophyte filament sp,cyanophyte
+397,Aphanizomenon flos-aquae/klebahnii,Aphanizomenon
+398,Chrysochromulina cf. parva,Chrysochromulina parva
+399,Peridinium umbonatum,Peridinium umbonatum
+400,Goniochloris contorta,Goniochloris contorta
+401,Cryptomonas cf. erosa,Cryptomonas erosa
+402,Dolichosprmum/Microcystis sp(cell pair),Microcystis
+403,Dolichosprmum/Microcystis sp(unicell),Microcystis
+404,Crucigeniella pulchra,Crucigeniella pulchra
+405,Dictytospaerium sp,Dictytospaerium sp
+406,"chlorophyte unicell, spere  5-7.5um sp",chlorophyte
+407,Scenedesmus verrucosus,Scenedesmus verrucosus
+408,Coelastrum astroideum,Coelastrum astroideum
+409,Desmodesmus smithii,Desmodesmus smithii
+410,"chlorophyte unicell, oval  5-7.5um sp",chlorophyte
+411,Closterium acutum v. linea,Closterium acutum
+412,Desmodesmus cf. bicaudatus,Desmodesmus
+413,Desmodesmus serratus,Desmodesmus
+414,Koliella longiseta v. tenuis,Koliella longiseta
+415,Koliella longiseta v. variabilis,Koliella longiseta
+416,Phacotus sp,Phacotus sp
+417,"cyanophyte cell pair, oval/rod sp",cyanophyte
+418,Desmodesmus sp,Desmodesmus sp
+419,Staurastrum tetracerum,Staurastrum tetracerum
+420,Oocystis pusilla,Oocystis pusilla
+421,Pseudodidymocystis sp,Pseudodidymocystis sp
+422,Kephyrion/Pseudokephyrion sp,Kephyrion
+423,cf. Sphaerosprmopsis aphanizomenoides,Sphaerosprmopsis aphanizomenoides
+424,Chrysochromulina sp,Chrysochromulina sp
+425,Pseudostaurastum sp,Pseudostaurastum sp
+426,Stephanodiscus niagarae,Stephanodiscus niagarae
+427,Coelospaerium sp,Coelospaerium sp
+428,Mychonastes sp,Mychonastes sp
+429,Dictyospaerium sp,Dictyospaerium sp
+430,Desmodesmus quadricauda,Desmodesmus quadricauda
+431,Desmodesmus cf. intermedius,Desmodesmus intermedius
+432,Hariotina reticulata,Hariotina reticulata
+433,Koliella longiseta,Koliella longiseta
+434,"chlorophyte unicell, oval 2.5-5um sp",chlorophyte
+435,chrysophyte flagellate sp,chrysophyte
+436,"chlorophyte unicell, oval 5-7.5um sp",chlorophyte
+437,chrysophyte colony sp,chrysophyte
+438,Peridiniopsis sp,Peridiniopsis sp
+439,Koliella sp,Koliella sp
+440,Synechococcus sp,Synechococcus sp
+441,"unknown unicell, oval sp",UNK
+442,"unknown unicell, spere sp",UNK
+443,Gomphonema/Gomphoneis sp,Gomphonema
+444,Rhoicospenia abbreviata,Rhoicospenia abbreviata
+445,Nitzschia sigmoidea,Nitzschia sigmoidea
+446,Gomphonema acuminatum,Gomphonema acuminatum
+447,chlorophyte tetrad sp,chlorophyte
+448,Dolichosprmum mendotae/sigmoideum,Dolichosprmum mendotae

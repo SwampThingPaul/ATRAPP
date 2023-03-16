@@ -13,7 +13,6 @@ library(AnalystHelper);
 library(openxlsx)
 library(plyr)
 library(reshape2)
-library(dssrip)
 library(zoo)
 library(classInt)
 #
@@ -45,6 +44,16 @@ wgs84=CRS("+proj=longlat +datum=WGS84")
 utm18=CRS("+init=epsg:26918")
 
 # -------------------------------------------------------------------------
+# as.data.frame(wx.sites[,c("station_name","lat","lon")])
+wx.sites2=data.frame(station_name = c("Bonsecours", "Bromptonville"), 
+                     lat = c(45.4, 45.48), 
+                     lon = c(-72.27, -71.95)
+                     )
+wx.sites2.shp=SpatialPointsDataFrame(wx.sites2[,c("lon","lat")],
+                                     wx.sites2,
+                         proj4string = wgs84 )
+
+wx.sites2.shp=spTransform(wx.sites2.shp,utm18)
 
 world <- ne_countries(scale = 50, returnclass = "sp")
 
@@ -127,10 +136,12 @@ mtext(side=3,line=-2,'Québec')
 box(lwd=1)
 
 bbox.lims=bbox(PLSF_watershed)
+# bbox.lims=bbox(bind(wx.sites2.shp,PLSF_sites))
 plot(PLSF_flow,col="lightblue",lwd=1.5,ylim=bbox.lims[c(2,4)],xlim=bbox.lims[c(1,3)])
 plot(PLSF,add=T,col="lightblue",border="grey50",lwd=0.5)
 plot(crop(lakes2,PLSF_watershed),add=T,col="lightblue",border="grey50",lwd=0.5)
 plot(PLSF_watershed,lwd=1.25,add=T)
+plot(wx.sites2.shp,add=T,pch=21,bg="dodgerblue1")
 mtext(side=3,line=-3,"Petit-lac-Saint-François\nWatershed")
 mapmisc::scaleBar(utm18,"bottom",bty="n",cex=1,seg.len=4,outer=F)
 box(lwd=1)
