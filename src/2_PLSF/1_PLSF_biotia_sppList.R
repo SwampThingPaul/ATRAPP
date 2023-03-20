@@ -228,5 +228,17 @@ GenusSpp.list2[is.na(GenusSpp.list2$order)==T,"order"]="unid"
 subset(GenusSpp.list2,class=="unid")
 subset(GenusSpp.list2,order=="unid")
 
+head(GenusSpp.df)
+head(GenusSpp.list2)
 
-## rejoin GenusSpp list with GenusSpp.list2 to match with main data 
+GenusSpp.df2=merge(GenusSpp.df,GenusSpp.list2,by.x="GenusSpp3",by.y="verbatim_name",all.x=T)
+is.na(GenusSpp.df2$class)
+
+head(GenusSpp.df2)
+GenusSpp.df2=GenusSpp.df2[,c("GenusSpp","genus","order","class")]
+unique(GenusSpp.df2$class)
+
+# write.csv(GenusSpp.df2,paste0(export.path,"20230317_GenusSpp_ClassOrder.csv"),row.names = F)
+# -------------------------------------------------------------------------
+
+
