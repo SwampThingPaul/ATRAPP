@@ -48,6 +48,13 @@ plsf.phyto=subset(plsf.phyto,month%in%seq(5,10,1))
 spp.class.order=read.csv(paste0(export.path,"20230317_GenusSpp_ClassOrder.csv"))
 head(spp.class.order)
 
+spp.class.order=rbind(spp.class.order,
+                      data.frame(GenusSpp="Cryptomonas marsonii",
+                                 genus="Cryptomonas",
+                                 order="Cryptomonadales",
+                                 class="Cryptophyceae"))
+
+
 subset(spp.class.order,GenusSpp=="nostocalean filament sp.")
 diazotroph.genera=c("Dolichospermum", "Anabaena", "Aphanizomenon", "Cuspidothrix", 
                     "Aphanocapsa", "Aphanothece", "Komvophoron", "Oscillatoria", 
@@ -100,6 +107,8 @@ plsf.phyto$GenusSpp=trimws(plsf.phyto$GenusSpp)
 plsf.phyto=merge(plsf.phyto,spp.class.order,"GenusSpp",all.x=T)
 sum(is.na(plsf.phyto$diaztroph.fac))
 
+# write.csv(plsf.phyto,paste0(export.path,"PLSF_phyto_dat.csv"),row.names = F)
+
 plsf.phyto$diaztroph.fac_cyano=with(plsf.phyto,
                                          ifelse(class=="Cyanophyceae",
                                                 paste0("cyano_",diaztroph.fac),
@@ -107,7 +116,7 @@ plsf.phyto$diaztroph.fac_cyano=with(plsf.phyto,
 
 # is.na(plsf.phyto$class)
 # unique(subset(plsf.phyto,is.na(class)==T)$GenusSpp)
-
+subset(plsf.phyto,CY==2017)
 plsf.phyto2=ddply(plsf.phyto,c("CY","month","GenusSpp","class",
                                "diaztroph.fac","diaztroph.fac_cyano"),
                   summarise,
@@ -122,16 +131,39 @@ x.val=apply(plsf.phyto.diaz.xtab[,3:ncol(plsf.phyto.diaz.xtab)],1,sum,na.rm=T)
 plsf.phyto.diaz.xtab.prop=plsf.phyto.diaz.xtab
 plsf.phyto.diaz.xtab.prop[,3:ncol(plsf.phyto.diaz.xtab.prop)]=sweep(plsf.phyto.diaz.xtab.prop[,3:ncol(plsf.phyto.diaz.xtab.prop)],1,x.val,"/")
 
+
+
+### Pettit Test -----------------------------------------------------------
+library(trend)
+plsf.phyto.diaz2=plsf.phyto.diaz
+plsf.phyto.diaz2$MonCY.date=with(plsf.phyto.diaz2,date.fun(paste(CY,month,"01",sep="-")))
+plsf.phyto.diaz2$dec.date=lubridate::decimal_date(plsf.phyto.diaz2$MonCY.date)
+plsf.phyto.diaz2$biovol.log10=with(plsf.phyto.diaz2,ifelse(sum.biovol.um3mL==0,0,log10(sum.biovol.um3mL)))
+
+diaz.biovol=subset(plsf.phyto.diaz2,diaztroph.fac=="diaz")
+pt.test.diaz=pettitt.test(diaz.biovol$biovol.log10)
+diaz.biovol[pt.test.diaz$estimate,]
+plot(biovol.log10~MonCY.date,diaz.biovol)
+with(diaz.biovol,cor.test(biovol.log10,dec.date,method="kendall"))
+
+nondiaz.biovol=subset(plsf.phyto.diaz2,diaztroph.fac=="nondiaz")
+pt.test.nondiaz=pettitt.test(nondiaz.biovol$biovol.log10);pt.test.nondiaz
+nondiaz.biovol[pt.test.nondiaz$estimate,]
+plot(biovol.log10~MonCY.date,nondiaz.biovol)
+with(nondiaz.biovol,cor.test(biovol.log10,dec.date,method="kendall"))
+
+
 # plsf.phyto.diaz.xtab.prop$chk=rowSums(plsf.phyto.diaz.xtab.prop[,3:5],na.rm=T)
 # subset(plsf.phyto.diaz.xtab.prop,chk<1)
 
 apply(plsf.phyto.diaz.xtab.prop[,3:ncol(plsf.phyto.diaz.xtab.prop)],2,mean,na.rm=T)
 apply(plsf.phyto.diaz.xtab.prop[,3:ncol(plsf.phyto.diaz.xtab.prop)],1,sum,na.rm=T)
 
-
 fill.val=expand.grid(month=1:12,
                      CY=2009:2020)
 fill.val=rbind(fill.val,data.frame(month=1,CY=2021))
+
+plsf.phyto.diaz.xtab.prop[is.na(plsf.phyto.diaz.xtab.prop)]=0
 
 phyto.diaz.prop.sum=merge(plsf.phyto.diaz.xtab.prop,fill.val,c("month","CY"),all.y=T)
 phyto.diaz.prop.sum=phyto.diaz.prop.sum[order(phyto.diaz.prop.sum$CY,phyto.diaz.prop.sum$month),c("month","CY","diaz","nondiaz","NoClass")]
@@ -151,13 +183,13 @@ barplot(t(phyto.diaz.prop.sum[,3:ncol(phyto.diaz.prop.sum)]),
 fill.val$date=with(fill.val,date.fun(paste(CY,month,"01",sep="-")))
 xlim.val=date.fun(c("2009-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
 # png(filename=paste0(plot.path,"PLSF_DiazNonDiaz.png"),width=10,height=5,units="in",res=200,type="windows",bg="white")
-par(family="serif",mar=c(4,1.5,0.5,0.5),oma=c(1,2,0.75,0.5),lwd=0.5);
+par(family="serif",mar=c(4,1.5,0.5,0.5),oma=c(1,2,0.75,0.5),lwd=0.25);
 # layout(matrix(1:2,2,1,byrow = T),heights=c(1,0.25))
 
 ylim.val=c(0,1);by.y=0.2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
-cols=c("lightblue","lightgreen","grey")
+cols=c("steelblue","darkseagreen3","grey")
 x=barplot(t(phyto.diaz.prop.sum[,3:ncol(phyto.diaz.prop.sum)]),
-          beside=F,space=0,col=cols,border=cols,axes=F,yaxs="i",width=0.75,
+          beside=F,space=0,col=cols,border="grey50",axes=F,yaxs="i",width=0.75,
           ylim=ylim.val,names=rep(NA,nrow(phyto.diaz.prop.sum)))
 
 axis_fun(1,x[which(fill.val$date%in%xmaj)],x[which(fill.val$date%in%xmin)],format(xmaj,"%b-%Y"),line=-0.5)
@@ -172,6 +204,8 @@ legend("topleft",legend=c("Diazatroph","Non-Diazatroph","Not Classified"),
        lty=c(NA),lwd=c(0.01),col=rev(cols),
        ncol=1,cex=0.75,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
 dev.off()
+
+
 
 ### With Cyanos broken out
 plsf.phyto.diaz=ddply(plsf.phyto2,c("CY","month","diaztroph.fac_cyano"),summarise,sum.biovol.um3mL=sum(mean.biovol.um3mL,na.rm=T))
@@ -206,13 +240,14 @@ plsf.phyto.cyano.diaz.xtab.prop[,3:ncol(plsf.phyto.cyano.diaz.xtab.prop)]=sweep(
 apply(plsf.phyto.cyano.diaz.xtab.prop[,3:ncol(plsf.phyto.cyano.diaz.xtab.prop)],2,mean,na.rm=T)
 apply(plsf.phyto.cyano.diaz.xtab.prop[,3:ncol(plsf.phyto.cyano.diaz.xtab.prop)],1,sum,na.rm=T)
 
-mean(subset(phyto.cyano.diaz.prop.sum,CY<=2017)$diaz,na.rm=T)
-mean(subset(phyto.cyano.diaz.prop.sum,CY>2017)$diaz,na.rm=T)
+mean(subset(plsf.phyto.cyano.diaz.xtab.prop,CY<=2017)$diaz,na.rm=T)
+mean(subset(plsf.phyto.cyano.diaz.xtab.prop,CY>2017)$diaz,na.rm=T)
 
 fill.val=expand.grid(month=1:12,
                      CY=2009:2020)
 fill.val=rbind(fill.val,data.frame(month=1,CY=2021))
 
+plsf.phyto.cyano.diaz.xtab.prop[is.na(plsf.phyto.cyano.diaz.xtab.prop)]=0
 phyto.cyano.diaz.prop.sum=merge(plsf.phyto.cyano.diaz.xtab.prop,fill.val,c("month","CY"),all.y=T)
 phyto.cyano.diaz.prop.sum=phyto.cyano.diaz.prop.sum[order(phyto.cyano.diaz.prop.sum$CY,phyto.cyano.diaz.prop.sum$month),c("month","CY","diaz","nondiaz","NoClass")]
 
@@ -250,10 +285,15 @@ legend("topleft",legend=c("Diazatroph","Non-Diazatroph","Not Classified"),
 dev.off()
 
 
+##
+### PCoA - Diaz/Non-Diaz --------------------------------------------------
+## Can't do a PCoA on two factors 
+
 ## Abundance - Class ------------------------------------------------------
 plsf.phyto.class=ddply(plsf.phyto2,c("CY","month","class"),summarise,
                        sum.biovol.um3mL=sum(mean.biovol.um3mL,na.rm=T),
                        sum.conc.cellsmL=sum(mean.conc.cellsmL,na.rm=T))
+plsf.phyto.class$log10.biovol=with(plsf.phyto.class,ifelse(sum.biovol.um3mL==0,0,log10(sum.biovol.um3mL)))
 
 plsf.phyto.class.xtab=dcast(plsf.phyto.class,CY+month~class,value.var="sum.biovol.um3mL",mean,na.rm=T)
 x.val=apply(plsf.phyto.class.xtab[,3:ncol(plsf.phyto.class.xtab)],1,sum,na.rm=T)
@@ -318,6 +358,49 @@ legend("topleft",legend=c("Bacillariophyceae","Dinophyceae",
        ncol=1,cex=0.75,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
 dev.off()
 
+plsf.phyto.class$biovol.mm3L=plsf.phyto.class$sum.biovol.um3mL*1e-6
+
+phyto.class.biovol=merge(plsf.phyto.class,class.reclass,by.x="class",by.y="class")
+phyto.class.biovol.sum=ddply(phyto.class.biovol,c("CY","month","class.reclass"),summarise,Tbiovol=sum(biovol.mm3L,na.rm=T))
+phyto.class.biovol.sum$Tbiovol.log10=with(phyto.class.biovol.sum,ifelse(Tbiovol==0,0,log10(Tbiovol)))
+
+phyto.class.biovol.sum=dcast(phyto.class.biovol.sum,CY+month~class.reclass,value.var = "Tbiovol",sum,na.rm=T)
+phyto.class.biovol.sum=merge(phyto.class.biovol.sum,fill.val,c("month","CY"),all.y=T)
+
+phyto.class.biovol.sum=phyto.class.biovol.sum[order(phyto.class.biovol.sum$CY,phyto.class.biovol.sum$month),]
+
+phyto.class.biovol.sum=phyto.class.biovol.sum[,c("month","CY","Bacillariophyceae","Dinophyceae",
+                                                 "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other")]
+range(rowSums(phyto.class.biovol.sum[,3:ncol(phyto.class.biovol.sum)],na.rm=T))
+
+xlim.val=date.fun(c("2009-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
+# png(filename=paste0(plot.path,"PLSF_Class_biovol.png"),width=10,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(4,1.5,0.5,0.5),oma=c(1,2,0.75,0.5),lwd=0.25);
+# layout(matrix(1:2,2,1,byrow = T),heights=c(1,0.25))
+
+ylim.val=c(0,500);by.y=100;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+cols=c("burlywood1","goldenrod","mediumaquamarine","seagreen","paleturquoise2","grey")
+x=barplot(t(phyto.class.biovol.sum[,3:ncol(phyto.class.biovol.sum)]),
+          beside=F,space=0,col=cols,border="grey50",axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(phyto.class.biovol.sum)))
+
+axis_fun(1,x[which(fill.val$date%in%xmaj)],x[which(fill.val$date%in%xmin)],format(xmaj,"%b-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.25,"Total Biovolume (mm\u00B3 L\u207B\u00b9)")
+mtext(side=1,line=2.5,'Date (Month-Year)')
+
+# 
+# par(mar=c(1,1.5,0.5,3.5))
+# plot(0:1,0:1,ann=F,axes=F,type="n")
+legend("topleft",legend=c("Bacillariophyceae","Dinophyceae",
+                          "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other"),
+       pch=22,pt.bg=cols,pt.cex = 1.5,
+       lty=c(NA),lwd=c(0.01),col=rev(cols),
+       ncol=1,cex=0.75,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
+dev.off()
+
+
+
 
 
 # PCoA --------------------------------------------------------------------
@@ -326,6 +409,38 @@ dev.off()
 phyto_class.dat=na.omit(phyto.class.prop.sum)
 phyto_class.dat=phyto_class.dat[rowSums(phyto_class.dat[,3:ncol(phyto_class.dat)])==1,]
 
+## DETERMINE THE OPTIMAL DISSIMILARITY MEASURE FOR DISSIMILARITY-BASED ANALYSES
+# We used Principal coordinates analysis (PCoA) for this, a.k.a. Classical Multidimensional Scaling. Interpretation: The Canberra distance shows the best spread of points.
+
+# Euclidean distance: from vegdist function d[jk] = sqrt(sum(x[ij]-x[ik])^2)
+pco.eu <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="euclidean"), eig=T) 
+# Bray-Curtis dissimilarity: from vegdist function d[jk] = (sum abs(x[ij]-x[ik]))/(sum (x[ij]+x[ik]))
+pco.bc <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="bray"), eig=T) 
+# Alternative Gower distance: from vegdist function d[jk] = (1/NZ) sum(abs(x[ij] - x[ik])), NZ is the number of non-zero columns excluding double-zeros (Anderson et al. 2006)
+pco.ag <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="altGower"), eig=T) 
+# Manhattan dissimilarity: from vegdist function d[jk] = sum(abs(x[ij] - x[ik]))
+pco.mh <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="manhattan"), eig=T) 
+# Chi-square distance: from dsvdis function (exp - obs) / sqrt{exp}
+pco.cs <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], "chisq"), eig=T)
+# Canberra distance: from vegdist function d[jk] = (1/NZ) sum ((x[ij]-x[ik])/(x[ij]+x[ik]))
+pco.ca <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], "canberra"), eig=T) 
+
+layout(matrix(1:6,3,2))
+plot(pco.eu$points, main="PCoA Euclidean (i.e. PCA)")
+plot(pco.bc$points, main="PCoA Bray-Curtis") 
+plot(pco.ag$points, main="PCoA alt Gower") 
+plot(pco.mh$points, main="PCoA Manhattan") 
+plot(pco.cs$points, main="PCoA Chi-squared") 
+plot(pco.ca$points, main="PCoA Canberra")
+
+plot(pco.bc$points~pco.eu$points);abline(0,1)
+plot(pco.bc$points~pco.ag$points);abline(0,1)
+plot(pco.bc$points~pco.mh$points);abline(0,1)
+plot(pco.bc$points~pco.cs$points);abline(0,1)
+plot(pco.bc$points~pco.ca$points);abline(0,1)
+
+
+## PCoA analysis
 phyto_class.dat.dist=vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)],method="bray")
 
 pco1=wcmdscale(phyto_class.dat.dist,eig=T)
@@ -358,7 +473,7 @@ par(family="serif",mar=c(1,2,0.75,0.5),oma=c(2,2,0.25,0.5));
 # layout(matrix(1:2,2,1),heights=c(1,0.25))
 
 xlim.val=c(-0.4,0.8);by.x=0.2;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/2);
-ylim.val=c(-0.4,0.6);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
+ylim.val=c(-0.4,0.8);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
 plot(xlim.val,ylim.val,type="n",axes=F,ann=F);
 abline(h=0,v=0,lty=3,col="grey");
 points(scrs[,c(1,2)],pch=21,bg=adjustcolor("dodgerblue1",0.5),col="grey40",cex=1,lwd=0.5);
@@ -391,6 +506,8 @@ eclust.rslt$cluster
 
 test=phyto_class.dat
 test$clusts=eclust.rslt$cluster
+test$MonCY.date=with(test,date.fun(paste(CY,month,"01",sep="-")))
+plot(clusts~MonCY.date,test)
 
 
 clust.cols=c("lightgreen",'steelblue')
@@ -418,6 +535,8 @@ dev.off()
 
 
 
+
+# Buckley et al -----------------------------------------------------------
 #### Analysis from Buckley et al. 2021. Measuring change in biological 
 #### communities: multivariate analysis approaches for temporal datasets 
 #### with low sample size. PeerJ 9. PeerJ Inc.: e11096.
@@ -433,105 +552,14 @@ plot(dca.res)
 ## DETERMINE THE OPTIMAL DISSIMILARITY MEASURE FOR DISSIMILARITY-BASED ANALYSES
 # We used Principal coordinates analysis (PCoA) for this, a.k.a. Classical Multidimensional Scaling. Interpretation: The Canberra distance shows the best spread of points.
 
-# Euclidean distance: from vegdist function d[jk] = sqrt(sum(x[ij]-x[ik])^2)
-pco.eu <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="euclidean"), eig=T) 
+### Moved above as part of PCoA
 
-# Bray-Curtis dissimilarity: from vegdist function d[jk] = (sum abs(x[ij]-x[ik]))/(sum (x[ij]+x[ik]))
-pco.bc <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="bray"), eig=T) 
-
-# Alternative Gower distance: from vegdist function d[jk] = (1/NZ) sum(abs(x[ij] - x[ik])), NZ is the number of non-zero columns excluding double-zeros (Anderson et al. 2006)
-pco.ag <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="altGower"), eig=T) 
-
-# Manhattan dissimilarity: from vegdist function d[jk] = sum(abs(x[ij] - x[ik]))
-pco.mh <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], method="manhattan"), eig=T) 
-
-# Chi-square distance: from dsvdis function (exp - obs) / sqrt{exp}
-pco.cs <- cmdscale(dsvdis(phyto_class.dat[,3:ncol(phyto_class.dat)], "chisq"), eig=T)
-
-# Canberra distance: from vegdist function d[jk] = (1/NZ) sum ((x[ij]-x[ik])/(x[ij]+x[ik]))
-pco.ca <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], "canberra"), eig=T) 
-
-layout(matrix(1:6,3,2))
-plot(pco.eu$points, main="PCoA Euclidean (i.e. PCA)")
-plot(pco.bc$points, main="PCoA Bray-Curtis") 
-plot(pco.ag$points, main="PCoA alt Gower") 
-plot(pco.mh$points, main="PCoA Manhattan") 
-plot(pco.cs$points, main="PCoA Chi-squared") 
-plot(pco.ca$points, main="PCoA Canberra")
-
-## PRINCIPAL CO-ORDINATES ANALYSIS (PCoA)
-
-# Perform the PCoA using Canberra distance (as determined in the EDA). Canberra distance: from vegdist function d[jk] = (1/NZ) sum ((x[ij]-x[ik])/(x[ij]+x[ik])) where NZ is the number of non-zero entries
-pco.ca <- cmdscale(vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)], "bray"), eig=T) 
-
-# The variation explained by each axis is its eigenvalue divided by the sum of the positive eigenvalues.
-eig <- as.numeric(eigenvals(pco.ca))
-variance <- eig*100/sum(eig[eig>0])
-cumvar <- cumsum(variance)
-eig.pca <- data.frame(eig = eig, variance = variance,cumvariance = cumvar)
-eig.pca[1:4,]
-
-# from Buckley
-# Extract the pcoa year scores for graphing
-year.PCO1 <- pco.ca$points[, 1]
-year.PCO2 <- pco.ca$points[, 2]
-
-gdat <- as.data.frame(cbind(phyto_class.dat[,1:2], year.PCO1, year.PCO2))
-
-# Create 'species scores': the correlation between the raw data and the year scores
-pco.ca.species <- as.data.frame(cor(phyto_class.dat[,3:ncol(phyto_class.dat)], pco.ca$points)) 
-pco.ca.species$species <- rownames(pco.ca.species)
-names(pco.ca.species)[1:2] <- c("PCO1", "PCO2")
-
-#get PCoA scores
-scrs=scores(pco.ca)
-#weighted by abundance
-spp_scrs=wascores(scrs,phyto_class.dat[,3:ncol(phyto_class.dat)],expand=F)
-
-layout(matrix(1:2,2,1))
-plot(year.PCO2~ year.PCO1)
-plot(scrs)
-
-par(family="serif",mar=c(1,2,0.75,0.5),oma=c(2,2,0.25,0.5));
-# layout(matrix(1:2,2,1),heights=c(1,0.25))
-
-xlim.val=c(-0.4,0.8);by.x=0.2;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/2);
-ylim.val=c(-0.4,0.6);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
-plot(xlim.val,ylim.val,type="n",axes=F,ann=F);
-abline(h=0,v=0,lty=3,col="grey");
-points(scrs[,c(1,2)],pch=21,bg=adjustcolor("dodgerblue1",0.5),col="grey40",cex=1,lwd=0.5);
-# text(spp_scrs,row.names(spp_scrs),cex=0.8,font=2,col="black")
-axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj),1);
-axis_fun(2,ymaj,ymin,format(ymaj),1); 
-mtext(side=1,line=1.5,"Dim 1");
-mtext(side=2,line=2.25,"Dim 2");
-box(lwd=1)
-
-
-
-ggplot() +
-  geom_text_repel(data = pco.ca.species, aes(x = PCO1, y = PCO2, label = species, fontface = 3), size = 4, col = "firebrick", alpha = 0.8) +
-  geom_text_repel(data = gdat, aes(x = year.PCO1, y = year.PCO2), size = 5, col = "steelblue4", alpha = 0.8, label = paste(phyto_class.dat$month,phyto_class.dat$CY)) +
-  geom_path(data = gdat, aes(x = year.PCO1, y = year.PCO2)) +
-  #ggtitle("Year scores and 'species scores', PCoA Canberra") +
-  xlab("PCoA axis 1 (20.6%)") + ylab("PCoA axis 2 (15.0%)") +
-  theme_bw(base_size = 18)
 
 ## Do analysis on annual values to see trajectory?
 
+# Question: Is there rapid and permanent compositional change
 
-###################################################
-### DATA ANALYSIS: 
-### 1. Turnover analysis
-### 2. Time lag analysis
-### 3. Venn diagrams 
-###################################################
-
-# Question: Is there rapid and permanent compositional change after logging treatment in 2005?
-
-##########################################################
-# 1. Temporal turnover analysis
-##########################################################
+### 1. Temporal turnover analysis ------------------------------------------
 # Use the turnover function in the package 'codyn' to compare temporal turnover values over time.
 library(codyn) # for temporal turnover
 
@@ -547,32 +575,37 @@ total.to=turnover(phyto_class.dat.melt,
          species.var="variable",
          abundance.var="value",
          metric="total")
-total.to$Measure="total"
-total.to=rename(total.to,c("total"="value"))
+# total.to$Measure="total"
+# total.to=rename(total.to,c("total"="value"))
 appear.to=turnover(phyto_class.dat.melt,
                   time.var = "MonCY.date",
                   species.var="variable",
                   abundance.var="value",
                   metric="appearance")
-appear.to$Measure="appearance"
-appear.to=rename(appear.to,c("appearance"="value"))
-
+# appear.to$Measure="appearance"
+# appear.to=rename(appear.to,c("appearance"="value"))
 disappear.to=turnover(phyto_class.dat.melt,
                    time.var = "MonCY.date",
                    species.var="variable",
                    abundance.var="value",
                    metric="disappearance")
-disappear.to$Measure="disappearance"
-disappear.to=rename(disappear.to,c("disappearance"="value"))
+# disappear.to$Measure="disappearance"
+# disappear.to=rename(disappear.to,c("disappearance"="value"))
+
+turnover.class=merge(total.to,appear.to,c("MonCY.date"))
+turnover.class=merge(turnover.class,disappear.to,c("MonCY.date"))
+
+plot(total~MonCY.date,turnover.class,type="b")
+plot(appearance~MonCY.date,appear.to,type="b",pch=21,bg="Red")
+plot(disappearance~MonCY.date,disappear.to,type="b",pch=21,bg="lightgreen")
+
+with(turnover.class,cor.test(total,MonCY.date,method="kendall"))
+with(turnover.class,cor.test(appearance,MonCY.date,method="kendall"))
+with(turnover.class,cor.test(disappearance,MonCY.date,method="kendall"))
 
 
-plot(value~MonCY.date,total.to,type="b")
-plot(value~MonCY.date,appear.to,type="b",pch=21,bg="Red")
-plot(value~MonCY.date,disappear.to,type="b",pch=21,bg="lightgreen")
-
-##########################################################
-# 2. Time lag analysis
-##########################################################
+### 2. Time lag analysis ----------------------------------------------------
+# phyto_class.dat$MonCY.date=with(phyto_class.dat,date.fun(paste(CY,month,"01",sep="-")))
 phyto_class.dat$MonCY.date.num=lubridate::decimal_date(phyto_class.dat$MonCY.date)
 # Interpretation: Dissimilarity did not increase significantly over the entire 
 # sampling period; 
@@ -589,3 +622,305 @@ mod=loess(can.dist ~ time.lag, data = time_lag)
 x.val=seq(min(time_lag$time.lag),max(time_lag$time.lag),length.out=50)
 pred.mod=predict(mod,data.frame(time.lag=x.val))
 lines(x.val,pred.mod,col="dodgerblue1")
+
+
+with(time_lag,cor.test(can.dist,time.lag,method="kendall"))
+
+
+# Mean dissimilarity as response in regression to test
+# Question: How does the dissimilarity of samples change in time? 
+# Are these changes related to seasonality? 
+mean.class.bray <- data.frame(Days = phyto_class.dat$MonCY.date.num, 
+                               Mean_bray_dist = as.numeric(colMeans(as.matrix(as.dist(vegdist(phyto_class.dat[,3:(ncol(phyto_class.dat)-2)], method = "bray"), upper = TRUE)))))
+mean.class.bray$periods=with(mean.class.bray,ifelse(Days<2017,"pre","post"))
+
+boxplot(Mean_bray_dist~periods,mean.class.bray)
+kruskal.test(Mean_bray_dist~periods,mean.class.bray)
+
+plot(Mean_bray_dist~Days,mean.class.bray,type="l")
+with(mean.class.bray,cor.test(Mean_bray_dist,Days,method="kendall"))
+## no significant change in mean dissilimarity. 
+
+### Zeta diversity ----------------------------------------------------------
+
+library(zetadiv) # Zeta diversity
+# Does the number of shared taxa (of those that were most variable) change for subsets of increasing numbers of temporal samples? 
+# Calculate temporal normalised zeta diversity: Number of shared species among different numbers of temporal samples (orders of zeta) divided by the minimum number of species in the sites of each specific sample. 
+#Interpretation: Zeta diversity declines, 
+## From Gilbert but only to around 0.67 showing that many of the OTUs are common and therefore shared across large numbers of temporal samples
+
+phyto_pa <- phyto_class.dat[,3:(ncol(phyto_class.dat)-2)]
+phyto_pa[phyto_pa > 0] <- 1 
+
+phyto_zeta <- data.frame(Order = 1:(length(unique(phyto_class.dat$MonCY.date)) - 1), Zeta_diversity = NA, Zeta_diversity_SD = NA)
+
+for(z in 1:(length(unique(phyto_class.dat$MonCY.date)) - 1)) {
+  zeta.out <- Zeta.order.mc(phyto_pa, order = z, normalize = "Simpson")
+  phyto_zeta$Order[z] <- zeta.out$zeta.order
+  phyto_zeta$Zeta_diversity[z] <- zeta.out$zeta.val
+  phyto_zeta$Zeta_diversity_SD[z] <- zeta.out$zeta.val.sd
+  print(z)
+} # end z loop through zeta orders
+
+
+
+plot(Zeta_diversity~Order,subset(phyto_zeta,Order>1),ylim=c(0,1.1),
+     ylab='Zeta Diversity',xlab="Zeta Order")
+with(subset(phyto_zeta,Order>1),shaded.range(Order,
+                             Zeta_diversity - Zeta_diversity_SD,
+                             Zeta_diversity + Zeta_diversity_SD,
+                             bg="red"))
+# library(tidyverse)
+# phyto_zeta %>%
+#   filter(Order > 1) %>%
+#   ggplot(aes(x = Order, y = Zeta_diversity)) +
+#   geom_ribbon(aes(ymin = (Zeta_diversity - Zeta_diversity_SD), ymax = (Zeta_diversity + Zeta_diversity_SD)), fill = "steelblue3", alpha = 0.6) +
+#   geom_point(size = 4) +
+#   geom_line(size = 1.5) +
+#   xlab("Zeta order") +
+#   ylab("Zeta diversity") +
+#   theme_bw(base_size = 18)
+
+
+# ANOSIM ------------------------------------------------------------------
+
+phyto_class.dat=na.omit(phyto.class.prop.sum)
+phyto.class.period=with(phyto_class.dat,ifelse(CY<2015,"pre","post"))
+phyto_class.dat=phyto_class.dat[rowSums(phyto_class.dat[,3:ncol(phyto_class.dat)])==1,]
+
+phyto.class.dist=vegdist(phyto_class.dat[,3:ncol(phyto_class.dat)])
+phyto.ano=anosim(phyto.class.dist,phyto.class.period)
+summary(phyto.ano)
+plot(phyto.ano)
+
+# SIMPER routine
+## https://uw.pressbooks.pub/appliedmultivariatestatistics/chapter/simper/
+sim <- simper(phyto.class.dist,phyto.class.period)
+summary(sim)
+
+str(sim)
+sim$pre_post
+plot(sim$pre_post$ratio,col=ifelse(phyto.class.period=="pre","forestgreen","red"))
+plot(sim$pre_post$average,col=ifelse(phyto.class.period=="pre","forestgreen","red"))
+
+
+# https://uw.pressbooks.pub/appliedmultivariatestatistics/chapter/isa/
+library(indicspecies)
+set.seed(12)
+phyto.ISA <- multipatt(x = phyto_class.dat[,3:ncol(phyto_class.dat)],
+                      cluster = phyto.class.period,
+                      duleg = TRUE)
+
+phyto.ISA
+
+
+# WQ Data -----------------------------------------------------------------
+MDL_func=function(data,MDL,rng.val=TRUE){
+  tmp=as.numeric(ifelse(data=="LOD"|data==0,MDL/2,data))
+  tmp=ifelse(tmp<MDL,MDL/2,tmp)
+  if(rng.val==TRUE){print(range(tmp,na.rm=T))}
+  return(tmp)
+}
+
+dat=read.xlsx(paste0(data.path,"PLSF Database-12 Years (v2021-07-07).xlsx"))
+dat$Date=date.fun(convertToDate(dat$Date))
+
+# Water quality specific parameters
+wq.dat=dat[,c(1:20,364:374,387)]
+names(wq.dat)
+
+# all WQ Vars
+wq.vars=c("Date", "Site", "ENKI", "N_P", "TP.mgL", 
+          "PP.calc.mgL", "DP.mgL","SRP.mgL", "DOP.calc.mgL", 
+          "TN.mgL", "TKN.mgL", "NH4.mgL","NOx.mgL", "Urea.mgL", "DON.mgL", 
+          "SolN.mgL", "SolOC.mgL", "TOC.mgL", 
+          "pH", "Chla.ugL", "Cond", "DO.per", 
+          "TDS.mgL", "Temp.C", "ORP.mV", "Sal",
+          "Resistivity.ohm","Phyco.ugL", "TChl.ugL", 
+          "Turb.NTU", "Colour_PCU","Secchi_cm")
+colnames(wq.dat)=wq.vars
+
+plot(SolN.mgL~Date,wq.dat)
+
+## data handling
+TP.MDL=0.7*0.001
+SRP.MDL=TP.MDL
+DP.MDL=TP.MDL
+NOx.MDL=0.0004
+NH4.MDL=0.0014
+TN.MDL=0.004
+Chla.MDL=0.1
+Turb.MDL=2
+
+wq.dat$TP.ugL=with(wq.dat,MDL_func(TP.mgL,TP.MDL)*1000)
+wq.dat$SRP.ugL=with(wq.dat,MDL_func(SRP.mgL,SRP.MDL)*1000)
+wq.dat$DP.ugL=with(wq.dat,MDL_func(DP.mgL,DP.MDL)*1000)
+
+wq.dat$NOx.mgL=with(wq.dat,MDL_func(NOx.mgL,NOx.MDL))
+wq.dat$NH4.mgL=with(wq.dat,MDL_func(NH4.mgL,NH4.MDL))
+wq.dat$TN.mgL=with(wq.dat,MDL_func(TN.mgL,TN.MDL))
+wq.dat$Chla.ugL=with(wq.dat,MDL_func(Chla.ugL,Chla.MDL))
+wq.dat$Turb.NTU=with(wq.dat,MDL_func(Turb.NTU,Turb.MDL))
+
+wq.dat$DIN.mgL=with(wq.dat,NOx.mgL+NH4.mgL)
+wq.dat$DOP.ugL=with(wq.dat,ifelse(DP.ugL-SRP.ugL<0|DP.ugL-SRP.ugL==0,DP.MDL,DP.ugL-SRP.ugL))
+
+## Finding high sediment outliers (as communicated by Barry)
+plot(TP.ugL~Turb.NTU,wq.dat)
+plot(TN.mgL~Turb.NTU,wq.dat)
+
+# sampling error/outlier?
+turb.outliers=subset(wq.dat,Turb.NTU>100)
+High.TPTN=subset(wq.dat,TP.ugL>5000)
+
+pre.out.screen=nrow(wq.dat)
+wq.dat=subset(wq.dat,Turb.NTU<100|is.na(Turb.NTU)==T)
+wq.dat=subset(wq.dat,TP.ugL<5000|is.na(TP.ugL)==T)
+
+pre.out.screen-nrow(wq.dat)
+
+# P reversal check
+wq.dat$TPReversal=with(wq.dat,ifelse(is.na(SRP.ugL)==T|is.na(TP.ugL)==T,0,ifelse(SRP.ugL>(TP.ugL*1.3),1,0)));
+sum(wq.dat$TPReversal,na.rm=T)
+subset(wq.dat,TPReversal==1)
+plot(TP.ugL~SRP.ugL,wq.dat,ylab="TP (\u03BCg L\u207B\u00b9)",xlab="SRP (\u03BCg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TPReversal==1,"red",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
+
+# removed TP values with reversal
+wq.dat[wq.dat$TPReversal==1,c("TP.ugL","SRP.ugL","DP.ugL","DOP.ugL")]=NA
+
+## TN Reversal Check
+nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F&is.na(Urea.mgL)==F))
+nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F|is.na(Urea.mgL)==T))
+
+wq.dat$TNReversal=with(wq.dat,ifelse(is.na(DIN.mgL)==T|is.na(TN.mgL)==T,0,ifelse(DIN.mgL>(TN.mgL*1.3),1,0)));
+sum(wq.dat$TNReversal,na.rm=T)
+subset(wq.dat,TNReversal==1)
+plot(TN.mgL~DIN.mgL,wq.dat,ylab="TN (mg L\u207B\u00b9)",xlab="DIN (mg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TNReversal==1,"blue",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
+wq.dat[wq.dat$TNReversal==1,c("TN.mgL","DIN.mgL","NOx.mgL","NH4.mgL")]=NA
+
+pre.out.screen-nrow(wq.dat)
+
+# 
+wq.dat$TON.mgL=with(wq.dat,ifelse(TN.mgL-DIN.mgL<TN.MDL,TN.MDL/2,TN.mgL-DIN.mgL))
+
+## Stoichiometry
+N.mw=14.0067
+P.mw=30.973762
+C.mw=12.0107
+
+wq.dat$TP.mM=with(wq.dat,(TP.ugL/1000)/P.mw)
+wq.dat$TN.mM=with(wq.dat,TN.mgL/N.mw)
+wq.dat$SRP.mM=with(wq.dat,(SRP.ugL/1000)/P.mw)
+wq.dat$DIN.mM=with(wq.dat,DIN.mgL/N.mw)
+wq.dat$TON.mM=with(wq.dat,TON.mgL/N.mw)
+wq.dat$TOC.mM=with(wq.dat,TOC.mgL/C.mw)
+
+wq.dat$TOC_TON=with(wq.dat,TOC.mM/TON.mM)
+wq.dat$TN_TP=with(wq.dat,TN.mM/TP.mM)
+wq.dat$DIN_SRP=with(wq.dat,DIN.mM/SRP.mM)
+
+unique(wq.dat$Site)
+vars=c("Date",
+       "Temp.C","Cond","Turb.NTU","DO.per",
+       "TP.ugL","SRP.ugL","DP.ugL","DOP.ugL",
+       "TN.mgL","NOx.mgL","NH4.mgL","DIN.mgL","TON.mgL",
+       "TN_TP","DIN_SRP")
+wq.dat=subset(wq.dat,Site=="Lake_Outlet")[,vars]
+
+wq.dat.melt=melt(wq.dat,id.vars = "Date")
+wq.dat.melt=subset(wq.dat.melt,is.na(value)==F)
+wq.dat.melt$month=as.numeric(format(wq.dat.melt$Date,"%m"))
+wq.dat.melt$CY=as.numeric(format(wq.dat.melt$Date,"%Y"))
+wq.dat.melt$monCY.date=with(wq.dat.melt,paste(CY,month,"01",sep="-"))
+
+wq.dat.month=dcast(wq.dat.melt,CY+month+monCY.date~variable,value.var = "value",mean)
+na.omit(wq.dat.month)
+
+head(wq.dat.month)
+range(subset(wq.dat.month,is.na(TN.mgL)==F)$monCY.date)
+range(subset(wq.dat.month,is.na(NOx.mgL)==F)$monCY.date)
+range(subset(wq.dat.month,is.na(NH4.mgL)==F)$monCY.date)
+
+### RDA ------------------------------------------------------------------
+phyto.diaz.prop.sum2=merge(phyto.diaz.prop.sum,wq.dat.month,c("CY","month"),all.x=T)
+
+env_st<-na.omit(phyto.diaz.prop.sum2)[,7:ncol(phyto.diaz.prop.sum2)]
+abotu<-na.omit(phyto.diaz.prop.sum2)[,3:4]
+
+## stepwise RDA
+spe.rda <- rda(abotu~., data=env_st)
+ordiR2step(rda(abotu~1, data=env_st), scope= formula(spe.rda), direction= "both", R2scope=TRUE, pstep=100)
+vif.cca(spe.rda)
+
+
+rda.step.vars=c("SRP.ugL","TN.mgL","Turb.NTU","TN_TP")
+env_st2=na.omit(phyto.diaz.prop.sum2)[,rda.step.vars]
+
+spe.rda2 <- rda(abotu~., data=env_st2)
+summary(spe.rda2, display=NULL)
+vif.cca(spe.rda2)
+
+
+anova.cca(spe.rda2, step=1000)
+anova.cca(spe.rda2, by='axis', step=1000)
+rslt.terms=anova.cca(spe.rda2, by='terms', step=1000);rslt.terms
+(R2adj <- RsquareAdj(spe.rda2)$adj.r.squared)
+
+
+eig <- spe.rda2$CA$eig
+variance <- eig*100/sum(eig)
+cumvar <- cumsum(variance)
+eig.pca <- data.frame(eig = eig, variance = variance,cumvariance = cumvar)
+eig.pca
+
+plot(spe.rda2)
+
+
+
+
+# Regression tree  --------------------------------------------------------
+# https://r.qcbs.ca/workshop10/book-en/
+phyto.class.prop.sum$MonCY.date=with(phyto.class.prop.sum,date.fun(paste(CY,month,"01",sep="-")))
+phyto.class.prop.sum$MonCY.date.num=lubridate::decimal_date(phyto.class.prop.sum$MonCY.date)
+
+wq.vars=c("CY","month","TP.ugL","TN.mgL")# ,"Cond","Temp.C")
+bio.vars=c("month", "CY", "MonCY.date.num", "Bacillariophyceae", "Dinophyceae", "Cryptophyceae", 
+           "Chlorophyceae", "Cyanophyceae", "Other")
+phyto.class.prop.sum2=merge(phyto.class.prop.sum[,bio.vars],wq.dat.month[,wq.vars],c("CY","month"),all.x=T)
+
+plsf.spp=na.omit(phyto.class.prop.sum2)[,bio.vars[4:length(bio.vars)]]
+plsf.env=na.omit(phyto.class.prop.sum2)[,c("MonCY.date.num",wq.vars[3:length(wq.vars)])]
+
+plsf.spp.hel=decostand(plsf.spp, method = "hellinger")
+# Create multivariate regression tree
+plsf.mrt <- mvpart(as.matrix(plsf.spp) ~ ., data = plsf.env,
+                    xv = "pick", # interactively select best tree
+                    xval = nrow(plsf.spp), # number of cross-validations
+                    xvmult = 5, # number of multiple cross-validations
+                    which = 4, # plot both node labels
+                    legend = FALSE, margin = 0.01, cp = 0)
+## picked 5
+
+plsf.mrt2 <- mvpart(as.matrix(plsf.spp) ~ ., data = plsf.env,
+              xv = "1se", # select smallest tree within 1 se
+              xval = nrow(plsf.spp), # number of cross-validations
+              xvmult = 100, # number of multiple cross-validations
+              which = 4, # plot both node labels
+              legend = FALSE, margin = 0.01, cp = 0,
+              size=5)
+
+plsf.mrt2$cptable
+summary(plsf.mrt2)
+
+# Calculate indicator values (indval) for each species
+doubs.mrt.indval <- indval(plsf.spp, plsf.mrt2$where)
+
+# Extract the significant indicator species (and which node
+# they represent)
+doubs.mrt.indval$maxcls[which(doubs.mrt.indval$pval <= 0.05)]
+
+# Extract their indicator values
+doubs.mrt.indval$indcls[which(doubs.mrt.indval$pval <= 0.05)]
+
+### SEM
+

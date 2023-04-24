@@ -25,6 +25,7 @@ data.path=paths[3]
 
 files.all=list.files(data.path,full.names=T)
 files.all=files.all[grepl("Phytoplankton 2009-2015",files.all)==F]
+files.all=files.all[!files.all%in%c("C:/Julian_LaCie/_GitHub/ATRAPP/Data/PLSF_Microscope/SppList")]
 
 tmp=lapply(files.all,getSheetNames)
 
@@ -55,9 +56,14 @@ for(i in 1:length(vals1)){
 lengths(phyto.col.names)
 phyto.col.names
 ## Read Data
-colnm.vals=c("Class","GenusSpp","Conc.cellsmL","totbiovol.um3mL")
-colvars1_common=c("Class","Taxa","Genus.species","Concentration.(cells/mL)","Total.biovolume.(µm3/mL)",
-                  "Cells/mL","Total.biovol..(µm3/mL)")
+colnm.vals=c("Class","GenusSpp","Conc.cellsmL","indbiovol.um3","totbiovol.um3mL")
+colvars1_common=c("Class","Taxa","Genus.species",
+                  "Concentration.(cells/mL)","Cells/mL",
+                  "Total.biovol..(µm3/mL)", "Total.biovolume.(µm3/mL)",
+                  "Indiv..biovol..(µm3)","Individual.biovolume.(µm3)"
+                  )
+
+lapply(phyto.col.names,function(x) x[x%in%colvars1_common])
 
 phyto.dat=data.frame()
 for(i in 1:length(vals1)){
@@ -110,6 +116,8 @@ for(i in 1:length(vals2)){
 zoo.col.names
 lengths(zoo.col.names)
 
+lapply(zoo.col.names,function(x) x[x%in%dat.col.nam])
+
 ## Read Data
 colnm.vals=c("Order","Taxa","conc.numbL","tot.biomass.ugL")
 
@@ -157,9 +165,13 @@ for(i in 1:length(vals3)){
 lengths(phyto.col.names)
 phyto.col.names
 ## Read Data
-colnm.vals=c("Class","GenusSpp","Conc.cellsmL","totbiovol.um3mL")
+colnm.vals=c("Class","GenusSpp","Conc.cellsmL","indbiovol.um3","totbiovol.um3mL")
 colvars1_common=c("Division","Taxa","Genus.species","Concentration.(cells/mL)","Total.biovolume.(µm3/mL)",
-                  "Cells/mL","Total.biovol..(µm3/mL)")
+                  "Cells/mL","Total.biovol..(µm3/mL)","Individual.biovolume.(µm3)")
+
+
+lapply(phyto.col.names,function(x) x[x%in%colvars1_common])
+
 
 phyto.dat2=data.frame()
 for(i in 1:length(vals3)){
@@ -172,7 +184,7 @@ for(i in 1:length(vals3)){
   
   tmp=tmp[,tmp.col.vars]
   colnames(tmp)=colnm.vals
-  tmp$date=convertToDate(read.xlsx(vals3[i],sheet=1,startRow =1)[2,ncol.vals])
+  tmp$date=convertToDate(read.xlsx(vals3[i],sheet=1,startRow =1)[1,ncol.vals])
   phyto.dat2=rbind(phyto.dat2,tmp)
   print(i)
 }
@@ -430,10 +442,11 @@ unique(phyto_20092015$Algal.Group)
 
 head(phyto_20092015,1L)
 phyto_20092015$GenusSpp=with(phyto_20092015, paste(Genus,Species))
-vars=c("Algal.Group","GenusSpp","Species.Cells/mL","Species.Biovolume/mL","date")
+vars=c("Algal.Group","GenusSpp","Species.Cells/mL","Cell.Biovolume.(um3)","Group.Total.Biovolume/mL","date")
+head(phyto.dat.all)
+tail(phyto_20092015[,vars])
 
 phyto_20092015=phyto_20092015[,vars]
-
 colnames(phyto_20092015)=names(phyto.dat.all)
 
 ## Combine all phyto data
@@ -450,6 +463,9 @@ subset(phyto.dat.all,date%in%as.Date("2017-07-11"))
 subset(zoo.dat.all,date%in%as.Date("2017-07-11"))
 subset(zoo.dat.all,date%in%as.Date("2015-08-16"))
 
+subset(phyto.dat.all,date%in%as.Date("2017-08-15"))
+subset(phyto.dat.all,date%in%as.Date("2017-09-12"))
+subset(phyto.dat.all,date%in%as.Date("2017-10-17"))
 
 subset(zoo.dat.all,is.na(date))
 subset(phyto.dat.all,is.na(date))
@@ -460,13 +476,14 @@ length(unique(phyto.dat.all$date))
 sort(unique(zoo.dat.all$date))
 sort(unique(phyto.dat.all$date))
 
+range(phyto.dat.all$date)
 
 
 length(unique(subset(phyto.dat.all,date%in%zoo.dat.all$date)$date))
 
 range(unique(subset(phyto.dat.all,date%in%zoo.dat.all$date)$date))
 
-# write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
+# write.csv(phyto.dat.all[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL","indbiovol.um3", "date")],
 #           paste0(export.path,"PLSF_microscope_data_phyto.csv"),row.names = F)
 # write.csv(zoo.dat.all[,c("Taxa", "conc.numbL", "tot.biomass.ugL", "date")],
 #           paste0(export.path,"PLSF_microscope_data_zoo.csv"),row.names = F)
