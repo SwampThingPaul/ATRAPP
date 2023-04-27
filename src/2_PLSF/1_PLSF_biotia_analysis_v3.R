@@ -31,6 +31,133 @@ export.path=paths[2]
 data.path=paths[3]
 GIS.path=paths[4]
 
+# WQ Data -----------------------------------------------------------------
+MDL_func=function(data,MDL,rng.val=TRUE){
+  tmp=as.numeric(ifelse(data=="LOD"|data==0,MDL/2,data))
+  tmp=ifelse(tmp<MDL,MDL/2,tmp)
+  if(rng.val==TRUE){print(range(tmp,na.rm=T))}
+  return(tmp)
+}
+
+dat=read.xlsx(paste0(data.path,"PLSF Database-12 Years (v2021-07-07).xlsx"))
+dat$Date=date.fun(convertToDate(dat$Date))
+
+# Water quality specific parameters
+wq.dat=dat[,c(1:20,364:374,387)]
+names(wq.dat)
+
+# all WQ Vars
+wq.vars=c("Date", "Site", "ENKI", "N_P", "TP.mgL", 
+          "PP.calc.mgL", "DP.mgL","SRP.mgL", "DOP.calc.mgL", 
+          "TN.mgL", "TKN.mgL", "NH4.mgL","NOx.mgL", "Urea.mgL", "DON.mgL", 
+          "SolN.mgL", "SolOC.mgL", "TOC.mgL", 
+          "pH", "Chla.ugL", "Cond", "DO.per", 
+          "TDS.mgL", "Temp.C", "ORP.mV", "Sal",
+          "Resistivity.ohm","Phyco.ugL", "TChl.ugL", 
+          "Turb.NTU", "Colour_PCU","Secchi_cm")
+colnames(wq.dat)=wq.vars
+
+plot(SolN.mgL~Date,wq.dat)
+
+## data handling
+TP.MDL=0.7*0.001
+SRP.MDL=TP.MDL
+DP.MDL=TP.MDL
+NOx.MDL=0.0004
+NH4.MDL=0.0014
+TN.MDL=0.004
+Chla.MDL=0.1
+Turb.MDL=2
+
+wq.dat$TP.ugL=with(wq.dat,MDL_func(TP.mgL,TP.MDL)*1000)
+wq.dat$SRP.ugL=with(wq.dat,MDL_func(SRP.mgL,SRP.MDL)*1000)
+wq.dat$DP.ugL=with(wq.dat,MDL_func(DP.mgL,DP.MDL)*1000)
+
+wq.dat$NOx.mgL=with(wq.dat,MDL_func(NOx.mgL,NOx.MDL))
+wq.dat$NH4.mgL=with(wq.dat,MDL_func(NH4.mgL,NH4.MDL))
+wq.dat$TN.mgL=with(wq.dat,MDL_func(TN.mgL,TN.MDL))
+wq.dat$Chla.ugL=with(wq.dat,MDL_func(Chla.ugL,Chla.MDL))
+wq.dat$Turb.NTU=with(wq.dat,MDL_func(Turb.NTU,Turb.MDL))
+
+wq.dat$DIN.mgL=with(wq.dat,NOx.mgL+NH4.mgL)
+wq.dat$DOP.ugL=with(wq.dat,ifelse(DP.ugL-SRP.ugL<0|DP.ugL-SRP.ugL==0,DP.MDL,DP.ugL-SRP.ugL))
+
+## Finding high sediment outliers (as communicated by Barry)
+plot(TP.ugL~Turb.NTU,wq.dat)
+plot(TN.mgL~Turb.NTU,wq.dat)
+
+# sampling error/outlier?
+turb.outliers=subset(wq.dat,Turb.NTU>100)
+High.TPTN=subset(wq.dat,TP.ugL>5000)
+
+pre.out.screen=nrow(wq.dat)
+wq.dat=subset(wq.dat,Turb.NTU<100|is.na(Turb.NTU)==T)
+wq.dat=subset(wq.dat,TP.ugL<5000|is.na(TP.ugL)==T)
+
+pre.out.screen-nrow(wq.dat)
+
+# P reversal check
+wq.dat$TPReversal=with(wq.dat,ifelse(is.na(SRP.ugL)==T|is.na(TP.ugL)==T,0,ifelse(SRP.ugL>(TP.ugL*1.3),1,0)));
+sum(wq.dat$TPReversal,na.rm=T)
+subset(wq.dat,TPReversal==1)
+plot(TP.ugL~SRP.ugL,wq.dat,ylab="TP (\u03BCg L\u207B\u00b9)",xlab="SRP (\u03BCg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TPReversal==1,"red",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
+
+# removed TP values with reversal
+wq.dat[wq.dat$TPReversal==1,c("TP.ugL","SRP.ugL","DP.ugL","DOP.ugL")]=NA
+
+## TN Reversal Check
+nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F&is.na(Urea.mgL)==F))
+nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F|is.na(Urea.mgL)==T))
+
+wq.dat$TNReversal=with(wq.dat,ifelse(is.na(DIN.mgL)==T|is.na(TN.mgL)==T,0,ifelse(DIN.mgL>(TN.mgL*1.3),1,0)));
+sum(wq.dat$TNReversal,na.rm=T)
+subset(wq.dat,TNReversal==1)
+plot(TN.mgL~DIN.mgL,wq.dat,ylab="TN (mg L\u207B\u00b9)",xlab="DIN (mg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TNReversal==1,"blue",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
+wq.dat[wq.dat$TNReversal==1,c("TN.mgL","DIN.mgL","NOx.mgL","NH4.mgL")]=NA
+
+pre.out.screen-nrow(wq.dat)
+
+# 
+wq.dat$TON.mgL=with(wq.dat,ifelse(TN.mgL-DIN.mgL<TN.MDL,TN.MDL/2,TN.mgL-DIN.mgL))
+
+## Stoichiometry
+N.mw=14.0067
+P.mw=30.973762
+C.mw=12.0107
+
+wq.dat$TP.mM=with(wq.dat,(TP.ugL/1000)/P.mw)
+wq.dat$TN.mM=with(wq.dat,TN.mgL/N.mw)
+wq.dat$SRP.mM=with(wq.dat,(SRP.ugL/1000)/P.mw)
+wq.dat$DIN.mM=with(wq.dat,DIN.mgL/N.mw)
+wq.dat$TON.mM=with(wq.dat,TON.mgL/N.mw)
+wq.dat$TOC.mM=with(wq.dat,TOC.mgL/C.mw)
+
+wq.dat$TOC_TON=with(wq.dat,TOC.mM/TON.mM)
+wq.dat$TN_TP=with(wq.dat,TN.mM/TP.mM)
+wq.dat$DIN_SRP=with(wq.dat,DIN.mM/SRP.mM)
+
+unique(wq.dat$Site)
+vars=c("Date",
+       "Temp.C","Cond","Turb.NTU","DO.per",
+       "TP.ugL","SRP.ugL","DP.ugL","DOP.ugL",
+       "TN.mgL","NOx.mgL","NH4.mgL","DIN.mgL","TON.mgL",
+       "TN_TP","DIN_SRP")
+wq.dat=subset(wq.dat,Site=="Lake_Outlet")[,vars]
+
+wq.dat.melt=melt(wq.dat,id.vars = "Date")
+wq.dat.melt=subset(wq.dat.melt,is.na(value)==F)
+wq.dat.melt$month=as.numeric(format(wq.dat.melt$Date,"%m"))
+wq.dat.melt$CY=as.numeric(format(wq.dat.melt$Date,"%Y"))
+wq.dat.melt$monCY.date=with(wq.dat.melt,paste(CY,month,"01",sep="-"))
+
+wq.dat.month=dcast(wq.dat.melt,CY+month+monCY.date~variable,value.var = "value",mean)
+na.omit(wq.dat.month)
+
+head(wq.dat.month)
+range(subset(wq.dat.month,is.na(TN.mgL)==F)$monCY.date)
+range(subset(wq.dat.month,is.na(NOx.mgL)==F)$monCY.date)
+range(subset(wq.dat.month,is.na(NH4.mgL)==F)$monCY.date)
+
 
 # Biotic data -------------------------------------------------------------
 plsf.phyto=read.csv(paste0(export.path,"PLSF_microscope_data_phyto.csv"))
@@ -410,7 +537,7 @@ rank_clock=ggplot(aggdat, aes(year, value,color=variable)) +
   # on polor coordinates
   coord_polar()+
   # label axes
-  labs(x="Year", y="Annual Mean Abundance", color="Class") + 
+  labs(x="Year", y="Annual Mean Relative Biovolume", color="Class") + 
   # format
   theme_bw() +
   theme(text = element_text(size = 14,family = "serif"),
@@ -425,7 +552,7 @@ rank_clock=ggplot(aggdat, aes(year, value,color=variable)) +
   geom_segment(aes(x = 2011, y = 0, xend = 2011, yend = 1), color = "grey70",lty=2)
 rank_clock
 
-# ggsave(paste0(plot.path,"Class_rank_clock.png"),rank_clock, width = 6.5, height = 6, units = "in",dpi = 300)
+# ggsave(paste0(plot.path,"Class_rank_clock.png"),rank_clock, width = 6, height = 5, units = "in",dpi = 300)
 
 ### Turnover ----------------------------------------------------------------
 
@@ -730,8 +857,8 @@ text(spp_scrs,row.names(spp_scrs),cex=0.8,font=2,col="black")
 # text(scrs[,1],scrs[,2],consec.day.vals)
 axis_fun(1,line=-0.5,xmaj,xmin,format(xmaj),1);
 axis_fun(2,ymaj,ymin,format(ymaj),1); box(lwd=1)
-mtext(side=1,line=1.5,"Dim 1");
-mtext(side=2,line=2.25,"Dim 2");
+mtext(side=1,line=1.5,paste0("Axis 1 (",round(eig.pca$variance[1],1)," %)"));
+mtext(side=2,line=2.25,paste0("Axis 2 (",round(eig.pca$variance[2],1)," %)"));
 
 legend("bottomleft",legend=c("Group 1","Group 2"),# legend=c("June 2011 - June 2016", "July 2016 - Sept 2020"),
        pch=21,pt.bg=c(adjustcolor(rev(clust.cols),0.25)),
@@ -754,6 +881,102 @@ other.dat=phyto_class.dat[,c("month","CY","PCOA1.clusts")]
 
 tmp1=adonis2(spp.dat ~ CY*PCOA1.clusts, data=other.dat, permutations=999)
 tmp1
+
+### Regression tree  --------------------------------------------------------
+# https://r.qcbs.ca/workshop10/book-en/
+# https://uw.pressbooks.pub/appliedmultivariatestatistics/chapter/univariate-regression-trees/
+library(mvpart)
+library(labdsv)
+phyto.class.prop.sum$MonCY.date=with(phyto.class.prop.sum,date.fun(paste(CY,month,"01",sep="-")))
+phyto.class.prop.sum$MonCY.date.num=as.numeric(lubridate::decimal_date(phyto.class.prop.sum$MonCY.date))
+
+wq.vars=c("CY","month","TP.ugL","TN.mgL")# ,"Cond","Temp.C")
+bio.vars=c("month", "CY", "MonCY.date.num", "Bacillariophyceae", "Dinophyceae", "Cryptophyceae", 
+           "Chlorophyceae", "Cyanophyceae", "Other")
+phyto.class.prop.sum2=merge(phyto.class.prop.sum[,bio.vars],wq.dat.month[,wq.vars],c("CY","month"),all.x=T)
+
+plsf.spp=na.omit(phyto.class.prop.sum2)[,bio.vars[4:length(bio.vars)]]
+plsf.env=na.omit(phyto.class.prop.sum2)[,c("MonCY.date.num",wq.vars[3:length(wq.vars)])]
+
+plsf.spp.hel=decostand(plsf.spp, method = "hellinger")
+# Create multivariate regression tree
+set.seed(123)
+plsf.mrt <- mvpart(as.matrix(plsf.spp) ~ ., data = plsf.env,
+                   xv = "1se", # interactively select best tree
+                   xval = nrow(plsf.spp), # number of cross-validations
+                   xvmult = 5, # number of multiple cross-validations
+                   which = 4, # plot both node labels
+                   legend = FALSE, margin = 0.01, cp = 0,size=17)
+
+cptab=data.frame(plsf.mrt$cptable)
+cptab$treesize=1:nrow(cptab)#cptab$nsplit+1
+#plotcp(plsf.mrt)
+
+# png(filename=paste0(plot.path,"PLSF_Phyto_mrt_errors.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.75,0.5),oma=c(2,2,0.25,0.5));
+
+xlim.val=c(1,17);by.x=1;xmaj=round(c(0,seq(xlim.val[1],xlim.val[2],by.x)),1);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x);
+ylim.val=c(0,1.5);by.y=0.2;ymaj=round(c(0,seq(ylim.val[1],ylim.val[2],by.y)),1);ymin=seq(ylim.val[1],ylim.val[2],by.y/2);
+
+plot(xerror~treesize,cptab,xlim=xlim.val,ylim=ylim.val,type="n",axes=F,ann=F)
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.5)
+with(cptab,pt_line(treesize,rel.error,1,"dodgerblue1",1,21,"dodgerblue1",cex=1.25,pt.lwd=0.01))
+with(cptab,arrows(treesize,xerror-xstd,
+                  treesize,xerror+xstd,col="indianred1",length=0,angle=90,code=3))
+with(cptab,pt_line(treesize,xerror,2,"indianred1",1,21,"indianred1",cex=1.25,pt.lwd=0.01))
+abline(h=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Relative Error")
+mtext(side=1,line=2,"Size of Tree")
+
+legend("bottomleft",legend=c("Relative Error","Cross-Validated Relative Error"),
+       pch=21,pt.bg=c("dodgerblue1","indianred1"),
+       lty=NA,lwd=c(1),col=c(rep("grey",2)),
+       pt.cex=c(2),ncol=1,cex=0.8,bty="n",y.intersp=0.9,x.intersp=0.75,xpd=NA,xjust=0.5,yjust=1)
+dev.off()
+
+##
+plsf.mrt2=mvpart(as.matrix(plsf.spp) ~ ., data = plsf.env,
+       xv = "1se", # interactively select best tree
+       xval = nrow(plsf.spp), # number of cross-validations
+       xvmult = 5, # number of multiple cross-validations
+       which = 4, # plot both node labels
+       legend = FALSE, margin = 0.01, cp = 0,size=5)
+plotcp(plsf.mrt2)
+summary(plsf.mrt2)
+
+library(ggdendro)
+ddata <- dendro_data(plsf.mrt2)
+
+ddata$labels$label=gsub("TN.mgL>=1.666","TN \u2265 1.67 mg L\u207B\u00B9",ddata$labels$label)
+ddata$labels$label=gsub("TN.mgL>=1.263","TN \u2265 1.26 mg L\u207B\u00B9",ddata$labels$label)
+ddata$labels$label=gsub("TP.ugL< 81.5","TP < 81 \u03BCg L\u207B\u00B9",ddata$labels$label)
+ddata$labels$label=gsub("MonCY.date.num< 2017","Date < 2017",ddata$labels$label)
+ddata$leaf_labels$label=round(as.numeric(ddata$leaf_labels$label),2)
+
+dendro=ggplot() +
+  geom_segment(data = ddata$segments,
+               aes(x = x, y = y, xend = xend, yend = yend)) +
+  geom_text(data = ddata$labels,
+            aes(x = x, y = y, label = label,family = "serif",fontface='bold'), size = 4, vjust = -0.5) +
+  geom_text(data = ddata$leaf_labels,
+            aes(x = x, y = y, label = label,family = "serif"), size = 4, vjust = 1) +
+  theme_dendro();dendro
+# ggsave(paste0(plot.path,"plsf_phyto_mrt.png"),dendro, width = 6, height = 5, units = "in",dpi = 300)
+
+# Calculate indicator values (indval) for each species
+doubs.mrt.indval <- indval(plsf.spp, plsf.mrt2$where)
+
+# Extract the significant indicator species (and which node
+# they represent)
+doubs.mrt.indval$maxcls[which(doubs.mrt.indval$pval <= 0.05)]
+
+# Extract their indicator values
+doubs.mrt.indval$indcls[which(doubs.mrt.indval$pval <= 0.05)]
+
+doubs.mrt.indval$pval[which(doubs.mrt.indval$pval <= 0.05)]
+
 
 
 ## Cyano  ------------------------------------------------------------------
@@ -1501,132 +1724,6 @@ phyto.ISA <- multipatt(x = phyto_class.dat[,3:ncol(phyto_class.dat)],
 phyto.ISA
 
 
-# WQ Data -----------------------------------------------------------------
-MDL_func=function(data,MDL,rng.val=TRUE){
-  tmp=as.numeric(ifelse(data=="LOD"|data==0,MDL/2,data))
-  tmp=ifelse(tmp<MDL,MDL/2,tmp)
-  if(rng.val==TRUE){print(range(tmp,na.rm=T))}
-  return(tmp)
-}
-
-dat=read.xlsx(paste0(data.path,"PLSF Database-12 Years (v2021-07-07).xlsx"))
-dat$Date=date.fun(convertToDate(dat$Date))
-
-# Water quality specific parameters
-wq.dat=dat[,c(1:20,364:374,387)]
-names(wq.dat)
-
-# all WQ Vars
-wq.vars=c("Date", "Site", "ENKI", "N_P", "TP.mgL", 
-          "PP.calc.mgL", "DP.mgL","SRP.mgL", "DOP.calc.mgL", 
-          "TN.mgL", "TKN.mgL", "NH4.mgL","NOx.mgL", "Urea.mgL", "DON.mgL", 
-          "SolN.mgL", "SolOC.mgL", "TOC.mgL", 
-          "pH", "Chla.ugL", "Cond", "DO.per", 
-          "TDS.mgL", "Temp.C", "ORP.mV", "Sal",
-          "Resistivity.ohm","Phyco.ugL", "TChl.ugL", 
-          "Turb.NTU", "Colour_PCU","Secchi_cm")
-colnames(wq.dat)=wq.vars
-
-plot(SolN.mgL~Date,wq.dat)
-
-## data handling
-TP.MDL=0.7*0.001
-SRP.MDL=TP.MDL
-DP.MDL=TP.MDL
-NOx.MDL=0.0004
-NH4.MDL=0.0014
-TN.MDL=0.004
-Chla.MDL=0.1
-Turb.MDL=2
-
-wq.dat$TP.ugL=with(wq.dat,MDL_func(TP.mgL,TP.MDL)*1000)
-wq.dat$SRP.ugL=with(wq.dat,MDL_func(SRP.mgL,SRP.MDL)*1000)
-wq.dat$DP.ugL=with(wq.dat,MDL_func(DP.mgL,DP.MDL)*1000)
-
-wq.dat$NOx.mgL=with(wq.dat,MDL_func(NOx.mgL,NOx.MDL))
-wq.dat$NH4.mgL=with(wq.dat,MDL_func(NH4.mgL,NH4.MDL))
-wq.dat$TN.mgL=with(wq.dat,MDL_func(TN.mgL,TN.MDL))
-wq.dat$Chla.ugL=with(wq.dat,MDL_func(Chla.ugL,Chla.MDL))
-wq.dat$Turb.NTU=with(wq.dat,MDL_func(Turb.NTU,Turb.MDL))
-
-wq.dat$DIN.mgL=with(wq.dat,NOx.mgL+NH4.mgL)
-wq.dat$DOP.ugL=with(wq.dat,ifelse(DP.ugL-SRP.ugL<0|DP.ugL-SRP.ugL==0,DP.MDL,DP.ugL-SRP.ugL))
-
-## Finding high sediment outliers (as communicated by Barry)
-plot(TP.ugL~Turb.NTU,wq.dat)
-plot(TN.mgL~Turb.NTU,wq.dat)
-
-# sampling error/outlier?
-turb.outliers=subset(wq.dat,Turb.NTU>100)
-High.TPTN=subset(wq.dat,TP.ugL>5000)
-
-pre.out.screen=nrow(wq.dat)
-wq.dat=subset(wq.dat,Turb.NTU<100|is.na(Turb.NTU)==T)
-wq.dat=subset(wq.dat,TP.ugL<5000|is.na(TP.ugL)==T)
-
-pre.out.screen-nrow(wq.dat)
-
-# P reversal check
-wq.dat$TPReversal=with(wq.dat,ifelse(is.na(SRP.ugL)==T|is.na(TP.ugL)==T,0,ifelse(SRP.ugL>(TP.ugL*1.3),1,0)));
-sum(wq.dat$TPReversal,na.rm=T)
-subset(wq.dat,TPReversal==1)
-plot(TP.ugL~SRP.ugL,wq.dat,ylab="TP (\u03BCg L\u207B\u00b9)",xlab="SRP (\u03BCg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TPReversal==1,"red",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
-
-# removed TP values with reversal
-wq.dat[wq.dat$TPReversal==1,c("TP.ugL","SRP.ugL","DP.ugL","DOP.ugL")]=NA
-
-## TN Reversal Check
-nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F&is.na(Urea.mgL)==F))
-nrow(subset(wq.dat,is.na(NOx.mgL)==F&is.na(NH4.mgL)==F|is.na(Urea.mgL)==T))
-
-wq.dat$TNReversal=with(wq.dat,ifelse(is.na(DIN.mgL)==T|is.na(TN.mgL)==T,0,ifelse(DIN.mgL>(TN.mgL*1.3),1,0)));
-sum(wq.dat$TNReversal,na.rm=T)
-subset(wq.dat,TNReversal==1)
-plot(TN.mgL~DIN.mgL,wq.dat,ylab="TN (mg L\u207B\u00b9)",xlab="DIN (mg L\u207B\u00b9)",pch=21,bg=ifelse(wq.dat$TNReversal==1,"blue",NA),col=adjustcolor("grey",0.8));abline(0,1,col="red")
-wq.dat[wq.dat$TNReversal==1,c("TN.mgL","DIN.mgL","NOx.mgL","NH4.mgL")]=NA
-
-pre.out.screen-nrow(wq.dat)
-
-# 
-wq.dat$TON.mgL=with(wq.dat,ifelse(TN.mgL-DIN.mgL<TN.MDL,TN.MDL/2,TN.mgL-DIN.mgL))
-
-## Stoichiometry
-N.mw=14.0067
-P.mw=30.973762
-C.mw=12.0107
-
-wq.dat$TP.mM=with(wq.dat,(TP.ugL/1000)/P.mw)
-wq.dat$TN.mM=with(wq.dat,TN.mgL/N.mw)
-wq.dat$SRP.mM=with(wq.dat,(SRP.ugL/1000)/P.mw)
-wq.dat$DIN.mM=with(wq.dat,DIN.mgL/N.mw)
-wq.dat$TON.mM=with(wq.dat,TON.mgL/N.mw)
-wq.dat$TOC.mM=with(wq.dat,TOC.mgL/C.mw)
-
-wq.dat$TOC_TON=with(wq.dat,TOC.mM/TON.mM)
-wq.dat$TN_TP=with(wq.dat,TN.mM/TP.mM)
-wq.dat$DIN_SRP=with(wq.dat,DIN.mM/SRP.mM)
-
-unique(wq.dat$Site)
-vars=c("Date",
-       "Temp.C","Cond","Turb.NTU","DO.per",
-       "TP.ugL","SRP.ugL","DP.ugL","DOP.ugL",
-       "TN.mgL","NOx.mgL","NH4.mgL","DIN.mgL","TON.mgL",
-       "TN_TP","DIN_SRP")
-wq.dat=subset(wq.dat,Site=="Lake_Outlet")[,vars]
-
-wq.dat.melt=melt(wq.dat,id.vars = "Date")
-wq.dat.melt=subset(wq.dat.melt,is.na(value)==F)
-wq.dat.melt$month=as.numeric(format(wq.dat.melt$Date,"%m"))
-wq.dat.melt$CY=as.numeric(format(wq.dat.melt$Date,"%Y"))
-wq.dat.melt$monCY.date=with(wq.dat.melt,paste(CY,month,"01",sep="-"))
-
-wq.dat.month=dcast(wq.dat.melt,CY+month+monCY.date~variable,value.var = "value",mean)
-na.omit(wq.dat.month)
-
-head(wq.dat.month)
-range(subset(wq.dat.month,is.na(TN.mgL)==F)$monCY.date)
-range(subset(wq.dat.month,is.na(NOx.mgL)==F)$monCY.date)
-range(subset(wq.dat.month,is.na(NH4.mgL)==F)$monCY.date)
 
 ### RDA ------------------------------------------------------------------
 phyto.diaz.prop.sum2=merge(phyto.diaz.prop.sum,wq.dat.month,c("CY","month"),all.x=T)
