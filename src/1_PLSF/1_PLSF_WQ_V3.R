@@ -414,6 +414,52 @@ unique(wq.dat.melt$variable)
 head(subset(wq.dat.melt,variable=="Cond"))
 head(subset(wq.dat.melt,variable=="TSI_mean2"))
 
+vars=c("TSI_mean2","TSI_TP","TSI_TN")
+TSI.melt=melt(wq.dat[,c(idvars,vars)],id.vars=idvars)
+
+sum.stats=ddply(subset(TSI.melt,Site%in%sites.vals),c("Site","variable"),summarise,
+                N.val=N.obs(value),
+                med.value=median(value,na.rm=T),
+                mean.value=mean(value,na.rm=T),
+                SD.value=sd(value,na.rm=T),
+                min.val=min(value,na.rm=T),max.val=max(value,na.rm=T))
+sum.stats$min.val=with(sum.stats,ifelse(is.infinite(min.val),NA,min.val))
+sum.stats$max.val=with(sum.stats,ifelse(is.infinite(max.val),NA,max.val))
+
+sum.stats%>%
+  flextable()%>%
+  colformat_double(j=4:8,digits=1,na_str = "---")%>%
+  compose(j="variable",i=~variable=="TSI_mean2",value=as_paragraph("TSI",as_sub("mean")))%>%
+  compose(j="variable",i=~variable=="TSI_TP",value=as_paragraph("TSI",as_sub("TP")))%>%
+  compose(j="variable",i=~variable=="TSI_TN",value=as_paragraph("TSI",as_sub("TN")))%>%
+  compose(j="Site",i=~Site=="Godbout",value=as_paragraph('Lake Inlet'))%>%
+  compose(j="Site",i=~Site=="Lake_Outlet",value=as_paragraph('Lake Outlet'))%>%
+  # merge_v(j="param")%>%
+  merge_v(j="Site")%>%
+  set_header_labels("Site"="Site",
+                    "variable" = "Parameter",
+                    "N.val" = "Sample\nSize",
+                    "med.value" = "Median",
+                    "mean.value" = "Mean",
+                    "SD.value" = "Std Dev",
+                    "N.val"="N",
+                    "min.val"="Min",
+                    "max.val"="Max")%>%
+  width(width=c(0.5,0.75,0.25,0.75,0.5,0.75,0.5,0.5))%>%
+  #align(align="center",part="header")%>%
+  align(j=1:2,align="left",part="all")%>%
+  align(j=3:8,align="right",part="all")%>%
+  padding(padding=1.5,part="all")%>%
+  # hline(i=seq(2,54,2))%>%
+  hline(i=3)%>%
+  fix_border_issues()%>%
+  footnote(j="variable",i=~variable=="TSI_mean2",ref_symbols = " 1 ",part="body",
+           value=as_paragraph("Mean TSI",as_sub("TP")," and TSI",as_sub("TN")),inline=T)%>%
+  font(fontname="Times New Roman",part="all")%>%
+  fontsize(size=10,part="all")%>%
+  fontsize(size=11,part="header")# %>%print("docx")
+
+
 
 ## Export to EDI
 idvars=c("Date","Site")
@@ -3548,6 +3594,358 @@ boxplot(value~x.pt,tmp.dat,outline=F)
 kruskal.test(value~x.pt,tmp.dat)
 
 
+# revised GAM Plots -------------------------------------------------------
+yaxs.cex=0.8
+labs.cex=0.9
+inflow.col=viridisLite::viridis(4,alpha=0.25,option="E")[2]
+outflow.col=viridisLite::viridis(4,alpha=0.5,option="E")[3]
+
+
+## TSI ---------------------------------------------------------------------
+
+# png(filename=paste0(plot.path,"revisedGAM/PLSF_GAM_weekly_TSI_year.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1,0.5,1),oma=c(1,2.25,0.5,0.25));
+layout(matrix(1:2,1,2,byrow = T))
+
+ylim.val=c(-20,20);by.y=10;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,m.TSI.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TSI.in$model$CY,partial.resids.TSI.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,m.TSI.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = m.TSI.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = m.TSI.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = m.TSI.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = m.TSI.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Inlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=2,line=1.5,"TSI Effect",cex=labs.cex)
+
+ylim.val=c(-0.5,0.5);by.y=0.5;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,TSI.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TSI.out$model$CY,partial.resids.TSI.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,TSI.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = TSI.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = TSI.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = TSI.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = TSI.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Outlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+
+mtext(side=1,"Year",outer=T)
+dev.off()
+
+
+## TP ----------------------------------------------------------------------
+# png(filename=paste0(plot.path,"revisedGAM/PLSF_GAM_weekly_TP_year.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1,0.5,1),oma=c(1,2.25,0.5,0.25));
+layout(matrix(1:2,1,2,byrow = T))
+{
+ylim.val=c(-2,3);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,TP.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TP.in$model$CY,partial.resids.TP.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,TP.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = TP.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = TP.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = TP.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = TP.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Inlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=2,line=2,"TP Effect",cex=labs.cex)
+
+ylim.val=c(-2,3);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,TP.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TP.out$model$CY,partial.resids.TP.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,TP.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = TP.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = TP.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = TP.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = TP.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Outlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=1,"Year",outer=T)
+}
+dev.off()
+
+# png(filename=paste0(plot.path,"revisedGAM/PLSF_GAM_weekly_TPspp_year.png"),width=6,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.5,1),oma=c(2,2,1.5,0.25));
+layout(matrix(1:8,4,2,byrow = T))
+
+## PP 
+{
+ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,PP.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.PP.in$model$CY,partial.resids.PP.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,PP.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = PP.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = PP.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = PP.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = PP.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Inlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=2,line=2,"PP Effect",cex=labs.cex)
+
+plot(fit.CY~CY,PP.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.PP.out$model$CY,partial.resids.PP.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,PP.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = PP.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = PP.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = PP.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = PP.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Outlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+}
+# DP
+{
+ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(fit.CY~CY,DP.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.DP.in$model$CY,partial.resids.DP.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,DP.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = DP.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = DP.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = DP.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = DP.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=2,line=2,"DP Effect",cex=labs.cex)
+
+plot(fit.CY~CY,DP.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.DP.out$model$CY,partial.resids.DP.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,DP.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = DP.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = DP.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = DP.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = DP.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+}
+# SRP
+{
+ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(fit.CY~CY,SRP.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.SRP.in$model$CY,partial.resids.SRP.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,SRP.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = SRP.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = SRP.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = SRP.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = SRP.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=2,line=2,"SRP Effect",cex=labs.cex)
+
+plot(fit.CY~CY,SRP.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.SRP.out$model$CY,partial.resids.SRP.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,SRP.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = SRP.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = SRP.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = SRP.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = SRP.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+}
+# DOP
+{
+ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(fit.CY~CY,DOP.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.DOP.in$model$CY,partial.resids.DOP.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,DOP.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = DOP.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = DOP.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = DOP.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = DOP.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=2,line=2,"DOP Effect",cex=labs.cex)
+
+plot(fit.CY~CY,DOP.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.DOP.out$model$CY,partial.resids.DOP.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,DOP.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = DOP.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = DOP.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = DOP.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = DOP.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+}
+mtext(side=1,"Year",outer=T,line=0.5)
+dev.off()
+
+## TN ----------------------------------------------------------------------
+# png(filename=paste0(plot.path,"revisedGAM/PLSF_GAM_weekly_TN_year.png"),width=6.5,height=4,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1,0.5,1),oma=c(1,2.25,0.5,0.25));
+layout(matrix(1:2,1,2,byrow = T))
+{
+ylim.val=c(-2,2);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,TN.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TN.in$model$CY,partial.resids.TN.in[,2],pch=19,col=inflow.col)
+lines(fit.CY~CY,TN.in.pdat,lwd=2)
+lines(upper.CY ~ CY, data = TN.in.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = TN.in.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = TN.in.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = TN.in.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Inlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=2,line=2,"TN Effect",cex=labs.cex)
+
+ylim.val=c(-2,2);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+plot(fit.CY~CY,TN.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey")
+abline(h=0)
+points(m.TN.out$model$CY,partial.resids.TN.out[,2],pch=19,col=outflow.col)
+lines(fit.CY~CY,TN.out.pdat,lwd=2)
+lines(upper.CY ~ CY, data = TN.out.pdat, lty = "dashed")
+lines(lower.CY ~ CY, data = TN.out.pdat, lty = "dashed")
+lines(dsig.CY.incr ~ CY, data = TN.out.pdat, col = "red", lwd = 3,lty=1)
+lines(dsig.CY.decr ~ CY, data = TN.out.pdat, col = "blue", lwd = 3,lty=1)
+axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+mtext(side=3,adj=0,"Lake Outlet",cex=labs.cex)
+mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+mtext(side=1,"Year",outer=T)
+}
+dev.off()
+
+# png(filename=paste0(plot.path,"revisedGAM/PLSF_GAM_weekly_Nspp_year.png"),width=6,height=4.5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(1,2,0.5,1),oma=c(2,2,1.5,0.25));
+layout(matrix(1:6,3,2,byrow = T))
+
+## TKN 
+{
+  ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+  xlim.val=c(2010,2020);by.x=5;xmaj=seq(xlim.val[1],xlim.val[2],by.x);xmin=seq(xlim.val[1],xlim.val[2],by.x/by.x)
+  plot(fit.CY~CY,TKN.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.TKN.in$model$CY,partial.resids.TKN.in[,2],pch=19,col=inflow.col)
+  lines(fit.CY~CY,TKN.in.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = TKN.in.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = TKN.in.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = TKN.in.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = TKN.in.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+  mtext(side=3,adj=0,"Lake Inlet",cex=labs.cex)
+  mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+  mtext(side=2,line=2,"TKN Effect",cex=labs.cex)
+  
+  plot(fit.CY~CY,TKN.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.TKN.out$model$CY,partial.resids.TKN.out[,2],pch=19,col=outflow.col)
+  lines(fit.CY~CY,TKN.out.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = TKN.out.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = TKN.out.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = TKN.out.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = TKN.out.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+  mtext(side=3,adj=0,"Lake Outlet",cex=labs.cex)
+  mtext(side=3,adj=0," s(Year)",cex=labs.cex,line=-1,font=3)
+}
+# NOx
+{
+  ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+  plot(fit.CY~CY,NOx.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.NOx.in$model$CY,partial.resids.NOx.in[,2],pch=19,col=inflow.col)
+  lines(fit.CY~CY,NOx.in.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = NOx.in.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = NOx.in.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = NOx.in.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = NOx.in.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+  mtext(side=2,line=2,"NO\u2093 Effect",cex=labs.cex)
+  
+  plot(fit.CY~CY,NOx.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.NOx.out$model$CY,partial.resids.NOx.out[,2],pch=19,col=outflow.col)
+  lines(fit.CY~CY,NOx.out.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = NOx.out.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = NOx.out.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = NOx.out.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = NOx.out.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+}
+# NH4
+{
+  ylim.val=c(-4,4);by.y=2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+  plot(fit.CY~CY,NH4.in.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.NH4.in$model$CY,partial.resids.NH4.in[,2],pch=19,col=inflow.col)
+  lines(fit.CY~CY,NH4.in.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = NH4.in.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = NH4.in.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = NH4.in.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = NH4.in.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+  mtext(side=2,line=2,"NH\u207B\u2084 Effect",cex=labs.cex)
+  
+  plot(fit.CY~CY,NH4.out.pdat,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n")
+  abline(h=ymaj,v=xmaj,lty=3,col="grey")
+  abline(h=0)
+  points(m.NH4.out$model$CY,partial.resids.NH4.out[,2],pch=19,col=outflow.col)
+  lines(fit.CY~CY,NH4.out.pdat,lwd=2)
+  lines(upper.CY ~ CY, data = NH4.out.pdat, lty = "dashed")
+  lines(lower.CY ~ CY, data = NH4.out.pdat, lty = "dashed")
+  lines(dsig.CY.incr ~ CY, data = NH4.out.pdat, col = "red", lwd = 3,lty=1)
+  lines(dsig.CY.decr ~ CY, data = NH4.out.pdat, col = "blue", lwd = 3,lty=1)
+  axis_fun(1,xmaj,xmin,xmaj,line=-0.5,cex=yaxs.cex);
+  axis_fun(2,ymaj,ymin,format(ymaj),cex=yaxs.cex);box(lwd=1)
+}
+
+mtext(side=1,"Year",outer=T,line=0.5)
+dev.off()
 
 # GAM Plot ----------------------------------------------------------------
 
@@ -5468,6 +5866,7 @@ kruskal.test(value~ice.sea,subset(wq.dat.melt,variable=="TP.ugL"&Site=="Lake_Out
 test=kruskal.test(value~ice.sea,subset(wq.dat.melt,variable=="TP.ugL"&Site=="Lake_Outlet"))
 test$statistic
 test$p.value
+
 
 paramvars
 dcast(subset(wq.dat.melt,Site%in%sites.vals&variable%in%paramvars),variable+Site~bloom.sea,value.var = "value",median,na.rm=T)

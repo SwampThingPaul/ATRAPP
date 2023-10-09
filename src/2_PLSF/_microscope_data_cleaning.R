@@ -490,9 +490,9 @@ range(unique(subset(phyto.dat.all,date%in%zoo.dat.all$date)$date))
 # write.csv(proto.dat.all[,c("Taxa", "conc.numbL", "tot.biovol.um3L", "date")],
 #           paste0(export.path,"PLSF_microscope_data_proto.csv"),row.names = F)
 
-phyto.dat.all.zoo=subset(phyto.dat.all,date%in%zoo.dat.all$date)
-write.csv(phyto.dat.all.zoo[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
-          paste0(export.path,"PLSF_microscope_data_phyto_zooperiod.csv"),row.names = F)
+# phyto.dat.all.zoo=subset(phyto.dat.all,date%in%zoo.dat.all$date)
+# write.csv(phyto.dat.all.zoo[,c("GenusSpp", "Conc.cellsmL", "totbiovol.um3mL", "date")],
+#           paste0(export.path,"PLSF_microscope_data_phyto_zooperiod.csv"),row.names = F)
 
 ####
 

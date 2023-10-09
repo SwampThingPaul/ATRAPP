@@ -1723,7 +1723,6 @@ vars.rename=c(paste0(params[3],".est"),paste0(params[3],".pval"))
 tmp3=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[3])
 tmp3=tmp3[,vars]
 colnames(tmp3)=vars.rename
-vars.rename=c(paste0(params[4],".est"),paste0(params[4],".pval"))
 tmp4=subset(ccf.rslt,lag%in%seq(-20,0,1)&climate.index=="mean.pdo"&variable==var.vals1[4])
 tmp4=tmp4[,vars]
 colnames(tmp4)=vars.rename
@@ -2945,6 +2944,7 @@ dev.off()
 
 
 # Biotia ------------------------------------------------------------------
+library(vegan)
 ## From PLSF "master" file
 # names(dat)
 # 
@@ -3013,6 +3013,552 @@ plsf.phyto.biovol.mon=ddply(plsf.phyto,c("CY","month"),summarise,
                             phyto.biovol.um3mL=sum(totbiovol.um3mL ,na.rm=T),
                             N.samp=N.obs(totbiovol.um3mL))
 
+spp.class.order=read.csv(paste0(export.path,"20230317_GenusSpp_ClassOrder.csv"))
+head(spp.class.order)
+
+spp.class.order=rbind(spp.class.order,
+                      data.frame(GenusSpp="Cryptomonas marsonii",
+                                 genus="Cryptomonas",
+                                 order="Cryptomonadales",
+                                 class="Cryptophyceae"))
+spp.class.order$class[spp.class.order$class=="Cyanobacteriia"]="Cyanophyceae"
+
+plsf.phyto$GenusSpp=trimws(plsf.phyto$GenusSpp)
+plsf.phyto=merge(plsf.phyto,spp.class.order,"GenusSpp",all.x=T)
+
+#### RE analysis with just phyto
+phyto.dat.biovol.xtab=dcast(plsf.phyto,date~GenusSpp,value.var = "totbiovol.um3mL",sum,na.rm=T)
+x.val=apply(phyto.dat.biovol.xtab[,2:ncol(phyto.dat.biovol.xtab)],1,sum,na.rm=T)
+phyto.dat.biovol.xtab[,2:ncol(phyto.dat.biovol.xtab)]=sweep(phyto.dat.biovol.xtab[,2:ncol(phyto.dat.biovol.xtab)],1,x.val,"/")
+subset(phyto.dat.biovol.xtab,date==date.fun("2011-06-26"))
+
+phyto.dat.conc.xtab=dcast(plsf.phyto,date~GenusSpp,value.var = "Conc.cellsmL",sum,na.rm=T)
+x.val=apply(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)],1,sum)
+phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)]=sweep(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)],1,x.val,"/")
+
+## Diversity (alpha) Indices
+# Shannon Index
+shannon=-phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)]*log(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)])
+shannon_H=apply(shannon,1,sum,na.rm=T)
+
+# Simpson
+simpson_D=1-apply(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)]^2,1,sum,na.rm=T)
+simpson_invD=1/apply(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)]^2,1,sum,na.rm=T)
+
+plot(simpson_D)
+
+#species richness
+richness=specnumber(phyto.dat.conc.xtab[,2:ncol(phyto.dat.conc.xtab)])
+plot(richness)
+
+# Pielou's evenness J' #https://www.rpubs.com/roalle/mres_2019
+pielou_even=shannon_H/log(richness)
+
+phyto.dat.conc.xtab=cbind(phyto.dat.conc.xtab,
+                          shannon_H,simpson_D,simpson_invD,richness,pielou_even)
+spp.rich.div=phyto.dat.conc.xtab[,c("date","shannon_H","simpson_D","simpson_invD","richness","pielou_even")]
+
+plot(richness~date,phyto.dat.diversity)
+
+
+### 
+plsf.phyto2=ddply(plsf.phyto,c("CY","month","GenusSpp","genus","order","class"),
+                  summarise,
+                  mean.biovol.um3mL=mean(totbiovol.um3mL,na.rm=T),
+                  mean.conc.cellsmL=mean(Conc.cellsmL,na.rm=T))
+
+plsf.phyto.class=ddply(plsf.phyto2,c("CY","month","class"),summarise,
+                       sum.biovol.um3mL=sum(mean.biovol.um3mL,na.rm=T),
+                       sum.conc.cellsmL=sum(mean.conc.cellsmL,na.rm=T))
+plsf.phyto.class$log10.biovol=with(plsf.phyto.class,ifelse(sum.biovol.um3mL==0,0,log10(sum.biovol.um3mL)))
+
+plsf.phyto.class.xtab=dcast(plsf.phyto.class,CY+month~class,value.var="sum.biovol.um3mL",mean,na.rm=T)
+x.val=apply(plsf.phyto.class.xtab[,3:ncol(plsf.phyto.class.xtab)],1,sum,na.rm=T)
+plsf.phyto.class.xtab.prop=plsf.phyto.class.xtab
+plsf.phyto.class.xtab.prop[,3:ncol(plsf.phyto.class.xtab.prop)]=sweep(plsf.phyto.class.xtab.prop[,3:ncol(plsf.phyto.class.xtab.prop)],1,x.val,"/")
+
+apply(plsf.phyto.class.xtab.prop[,3:ncol(plsf.phyto.class.xtab.prop)],2,mean,na.rm=T)
+phyto.class.prop=melt(plsf.phyto.class.xtab.prop,id.vars = c("CY","month"))
+phyto.class.prop.mean=ddply(phyto.class.prop,c("variable"),summarise,mean.val=mean(value,na.rm=T))
+
+phyto.class.prop.mean=phyto.class.prop.mean[order(-phyto.class.prop.mean$mean.val),]
+phyto.class.prop.mean
+
+class.reclass=data.frame(class=c("Cyanophyceae", "Cryptophyceae", "Bacillariophyceae", "Dinophyceae", 
+                                 "Chlorophyceae", "Chrysophyceae", "Euglenoidea", "Prasinophyceae", 
+                                 "Trebouxiophyceae", "Prymnesiophyceae", "Zygnematophyceae", "Eurotiomycetes", 
+                                 "unid", "Katablepharidea", "Euglenophyceae", "Xanthophyceae", 
+                                 "Eustigmatophyceae", "Liliopsida", "Klebsormidiophyceae"),
+                         class.reclass=c("Cyanophyceae", "Cryptophyceae", "Bacillariophyceae", "Dinophyceae", 
+                                         "Chlorophyceae", rep("Other",14)))
+
+phyto.class.prop=merge(phyto.class.prop,class.reclass,by.x="variable",by.y="class")
+phyto.class.prop.sum=ddply(phyto.class.prop,c("CY","month","class.reclass"),summarise,Tprop=sum(value,na.rm=T))
+
+phyto.class.prop=subset(phyto.class.prop,CY>2009)
+phyto.class.prop.sum=dcast(phyto.class.prop,CY+month~class.reclass,value.var = "value",sum,na.rm=T)
+fill.val=expand.grid(month=1:12,
+                     CY=2010:2020)
+fill.val=rbind(fill.val,data.frame(month=1,CY=2021))
+
+phyto.class.prop.sum=merge(phyto.class.prop.sum,fill.val,c("month","CY"),all.y=T)
+phyto.class.prop.sum=phyto.class.prop.sum[,c("month","CY","Bacillariophyceae","Dinophyceae",
+                                             "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other")]
+phyto.class.prop.sum=phyto.class.prop.sum[order(phyto.class.prop.sum$CY,phyto.class.prop.sum$month),]
+
+cols=c("burlywood1","goldenrod","mediumaquamarine","seagreen","paleturquoise2","grey")
+barplot(t(phyto.class.prop.sum[,3:ncol(phyto.class.prop.sum)]),
+        col=cols)
+
+plsf.phyto.class.reclass.biovol=ddply(merge(plsf.phyto.class,class.reclass,"class"),
+                                      c("CY","month","class.reclass"),summarize,
+                                      tot.biovol=sum(sum.biovol.um3mL,na.rm=T))
+plsf.phyto.class.reclass.biovol=merge(plsf.phyto.class.reclass.biovol,fill.val,c("month","CY"),all.y=T)
+# plsf.phyto.class.reclass.biovol=plsf.phyto.class.reclass.biovol[order(plsf.phyto.class.reclass.biovol$CY,
+#                                                                       plsf.phyto.class.reclass.biovol$month,
+#                                                                       plsf.phyto.class.reclass.biovol$class.reclass),]
+plsf.phyto.class.reclass.biovol$monCY.date=with(plsf.phyto.class.reclass.biovol,date.fun(paste(CY,month,"01",sep="-")))
+plsf.phyto.class.reclass.biovol=plsf.phyto.class.reclass.biovol[order(plsf.phyto.class.reclass.biovol$monCY.date),]
+
+plsf.phyto.class$biovol.mm3L=plsf.phyto.class$sum.biovol.um3mL*1e-6
+plsf.phyto.class$ice.period=with(plsf.phyto.class,ifelse(month%in%seq(5,11,1),"no-ice","ice"))
+
+plsf.phyto.class.reclass.biovol2=dcast(merge(plsf.phyto.class,class.reclass,"class"),
+                                       CY+month~class.reclass,value.var = "biovol.mm3L",sum,na.rm=T)
+plsf.phyto.class.reclass.biovol2=merge(plsf.phyto.class.reclass.biovol2,fill.val,c("month","CY"),all.y=T)
+plsf.phyto.class.reclass.biovol2$monCY.date=with(plsf.phyto.class.reclass.biovol2,date.fun(paste(CY,month,"01",sep="-")))
+class.vars=c("Bacillariophyceae","Dinophyceae",
+       "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other")
+plsf.phyto.class.reclass.biovol2=plsf.phyto.class.reclass.biovol2[order(plsf.phyto.class.reclass.biovol2$monCY.date),
+                                                                  c("CY","month","monCY.date",class.vars)]
+
+
+plsf.phyto.class.reclass.biovol3=ddply(plsf.phyto.class,
+                                      c("CY","month"),summarize,
+                                      tot.biovol=sum(biovol.mm3L,na.rm=T))
+spp.rich.div$month=as.numeric(format(spp.rich.div$date,"%m"))
+spp.rich.div$CY=as.numeric(format(spp.rich.div$date,"%Y"))
+spp.rich.div=merge(spp.rich.div,fill.val,c("CY","month"),all.y=T)
+spp.rich.div$monCY.date=with(spp.rich.div,date.fun(paste(CY,month,"01",sep="-")))
+spp.rich.div=spp.rich.div[order(spp.rich.div$monCY.date),]
+
+
+tmp=ddply(merge(plsf.phyto.class,class.reclass,"class"),c("ice.period","class.reclass","CY","month"),summarise,
+      Tbiovol=sum(biovol.mm3L,na.rm=T))
+ddply(tmp,c("ice.period","class.reclass"),summarise,mean.biovol=mean(Tbiovol,na.rm=T))
+tmp2=dcast(tmp,ice.period~class.reclass,value.var = "Tbiovol",mean)
+tmp2=tmp2[,c("ice.period",class.vars)]
+
+x.val=apply(tmp2[,2:ncol(tmp2)],1,sum,na.rm=T)
+tmp2[,2:ncol(tmp2)]=sweep(tmp2[,2:ncol(tmp2)],1,x.val,"/")
+
+phyto.class.prop.sum$monCY.date=with(phyto.class.prop.sum,date.fun(paste(CY,month,"01",sep="-")))
+phyto.class.prop.sum=merge(phyto.class.prop.sum,fill.val[,c("CY","month")],c("CY","month"),all.y=T)
+phyto.class.prop.sum=phyto.class.prop.sum[order(phyto.class.prop.sum$monCY.date),]
+
+fill.val$date=with(fill.val,date.fun(paste(CY,month,"01",sep="-")))
+fill.val2=subset(fill.val,CY>2010)
+phyto.class.prop.sum2=subset(phyto.class.prop.sum,CY>2010)
+# png(filename=paste0(plot.path,"PLSF_Class_relbiovol.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1.5,0.75,0.5),oma=c(2,4,0.5,0.5),lwd=0.25);
+layout(matrix(c(1,1,2:3),2,2,byrow = T),widths=c(1,0.5))
+
+xlim.val=date.fun(c("2011-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
+ylim.val=c(0,1);by.y=0.2;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+cols=c("burlywood1","goldenrod","mediumaquamarine","seagreen","paleturquoise2","grey")
+
+x=barplot(t(phyto.class.prop.sum2[,class.vars]),
+          beside=F,space=0,col=cols,border="grey50",axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(phyto.class.prop.sum2)))
+axis_fun(1,x[which(fill.val2$date%in%xmaj)],x[which(fill.val2$date%in%xmin)],format(xmaj,"J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Relative Biovolume\n(Proportion)")
+mtext(side=1,line=1.5,"Date")
+
+x=barplot(t(tmp2[,class.vars]),
+          beside=F,space=0.5,col=cols,border="grey50",axes=F,yaxs="i",
+          ylim=ylim.val,names=rep(NA,nrow(tmp2)))
+axis_fun(1,x,x,c("Ice-On","Ice-Off"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Relative Biovolume\n(Proportion)")
+mtext(side=1,line=1.5,"Ice Period")
+
+par(mar=c(1,1.5,0.5,3.5))
+plot(0:1,0:1,ann=F,axes=F,type="n")
+legend("center",legend=c("Bacillariophyceae","Dinophyceae",
+                         "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other"),
+       pch=22,pt.bg=cols,pt.cex = 1.5,
+       lty=c(NA),lwd=c(0.01),col="grey50",
+       ncol=1,cex=1,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
+dev.off()
+
+
+plsf.phyto.class.reclass.biovol3=subset(plsf.phyto.class.reclass.biovol3,CY>2010)
+plsf.phyto.class.reclass.biovol3$monCY.date=with(plsf.phyto.class.reclass.biovol3,date.fun(paste(CY,month,"01",sep="-")))
+plsf.phyto.class.reclass.biovol3=merge(plsf.phyto.class.reclass.biovol3,fill.val2[,c("CY","month")],c("CY","month"),all.y=T)
+plsf.phyto.class.reclass.biovol3=plsf.phyto.class.reclass.biovol3[order(plsf.phyto.class.reclass.biovol3$monCY.date),]
+# png(filename=paste0(plot.path,"PLSF_Class_biovol_rich_div_2.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1.5,0.5,0.5),oma=c(2,4,0.5,0.5),lwd=0.25);
+layout(matrix(c(1:4),2,2,byrow = T),widths=c(1,0.5))
+
+xlim.val=date.fun(c("2011-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
+# ylim.val=c(0,500);by.y=100;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+ylim.val=c(0.01,800);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i",log="y")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(plsf.phyto.class.reclass.biovol3,pt_line(monCY.date,tot.biovol,2,"olivedrab3",1,21,"olivedrab3",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Total Biovolume\n(mm\u00B3 L\u207B\u00b9)")
+# mtext(side=1,line=1.5,"Date")
+
+xlim.val2=c(1,12);by.x2=2;xmaj2=seq(xlim.val2[1],xlim.val2[2],by.x2);xmin2=seq(xlim.val2[1],xlim.val2[2],by.x2/by.x2)
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i",log="y")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(tot.biovol~month,plsf.phyto.class.reclass.biovol3,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+# mtext(side=1,line=1.5,"Month")
+
+
+ylim.val=c(0,100);by.y=25;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(richness~monCY.date,spp.rich.div,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(spp.rich.div,pt_line(monCY.date,richness,2,"grey",1,21,"grey",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Species\nRichness")
+ mtext(side=1,line=1.5,"Date")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(richness~month,spp.rich.div,pch=21,bg="grey",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+ mtext(side=1,line=1.5,"Month")
+
+ dev.off()
+
+
+
+
+
+fill.val$date=with(fill.val,date.fun(paste(CY,month,"01",sep="-")))
+# png(filename=paste0(plot.path,"PLSF_Class_biovol_rich_div.png"),width=10,height=6,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1.5,0.5,0.5),oma=c(2,4,0.5,0.5),lwd=0.25);
+layout(matrix(c(1:3,
+                4,4,5,
+                6,6,7,
+                8,8,9),4,3,byrow = T),widths=c(1,0.5,1),heights=c(1.5,0.75,0.75,0.75))
+
+xlim.val=date.fun(c("2011-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
+ylim.val=c(0,500);by.y=100;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+cols=c("burlywood1","goldenrod","mediumaquamarine","seagreen","paleturquoise2","grey")
+x=barplot(t(plsf.phyto.class.reclass.biovol2[,4:ncol(plsf.phyto.class.reclass.biovol2)]),
+          beside=F,space=0,col=NA,border=NA,axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(plsf.phyto.class.reclass.biovol2)))
+abline(h=ymaj,v=x[which(fill.val$date%in%xmaj)],lty=3,col="grey",lwd=0.5)
+yr.val=seq(2009,2021,1)
+for(i in 1:(length(yr.val)-1)){
+  if(yr.val[i]==2009){
+    xx.val=c(x[which(fill.val$CY==2010&fill.val$month==1)],
+             x[which(fill.val$CY==2010&fill.val$month==5)])
+  }else if(yr.val[i]==2020){
+    xx.val=c(x[which(fill.val$CY==2020&fill.val$month==12)],
+             x[which(fill.val$CY==2021&fill.val$month==1)])
+  }else{
+    xx.val=c(x[which(fill.val$CY==yr.val[i]&fill.val$month==12)],
+             x[which(fill.val$CY==yr.val[i]+1&fill.val$month==5)])
+  }
+  xx=c(xx.val,rev(xx.val))
+  yy=c(0,0,500,500)
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+x=barplot(t(plsf.phyto.class.reclass.biovol2[,4:ncol(plsf.phyto.class.reclass.biovol2)]),
+          beside=F,space=0,col=cols,border="grey50",axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(plsf.phyto.class.reclass.biovol2)),add=T)
+axis_fun(1,x[which(fill.val$date%in%xmaj)],x[which(fill.val$date%in%xmin)],format(xmaj,"J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Total Biovolume\n(mm\u00B3 L\u207B\u00b9)")
+mtext(side=1,line=1.5,"Date")
+
+par(mar=c(1,1.5,0.5,3.5))
+plot(0:1,0:1,ann=F,axes=F,type="n")
+legend("center",legend=c("Bacillariophyceae","Dinophyceae",
+                         "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other"),
+       pch=22,pt.bg=cols,pt.cex = 1.5,
+       lty=c(NA),lwd=c(0.01),col="grey50",
+       ncol=1,cex=1,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
+
+xlim.val2=c(1,12);by.x2=2;xmaj2=seq(xlim.val2[1],xlim.val2[2],by.x2);xmin2=seq(xlim.val2[1],xlim.val2[2],by.x2/by.x2)
+par(mar=c(2,1.5,0.5,0.5))
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(tot.biovol~month,plsf.phyto.class.reclass.biovol3,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=1,line=1.5,"Month")
+
+par(mar=c(1,1.5,0.5,0.5))
+ylim.val=c(0,100);by.y=25;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(richness~monCY.date,spp.rich.div,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(spp.rich.div,pt_line(monCY.date,richness,2,"grey",1,21,"grey",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Specie\nRichness")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(richness~month,spp.rich.div,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+# mtext(side=1,line=1.5,"Month")
+
+ylim.val=c(0,3);by.y=1;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(richness~monCY.date,spp.rich.div,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(spp.rich.div,pt_line(monCY.date,shannon_H ,2,"grey",1,21,"grey",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Shannon H\nDiveristy Index")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(shannon_H~month,spp.rich.div,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+# mtext(side=1,line=1.5,"Month")
+
+ylim.val=c(0,1);by.y=0.5;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(richness~monCY.date,spp.rich.div,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(spp.rich.div,pt_line(monCY.date,simpson_D ,2,"grey",1,21,"grey",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Simpson D\nDiveristy Index")
+mtext(side=1,line=1.5,"Date")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(simpson_D~month,spp.rich.div,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+mtext(side=1,line=1.5,"Month")
+
+dev.off()
+
+# png(filename=paste0(plot.path,"PLSF_Class_biovol_rich_div2.png"),width=6.5,height=5,units="in",res=200,type="windows",bg="white")
+par(family="serif",mar=c(2,1.5,0.5,0.5),oma=c(2,4,0.5,0.5),lwd=0.25);
+layout(matrix(c(1:3,
+                4,4,5),2,3,byrow = T),widths=c(1,0.5,1),heights=c(1.5,0.75))
+
+xlim.val=date.fun(c("2011-01-01","2021-01-01"));xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 year")
+ylim.val=c(0,500);by.y=100;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+cols=c("burlywood1","goldenrod","mediumaquamarine","seagreen","paleturquoise2","grey")
+x=barplot(t(plsf.phyto.class.reclass.biovol2[,4:ncol(plsf.phyto.class.reclass.biovol2)]),
+          beside=F,space=0,col=NA,border=NA,axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(plsf.phyto.class.reclass.biovol2)))
+abline(h=ymaj,v=x[which(fill.val$date%in%xmaj)],lty=3,col="grey",lwd=0.5)
+yr.val=seq(2009,2021,1)
+for(i in 1:(length(yr.val)-1)){
+  if(yr.val[i]==2009){
+    xx.val=c(x[which(fill.val$CY==2010&fill.val$month==1)],
+             x[which(fill.val$CY==2010&fill.val$month==5)])
+  }else if(yr.val[i]==2020){
+    xx.val=c(x[which(fill.val$CY==2020&fill.val$month==12)],
+             x[which(fill.val$CY==2021&fill.val$month==1)])
+  }else{
+    xx.val=c(x[which(fill.val$CY==yr.val[i]&fill.val$month==12)],
+             x[which(fill.val$CY==yr.val[i]+1&fill.val$month==5)])
+  }
+  xx=c(xx.val,rev(xx.val))
+  yy=c(0,0,500,500)
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+x=barplot(t(plsf.phyto.class.reclass.biovol2[,4:ncol(plsf.phyto.class.reclass.biovol2)]),
+          beside=F,space=0,col=cols,border="grey50",axes=F,yaxs="i",width=0.75,
+          ylim=ylim.val,names=rep(NA,nrow(plsf.phyto.class.reclass.biovol2)),add=T)
+axis_fun(1,x[which(fill.val$date%in%xmaj)],x[which(fill.val$date%in%xmin)],format(xmaj,"J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj));box(lwd=1)
+mtext(side=2,line=2.5,"Total Biovolume\n(mm\u00B3 L\u207B\u00b9)")
+mtext(side=1,line=1.5,"Date")
+
+par(mar=c(1,1.5,0.5,3.5))
+plot(0:1,0:1,ann=F,axes=F,type="n")
+legend("center",legend=c("Bacillariophyceae","Dinophyceae",
+                         "Cryptophyceae","Chlorophyceae","Cyanophyceae","Other"),
+       pch=22,pt.bg=cols,pt.cex = 1.5,
+       lty=c(NA),lwd=c(0.01),col="grey50",
+       ncol=1,cex=1,bty="n",y.intersp=1,x.intersp=1,xpd=NA,xjust=0.5,yjust=0.5)
+
+xlim.val2=c(1,12);by.x2=2;xmaj2=seq(xlim.val2[1],xlim.val2[2],by.x2);xmin2=seq(xlim.val2[1],xlim.val2[2],by.x2/by.x2)
+par(mar=c(2,1.5,0.5,0.5))
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(tot.biovol~month,plsf.phyto.class.reclass.biovol3,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=1,line=1.5,"Month")
+
+par(mar=c(1,1.5,0.5,0.5))
+ylim.val=c(0,100);by.y=25;ymaj=seq(ylim.val[1],ylim.val[2],by.y);ymin=seq(ylim.val[1],ylim.val[2],by.y/2)
+plot(richness~monCY.date,spp.rich.div,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(rep(ylim.val[1],2),rep(ylim.val[2]+ylim.val[2]*0.2,2))
+  polygon(xx,yy,col=adjustcolor("lightblue",0.25),border="grey")
+}
+with(spp.rich.div,pt_line(monCY.date,richness,2,"grey",1,21,"grey",pt.lwd=0.01))
+axis_fun(1,xmaj,xmin,format(xmaj,"%J-%Y"),line=-0.5)
+axis_fun(2,ymaj,ymin,ymaj);box(lwd=1)
+mtext(side=2,line=2.5,"Specie\nRichness")
+mtext(side=1,line=1.5,"Date")
+
+plot(tot.biovol~month,plsf.phyto.class.reclass.biovol3,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,type="n",yaxs="i")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.25),border="grey")
+points(richness~month,spp.rich.div,pch=21,bg="olivedrab3",lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,xmaj2,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+# mtext(side=1,line=1.5,"Month")
+mtext(side=1,line=1.5,"Month")
+
+dev.off()
+
+#####
+
+# png(filename=paste0(plot.path,"PLSF_Biota.png"),width=6.5,height=4.5,units="in",res=200,type="windows",bg="white")
+
+par(family="serif",mar=c(1,1,0.5,0.5),oma=c(2.5,6,1,0.25));
+layout(matrix(1:6,3,2,byrow = T),widths=c(1,0.5))
+
+xlim.val=date.fun(c("2009-12-01","2020-12-1"));by.x=0.5;xmaj=seq(xlim.val[1],xlim.val[2],"3 years");xmin=seq(xlim.val[1],xlim.val[2],"1 years")
+xlim.val2=c(1,12);by.x=3;xmaj2=seq(xlim.val2[1],xlim.val2[2],by.x);xmin2=seq(xlim.val2[1],xlim.val2[2],by.x/by.x)
+
+ylim.val=c(1e4,5e8);ymaj=log.scale.fun(ylim.val,"major");ymin=log.scale.fun(ylim.val,"minor")
+plot(phyto.biovol.um3mL~Date,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj,lty=3,col="grey",lwd=0.75)
+yr.val=seq(2008,2021,1)
+for(i in 1:length(yr.val)){
+  xx.val=date.fun(c(paste(yr.val[i],"12-01",sep="-"),
+                    paste(yr.val[i+1],"04-30",sep="-")))
+  xx=c(xx.val,rev(xx.val))
+  yy=c(1e3,1e3,5e9,5e9)
+  polygon(xx,yy,col=adjustcolor("lightblue",0.5),border="grey")
+}
+with(bio.dat2.outlet,pt_line(Date,phyto.biovol.um3mL,2,cols[1],1,21,cols[1],pt.lwd=0.01))
+# axis_fun(1,xmaj,xmin,format(xmaj,"%m-%Y"),line=-0.5)
+axis_fun(1,xmaj,xmin,NA,line=-0.5)
+axis_fun(2,ymaj,ymin,format(ymaj/1e6,scientific=F));box(lwd=1)
+mtext(side=2,line=4,"Phytoplankton\nBiovolume (mm\u00B3 L\u207B\u00B9)",cex=0.8)
+
+plot(phyto.biovol.um3mL~month,bio.dat2.outlet,ylim=ylim.val,xlim=xlim.val2,ann=F,axes=F,log="y",type="n")
+abline(h=ymaj,v=xmaj2,lty=3,col="grey",lwd=0.75)
+xx1=c(11.5,12.5)
+xx2=c(0,4.5)
+polygon(c(xx1,rev(xx1)),yy,col=adjustcolor("lightblue",0.5),border="grey")
+polygon(c(xx2,rev(xx2)),yy,col=adjustcolor("lightblue",0.5),border="grey")
+points(phyto.biovol.um3mL~month,bio.dat2.outlet,pch=21,bg=cols[1],lwd=0.01)
+# axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
+axis_fun(1,xmaj2,xmin2,NA,line=-0.5)
+axis_fun(2,ymaj,ymin,NA);box(lwd=1)
+# mod=loess(phyto_biovol_um3mL~month,subset(bio.dat2.outlet,is.na(phyto_biovol_um3mL)==F))
+# x.val=seq(1,12,length.out=50)
+# mod.pred=predict(mod,data.frame(month=x.val))
+# lines(mod.pred~x.val,lwd=2,col=adjustcolor("red",0.5))
+
+
+
+
+
+
+
+##
 plsf.zoo=read.csv(paste0(export.path,"PLSF_microscope_data_zoo.csv"))
 plsf.zoo$date=date.fun(plsf.zoo$date)
 plsf.zoo$month=as.numeric(format(plsf.zoo$date,"%m"))
@@ -3208,6 +3754,58 @@ axis_fun(1,xmaj2,xmin2,month.abb[xmaj2],line=-0.5)
 axis_fun(2,ymaj,ymin,NA);box(lwd=1)
 mtext(side=1,line=1.75,"Month")
 dev.off()
+
+
+
+# GDM model ---------------------------------------------------------------
+PLSF_sites=data.frame(SITE=c("Inlet","Outlet","In_Lake"),
+                      lat=c(45.5357,45.53154,45.5373),
+                      long=c(-72.0415,-72.0297,-72.0432))
+
+
+# phyto.dat.biovol.xtab
+# phyto.dat.conc.xtab
+
+wq.dat.month.xtab=dcast(subset(wq.dat.melt,Site=="Lake_Outlet"&variable%in%c("TP.ugL","TN.mgL")),month+CY~variable,value.var="value",mean)
+unique(wq.dat.month.xtab$month)
+wq.dat.month.xtab.wint=subset(wq.dat.month.xtab,month%in%c(10:12,1:4))
+
+phyto.class.prop.sum2=subset(phyto.class.prop.sum,month%in%c(10:12,1:4))
+phyto.class.prop.sum2=na.omit(phyto.class.prop.sum2)
+
+winter.wq.phyto=merge(wq.dat.month.xtab.wint,phyto.class.prop.sum2,c("month","CY"),all.y=T)
+winter.wq.phyto
+winter.wq.phyto$site="Outlet"
+winter.wq.phyto$lat=subset(PLSF_sites,SITE=="Outlet")$lat
+winter.wq.phyto$long=subset(PLSF_sites,SITE=="Outlet")$long
+
+site=unique(winter.wq.phyto$site)
+sppData.plsf=winter.wq.phyto[,c("monCY.date","Bacillariophyceae", "Dinophyceae", "Cryptophyceae", 
+                                     "Chlorophyceae", "Cyanophyceae", "Other")]
+envTab.plsf=winter.wq.phyto[,c("site","monCY.date","TP.ugL","TN.mgL","lat","long")]
+
+gdmDissim.plsf=vegdist(sppData.plsf[,2:(ncol(sppData.plsf))],na.rm=T)
+# gdmDissim.plsf=as.matrix(gdmDissim.plsf)
+
+# gdmDissim=cluster::daisy(sppData.plsf[,2:(ncol(sppData.plsf))])
+
+gdmDissim.plsf=cbind(site=winter.wq.phyto$site,gdmDissim.plsf[,1:ncol(gdmDissim.plsf)])
+
+gdmTab.dis <- formatsitepair(bioData=gdmDissim.plsf, 
+                             bioFormat=3, #diss matrix 
+                             XColumn="long", 
+                             YColumn="lat", 
+                             predData=envTab.plsf, 
+                             siteColumn="site")
+
+
+
+
+
+
+
+
+
 ##### END -----------------------------------------------------------------
 # workspace image ---------------------------------------------------------
 ## Save workspace image to this point

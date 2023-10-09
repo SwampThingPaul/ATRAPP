@@ -29,6 +29,39 @@
 "Ceratium sp.",20.2857142857143,771141.142857143,2017-07-11
 "Euglena sp.",20.2857142857143,3906.7580952381,2017-07-11
 "Trachelomonas sp.",20.2857142857143,35829.6428571429,2017-07-11
+"Amphora sp.",250,1205760,2017-08-15
+"Aulacoseira sp. #2",500,150720,2017-08-15
+"Nitzschia sp.",1750,164850,2017-08-15
+"Cosmarium sp.",250,33493.3333333333,2017-08-15
+"Desmodesmus abundans",1000,12560,2017-08-15
+"Desmodesmus communis",500,6280,2017-08-15
+"Monoraphidium griffithi",500,23550,2017-08-15
+"Nephrochlamys rostrata",1000,26166.6666666667,2017-08-15
+"Pediastrum tetras",2000,24000,2017-08-15
+"Tetraëdron trigonum",2250,562500,2017-08-15
+"Cryptomonas erosa",1750,2637600,2017-08-15
+"Cryptomonas marsonii",500,523333.333333333,2017-08-15
+"Cryptomonas parapyrenoidifera ",250,100480,2017-08-15
+"Cryptomonas sp.",250,376800,2017-08-15
+"Plagioselmis nannoplanctica",750,31400,2017-08-15
+"Aphanizomenon flos-aquae",872000,65713920,2017-08-15
+"Aphanocapsa holsatica",175000,91583.3333333333,2017-08-15
+"Dolichospermum flos-aquae",750750,84864780,2017-08-15
+"Microcystis aeruginosa ",7500,251200,2017-08-15
+"Planktothrix agardhii",3250,163280,2017-08-15
+"Tetraëdron trigonum",25,1350,2017-09-12
+"Cryptomonas marssonii",75,113040,2017-09-12
+"Cryptomonas ovata",6575,24572250.6392045,2017-09-12
+"Planktothrix agardhii",190575,9574488,2017-09-12
+"Nitzschia sp.",10,1004.8,2017-10-17
+"Pediastrum boryanum",200,21600,2017-10-17
+"Schroederia setigera ",20,4102.93333333333,2017-10-17
+"Tetraëdron minimum ",30,3840,2017-10-17
+"Cryptomonas curvata",2110,15086011.8422748,2017-10-17
+"Cryptomonas erosa",160,42871.4666666667,2017-10-17
+"Cryptomonas marsonii",50,41866.6666666667,2017-10-17
+"Cryptomonas ovata  ",30,61544,2017-10-17
+"Cryptomonas phaseolus ",80,66986.6666666667,2017-10-17
 "Navicula ",1.18333333333333,267.528,2017-11-14
 "Chlamydomonas ",2.36666666666667,66.882,2017-11-14
 "Desmodesmus communis",14.2,352.30024691358,2017-11-14
@@ -645,194 +678,317 @@
 "Microcystis sp.",1014.28571428571,33971.8095238095,2019-12-17
 "Gymnodinium sp.",20.2857142857143,54354.8952380952,2019-12-17
 "Chrysochromulina parva",689.714285714286,17325.6228571429,2019-12-17
-"Aulacoseira distans",1570.784,437306.2656,2015-08-16
-"centric diatom sp.",1570.784,353897.6352,2015-08-16
-"Cocconeis sp.",392.696,328568.7432,2015-08-16
-"Aulacoseira sp.",500,245450,2015-08-16
+"Asterionella formosa",100,18840,2016-07-15
+"Aulacoseira pusilla ",5500,2210560,2016-07-15
+"Aulacoseira sp.",4650,1401696,2016-07-15
+"Cyclotella sp.",50,8478,2016-07-15
+"Nitzschia sp.",400,16210.7733333333,2016-07-15
+"Synedra sp.",650,24492,2016-07-15
+"Cosmarium sp.",100,37680,2016-07-15
+"Crucigeniella crucifera",600,40192,2016-07-15
+"Desmodesmus communis",2000,25120,2016-07-15
+"Desmodesmus subspicatus ",100,2826,2016-07-15
+"Dichotomococcus curvatus",400,523.333333333333,2016-07-15
+"Dictyosphaerium pulchellum ",2600,36738,2016-07-15
+"Kirchneriella contorta",200,1674.66666666667,2016-07-15
+"Kirchneriella subsolitaria ",200,1674.66666666667,2016-07-15
+"Monoraphidium arcuatum ",50,261.666666666667,2016-07-15
+"Monoraphidium komarkovae",600,5495,2016-07-15
+"Oocystis sp.",150,60288,2016-07-15
+"Pediastrum duplex ",400,9600,2016-07-15
+"Pediastrum tetras",200,1600,2016-07-15
+"Scenedesmus ellipticus",100,18840,2016-07-15
+"Scenedesmus obtusus ",400,29632.2962962963,2016-07-15
+"Sorastrum americanum ",1400,8792,2016-07-15
+"Tetraedron caudatum",200,50000,2016-07-15
+"Tetraëdron minimum",2800,321355.102040816,2016-07-15
+"Tetraedron trigonum ",50,6400,2016-07-15
+"Mallomonas sp.",50,60288,2016-07-15
+"Synura sp.",100,135648,2016-07-15
+"Cryptomonas sp.",1000,745071.604938272,2016-07-15
+"Plagioselmis nannoplanctica ",1400,55682.6666666667,2016-07-15
+"Aphanizomenon sp.",11350,855336,2016-07-15
+"Aphanocapsa incerta",5000,2616.66666666667,2016-07-15
+"Dolichospermum flosaquae",124300,4163221.33333333,2016-07-15
+"Merismopedia minima ",1200,628,2016-07-15
+"Microcystis sp.",16000,226080,2016-07-15
+"Trachelomonas sp.",150,337724.444444444,2016-07-15
+"Aulacoseira sp.",1600,1054400,2016-08-15
+"Nitzschia sp.",50,2026.34666666667,2016-08-15
+"Chlamydomonas sp.",50,45216,2016-08-15
+"Coelastrum microporum ",2900,145580,2016-08-15
+"Cosmarium sp.",50,22608,2016-08-15
+"Crucigeniella rectangularis",1200,33912,2016-08-15
+"Desmodesmus abundans",2900,122960,2016-08-15
+"Desmodesmus communis",600,7536,2016-08-15
+"Desmodesmus intermedius",600,40192,2016-08-15
+"Dichotomococcus curvatus",5400,7065,2016-08-15
+"Dictyosphaerium pulchellum ",750,84750,2016-08-15
+"Kirchneriella subsolitaria ",300,3140,2016-08-15
+"Lagerheimiella genevensis",50,12500,2016-08-15
+"Lagerheimiella longiseta",150,28260,2016-08-15
+"Monoraphidium arcuatum ",350,1831.66666666667,2016-08-15
+"Monoraphidium komarkovae",75,3375,2016-08-15
+"Monoraphidium minutum ",275,1727,2016-08-15
+"Oocystis pusilla ",400,133973.333333333,2016-08-15
+"Oocystis solitaria",150,50240,2016-08-15
+"Pediastrum duplex ",400,128000,2016-08-15
+"Scenedesmus ellipticus",200,37680,2016-08-15
+"Schroederia setigera ",150,203472,2016-08-15
+"Staurastrum sp.",50,83733.3333333333,2016-08-15
+"Tetraedron caudatum",100,5400,2016-08-15
+"Tetraëdron minimum",850,167450,2016-08-15
+"Tetraedron trigonum ",150,19200,2016-08-15
+"Tetrastrum glabrum ",600,2512,2016-08-15
+"Ochromonas sp.",50,26166.6666666667,2016-08-15
+"Chroomonas nordstedtii ",150,17662.5,2016-08-15
+"Cryptomonas erosa ",15425,29640605.9695216,2016-08-15
+"Cryptomonas marssonii",125,140500,2016-08-15
+"Cryptomonas phaseolus ",300,188400,2016-08-15
+"Cryptomonas reflexa ",950,1446506.41666667,2016-08-15
+"Cryptomonas sp.",3000,3476100,2016-08-15
+"Cryptomonas tetrapyrenoidosa ",4000,7743658.66666667,2016-08-15
+"Plagioselmis nannoplanctica ",1250,263847.222222222,2016-08-15
+"Aphanocapsa delicatissima ",8425,551.135416666667,2016-08-15
+"Microcystis sp.",1100,36842.6666666667,2016-08-15
+"Planktothrix agardhii ",37500,1884000,2016-08-15
+"Phacus sp.",50,187550,2016-08-15
+"Trachelomonas sp.",650,681292.08,2016-08-15
+"Gymnodinium sp.",50,102575,2016-08-15
+"Peridinium sp.",50,656469.333333333,2016-08-15
+"Aulacoseira pusilla ",6100,2451712,2016-10-16
+"Aulacoseira sp.",75,11304,2016-10-16
+"Cocconeis sp.",25,28800,2016-10-16
+"Cyclotella sp.",50,3179.25,2016-10-16
+"Nitzschia sp.",50,1717.1875,2016-10-16
+"Synedra sp.",50,2767.125,2016-10-16
+"Actinastrum hantzschii",75,1256,2016-10-16
+"Closteriiopsis longissima",225,42345.1428571429,2016-10-16
+"Cosmarium sp.",325,138788,2016-10-16
+"Crucigeniella crucifera",1350,67824,2016-10-16
+"Desmodesmus abundans",500,18840,2016-10-16
+"Desmodesmus intermedius",550,6908,2016-10-16
+"Dichotomococcus curvatus",50,314,2016-10-16
+"Dictyosphaerium pulchellum ",2550,85408,2016-10-16
+"Kirchneriella sp.",325,5846.61458333333,2016-10-16
+"Monoraphidium arcuatum ",50,30091.6666666667,2016-10-16
+"Monoraphidium minutum ",175,4945.5,2016-10-16
+"Oocystis solitaria Whitrock",125,98125,2016-10-16
+"Oocystis sp.",150,50240,2016-10-16
+"Pediastrum duplex ",1725,496800,2016-10-16
+"Quadrigula closterioides",300,9891,2016-10-16
+"Scenedesmus arcuatus",200,4474.5,2016-10-16
+"Scenedesmus ellipticus",1700,41703.125,2016-10-16
+"Scenedesmus quadricauda",975,21770.6666666667,2016-10-16
+"Staurastrum sp.",25,20096,2016-10-16
+"Tetraedron caudatum",150,8100,2016-10-16
+"Tetraëdron minimum",3725,275925.925925926,2016-10-16
+"Tetraedron muticum",25,6250,2016-10-16
+"Tetraedron trigonum ",75,18750,2016-10-16
+"Tetrastrum glabrum ",800,26794.6666666667,2016-10-16
+"Chrysococcus sp.",25,3768,2016-10-16
+"Kephyrion sp.",50,2512,2016-10-16
+"Cryptomonas erosa ",450,1328265.216,2016-10-16
+"Cryptomonas parapyrenoidifera",75,153860,2016-10-16
+"Plagioselmis nannoplanctica ",900,30144,2016-10-16
+"Rhodomonas lens ",50,20665.125,2016-10-16
+"Rhodomonas minuta",125,15307.5,2016-10-16
+"Aphanocapsa delicatissima ",108750,56912.5,2016-10-16
+"Chroococcus dispersus ",150,16956,2016-10-16
+"Merismopedia minima ",800,3349.33333333333,2016-10-16
+"Microcystis wesenbergii",16000,535893.333333333,2016-10-16
+"Planktothrix agardhii",52075,919774.6875,2016-10-16
+"Snowella sp.",13750,57566.6666666667,2016-10-16
+"Synechocystis sp.",5050,8919.5625,2016-10-16
+"Trachelomonas sp.",25,104666.666666667,2016-10-16
+"Aulacoseira distans",1570.784,1365222.644,2015-08-16
+"centric diatom sp.",1570.784,NA,2015-08-16
+"Cocconeis sp.",392.696,NA,2015-08-16
+"Aulacoseira sp.",500,NA,2015-08-16
 "Closterium sp.",10,2315,2015-08-16
-"chlorophyte unicell, sphere  5-7.5um spp.",3141.568,273630.5728,2015-08-16
-"Mychonastes sp.",14137.056,108855.3312,2015-08-16
-"Desmodesmus sempervirens",4712.352,88592.2176,2015-08-16
-"chlorophyte colony sp.",9424.704,56548.224,2015-08-16
-"Tetraedron minimum",392.696,47359.1376,2015-08-16
-"Monoraphidium nanum",6283.136,37070.5024,2015-08-16
-"Pseudopediastrum boryanum",180,17190,2015-08-16
-"Oocystis sp.",1570.784,14451.2128,2015-08-16
-"Dictyosphaerium sp.",200,4100,2015-08-16
-"Monoraphidium contortum",392.696,4084.0384,2015-08-16
-"Desmodesmus sp.",30,2178,2015-08-16
-"Schroederia setigera",10,1659,2015-08-16
-"cryptophyte sp.",20,12164,2015-08-16
-"cryptophyte sp.",10,4396,2015-08-16
-"Microcystis wesenbergii",147653.696,15872772.32,2015-08-16
-"Microcystis sp.",50265.088,3287336.7552,2015-08-16
-"Aphanothece sp.",113096.448,904771.584,2015-08-16
-"Aphanizomenon flos-aquae/klebahnii",5890.44,360494.928,2015-08-16
-"Dolichospermum sp.",570,322335,2015-08-16
-"Microcystis spp. (unicell)",3141.568,273630.5728,2015-08-16
-"Microcystis spp. (cell pair)",3141.568,273630.5728,2015-08-16
-"Cyanodictyon imperfectum",339289.344,135715.7376,2015-08-16
-"Dolichospermum sp.",700,91630,2015-08-16
-"Cyanocatena planctonica",219909.76,87963.904,2015-08-16
-"Planktolyngbya limnetica",3640,37856,2015-08-16
-"Microcystis sp.",140,26796,2015-08-16
-"Cuspidothrix issatschenkoi",320,16512,2015-08-16
-"Pseudanabaena sp.",1963.48,15511.492,2015-08-16
-"cyanophyte tetrad spp.",12566.272,15079.5264,2015-08-16
-"cyanophyte unicell, sphere  2.5-5um spp.",1570.784,12880.4288,2015-08-16
-"Aphanocapsa sp.",16493.232,6597.2928,2015-08-16
-"Aphanocapsa planctonica",440,3608,2015-08-16
-"Trachelomonas volvocina",785.392,935087.7152,2015-08-16
-"Trachelomonas sp.",10,66268,2015-08-16
+"chlorophyte unicell, sphere  5-7.5um spp.",3141.568,655718.2368,2015-08-16
+"Mychonastes sp.",14137.056,NA,2015-08-16
+"Desmodesmus sempervirens",4712.352,NA,2015-08-16
+"chlorophyte colony sp.",9424.704,NA,2015-08-16
+"Tetraedron minimum",392.696,NA,2015-08-16
+"Monoraphidium nanum",6283.136,NA,2015-08-16
+"Pseudopediastrum boryanum",180,NA,2015-08-16
+"Oocystis sp.",1570.784,NA,2015-08-16
+"Dictyosphaerium sp.",200,NA,2015-08-16
+"Monoraphidium contortum",392.696,NA,2015-08-16
+"Desmodesmus sp.",30,NA,2015-08-16
+"Schroederia setigera",10,NA,2015-08-16
+"cryptophyte sp.",20,16560,2015-08-16
+"cryptophyte sp.",10,NA,2015-08-16
+"Microcystis wesenbergii",147653.696,21745122.1144,2015-08-16
+"Microcystis sp.",50265.088,NA,2015-08-16
+"Aphanothece sp.",113096.448,NA,2015-08-16
+"Aphanizomenon flos-aquae/klebahnii",5890.44,NA,2015-08-16
+"Dolichospermum sp.",570,NA,2015-08-16
+"Microcystis spp. (unicell)",3141.568,NA,2015-08-16
+"Microcystis spp. (cell pair)",3141.568,NA,2015-08-16
+"Cyanodictyon imperfectum",339289.344,NA,2015-08-16
+"Dolichospermum sp.",700,NA,2015-08-16
+"Cyanocatena planctonica",219909.76,NA,2015-08-16
+"Planktolyngbya limnetica",3640,NA,2015-08-16
+"Microcystis sp.",140,NA,2015-08-16
+"Cuspidothrix issatschenkoi",320,NA,2015-08-16
+"Pseudanabaena sp.",1963.48,NA,2015-08-16
+"cyanophyte tetrad spp.",12566.272,NA,2015-08-16
+"cyanophyte unicell, sphere  2.5-5um spp.",1570.784,NA,2015-08-16
+"Aphanocapsa sp.",16493.232,NA,2015-08-16
+"Aphanocapsa planctonica",440,NA,2015-08-16
+"Trachelomonas volvocina",785.392,1001355.7152,2015-08-16
+"Trachelomonas sp.",10,NA,2015-08-16
 "Pseudostaurastrum sp.",10,8836,2015-08-16
-"centric diatom sp.",785.392,280777.64,2016-04-15
-"pennate diatom sp.",1,18064.2,2016-04-15
-"Aulacoseira sp.",36,17672.4,2016-04-15
-"Aulacoseira distans",30,10602,2016-04-15
-"Stephanodiscus sp.",1,9236.3,2016-04-15
-"Asterionella formosa",12,9010.8,2016-04-15
-"Synedra sp.",6,8538.6,2016-04-15
-"Gomphonema/Gomphoneis sp.",1,2262,2016-04-15
-"Rhoicosphenia abbreviata",1,1117.7,2016-04-15
-"Nitzschia sp.",1,67.5,2016-04-15
-"Koliella longiseta",628.3136,90602.82112,2016-04-15
-"chlorophyte unicell, sphere  2.5-5um spp.",628.3136,32043.9936,2016-04-15
-"chlorophyte unicell, oval  5-7.5um spp.",157.0784,22854.9072,2016-04-15
-"chlorophyte flagellate sp.",39.2696,21339.10064,2016-04-15
-"Desmodesmus sempervirens",628.3136,20106.0352,2016-04-15
-"Pseudodidymocystis sp.",628.3136,11937.9584,2016-04-15
-"Tetraedron caudatum",39.2696,11564.8972,2016-04-15
-"Mychonastes sp.",1570.784,11309.6448,2016-04-15
-"Koliella sp.",1256.6272,10681.3312,2016-04-15
-"Desmodesmus sp.",314.1568,7696.8416,2016-04-15
-"Monoraphidium contortum",314.1568,6031.81056,2016-04-15
-"Tetrastrum staurogeniaeforme",628.3136,5780.48512,2016-04-15
-"chlorophyte cell pair spp.",314.1568,4429.61088,2016-04-15
-"Monoraphidium arcuatum",39.2696,1849.59816,2016-04-15
-"cf. Coenocystis sp.",4,362,2016-04-15
+"centric diatom sp.",785.392,357349.14,2016-04-15
+"pennate diatom sp.",1,NA,2016-04-15
+"Aulacoseira sp.",36,NA,2016-04-15
+"Aulacoseira distans",30,NA,2016-04-15
+"Stephanodiscus sp.",1,NA,2016-04-15
+"Asterionella formosa",12,NA,2016-04-15
+"Synedra sp.",6,NA,2016-04-15
+"Gomphonema/Gomphoneis sp.",1,NA,2016-04-15
+"Rhoicosphenia abbreviata",1,NA,2016-04-15
+"Nitzschia sp.",1,NA,2016-04-15
+"Koliella longiseta",628.3136,258591.03568,2016-04-15
+"chlorophyte unicell, sphere  2.5-5um spp.",628.3136,NA,2016-04-15
+"chlorophyte unicell, oval  5-7.5um spp.",157.0784,NA,2016-04-15
+"chlorophyte flagellate sp.",39.2696,NA,2016-04-15
+"Desmodesmus sempervirens",628.3136,NA,2016-04-15
+"Pseudodidymocystis sp.",628.3136,NA,2016-04-15
+"Tetraedron caudatum",39.2696,NA,2016-04-15
+"Mychonastes sp.",1570.784,NA,2016-04-15
+"Koliella sp.",1256.6272,NA,2016-04-15
+"Desmodesmus sp.",314.1568,NA,2016-04-15
+"Monoraphidium contortum",314.1568,NA,2016-04-15
+"Tetrastrum staurogeniaeforme",628.3136,NA,2016-04-15
+"chlorophyte cell pair spp.",314.1568,NA,2016-04-15
+"Monoraphidium arcuatum",39.2696,NA,2016-04-15
+"cf. Coenocystis sp.",4,NA,2016-04-15
 "Chrysococcus sp.",471.2352,30818.78208,2016-04-15
-"cryptophyte sp.",39.2696,27834.29248,2016-04-15
-"cryptophyte sp.",16,20761.6,2016-04-15
-"Microcystis sp.",3024,197769.6,2016-04-15
-"Microcystis wesenbergii",160,17200,2016-04-15
-"Microcystis spp. (cell pair)",78.5392,5458.4744,2016-04-15
-"Phormidium sp.",30,5037,2016-04-15
-"Cyanodictyon imperfectum",12566.272,3769.8816,2016-04-15
-"Dolichospermum sp.",4,2787.6,2016-04-15
-"Aphanothece sp.",1570.784,2356.176,2016-04-15
-"Aphanocapsa sp.",2042.0192,1837.81728,2016-04-15
-"cyanophyte unicell, oval/rod  2.5-5um spp.",157.0784,1303.75072,2016-04-15
-"cyanophyte unicell, sphere  2.5-5um spp.",157.0784,1288.04288,2016-04-15
-"Dolichospermum sp.",8,523.2,2016-04-15
-"cyanophyte tetrad spp.",628.3136,314.1568,2016-04-15
-"Peridiniopsis sp.",78.5392,604508.36848,2016-04-15
-"dinoflagellate sp.",157.0784,600777.75648,2016-04-15
-"Trachelomonas sp.",157.0784,192766.61248,2016-04-15
-"euglenophyte sp.",1,1047.2,2016-04-15
+"cryptophyte sp.",39.2696,48595.89248,2016-04-15
+"cryptophyte sp.",16,NA,2016-04-15
+"Microcystis sp.",3024,239645.69968,2016-04-15
+"Microcystis wesenbergii",160,NA,2016-04-15
+"Microcystis spp. (cell pair)",78.5392,NA,2016-04-15
+"Phormidium sp.",30,NA,2016-04-15
+"Cyanodictyon imperfectum",12566.272,NA,2016-04-15
+"Dolichospermum sp.",4,NA,2016-04-15
+"Aphanothece sp.",1570.784,NA,2016-04-15
+"Aphanocapsa sp.",2042.0192,NA,2016-04-15
+"cyanophyte unicell, oval/rod  2.5-5um spp.",157.0784,NA,2016-04-15
+"cyanophyte unicell, sphere  2.5-5um spp.",157.0784,NA,2016-04-15
+"Dolichospermum sp.",8,NA,2016-04-15
+"cyanophyte tetrad spp.",628.3136,NA,2016-04-15
+"Peridiniopsis sp.",78.5392,1205286.12496,2016-04-15
+"dinoflagellate sp.",157.0784,NA,2016-04-15
+"Trachelomonas sp.",157.0784,193813.81248,2016-04-15
+"euglenophyte sp.",1,NA,2016-04-15
 "Chrysochromulina sp.",39.2696,26255.65456,2016-04-15
-"Aulacoseira sp.",2827.4112,1387976.15808,2016-05-15
-"Asterionella formosa",235.6176,176925.25584,2016-05-15
-"centric diatom sp.",314.1568,87429.83744,2016-05-15
-"Synedra sp.",235.6176,66208.5456,2016-05-15
-"Asterionella formosa",78.5392,58975.08528,2016-05-15
-"Synedra sp.",78.5392,29915.58128,2016-05-15
-"Navicula sp.",78.5392,28556.85312,2016-05-15
-"Stephanodiscus sp.",2,20788.6,2016-05-15
-"pennate diatom sp.",4,17768.4,2016-05-15
-"Nitzschia sigmoidea",2,14579,2016-05-15
-"Cymbella/Encyonema sp.",2,12802,2016-05-15
-"Aulacoseira distans",32,11308.8,2016-05-15
-"Gomphonema acuminatum",2,6534.6,2016-05-15
-"Nitzschia sp.",2,135,2016-05-15
-"Closterium sp.",2,3928.8,2016-05-15
-"Staurastrum sp.",2,1965.8,2016-05-15
-"Mychonastes sp.",12566.272,90477.1584,2016-05-15
-"Desmodesmus sempervirens",1884.9408,60318.1056,2016-05-15
-"Tetrastrum staurogeniaeforme",1256.6272,23624.59136,2016-05-15
-"Desmodesmus sp.",1256.6272,21613.98784,2016-05-15
-"Dichotomococcus sp.",1884.9408,18849.408,2016-05-15
-"Pseudopediastrum boryanum",192,18336,2016-05-15
-"chlorophyte unicell, sphere  5-7.5um spp.",78.5392,14105.64032,2016-05-15
-"chlorophyte unicell, sphere  2.5-5um spp.",942.4704,13288.83264,2016-05-15
-"Monoraphidium nanum",942.4704,13006.09152,2016-05-15
-"Schroederia setigera",314.1568,11529.55456,2016-05-15
-"Pseudodidymocystis sp.",628.3136,10869.82528,2016-05-15
-"Monoraphidium minutum",314.1568,10272.92736,2016-05-15
-"Koliella longiseta",78.5392,8223.05424,2016-05-15
-"chlorophyte unicell, oval  5-7.5um spp.",314.1568,6440.2144,2016-05-15
-"Dichotomococcus sp.",628.3136,6283.136,2016-05-15
-"Tetrastrum elegans",628.3136,5152.17152,2016-05-15
-"Desmodesmus cf. bicaudatus",157.0784,3926.96,2016-05-15
-"Monoraphidium arcuatum",78.5392,3699.19632,2016-05-15
-"Monoraphidium sp.",314.1568,2513.2544,2016-05-15
-"chlorophyte tetrad spp.",1256.6272,2261.92896,2016-05-15
-"Monoraphidium contortum",78.5392,1507.95264,2016-05-15
-"Monoraphidium komarkovae",4,301.6,2016-05-15
-"Monoraphidium sp.",4,226.4,2016-05-15
-"Tetraedron minimum",2,204.8,2016-05-15
-"Chrysococcus sp.",314.1568,20545.85472,2016-05-15
-"chrysophyte flagellate sp.",4,2097.2,2016-05-15
-"Dinobryon sp.",2,196.4,2016-05-15
-"Microcystis sp.",69114.496,5390930.688,2016-05-15
-"Microcystis wesenbergii",3700,397750,2016-05-15
-"nostocalean filament sp.",3612.8032,202678.25952,2016-05-15
-"Dolichospermum mendotae/sigmoideum",2984.4896,134898.92992,2016-05-15
-"Microcystis spp. (unicell)",628.3136,49008.4608,2016-05-15
-"Microcystis spp. (cell pair)",628.3136,49008.4608,2016-05-15
-"Dolichospermum sp.",200,44180,2016-05-15
-"Cyanodictyon imperfectum",79167.5136,23750.25408,2016-05-15
-"Woronichinia naegeliana (unicell)",628.3136,14828.20096,2016-05-15
-"cyanophyte cell pair spp.",1884.9408,12063.62112,2016-05-15
-"Planktothrix sp.",432,7171.2,2016-05-15
-"Woronichinia naegeliana (cell pair)",157.0784,3707.05024,2016-05-15
-"cyanophyte unicell, oval/rod  2.5-5um spp.",314.1568,2607.50144,2016-05-15
-"Cyanocatena planctonica",5026.5088,1507.95264,2016-05-15
+"Aulacoseira sp.",2827.4112,1919903.71664,2016-05-15
+"Asterionella formosa",235.6176,NA,2016-05-15
+"centric diatom sp.",314.1568,NA,2016-05-15
+"Synedra sp.",235.6176,NA,2016-05-15
+"Asterionella formosa",78.5392,NA,2016-05-15
+"Synedra sp.",78.5392,NA,2016-05-15
+"Navicula sp.",78.5392,NA,2016-05-15
+"Stephanodiscus sp.",2,NA,2016-05-15
+"pennate diatom sp.",4,NA,2016-05-15
+"Nitzschia sigmoidea",2,NA,2016-05-15
+"Cymbella/Encyonema sp.",2,NA,2016-05-15
+"Aulacoseira distans",32,NA,2016-05-15
+"Gomphonema acuminatum",2,NA,2016-05-15
+"Nitzschia sp.",2,NA,2016-05-15
+"Closterium sp.",2,5894.6,2016-05-15
+"Staurastrum sp.",2,NA,2016-05-15
+"Mychonastes sp.",12566.272,347032.79136,2016-05-15
+"Desmodesmus sempervirens",1884.9408,NA,2016-05-15
+"Tetrastrum staurogeniaeforme",1256.6272,NA,2016-05-15
+"Desmodesmus sp.",1256.6272,NA,2016-05-15
+"Dichotomococcus sp.",1884.9408,NA,2016-05-15
+"Pseudopediastrum boryanum",192,NA,2016-05-15
+"chlorophyte unicell, sphere  5-7.5um spp.",78.5392,NA,2016-05-15
+"chlorophyte unicell, sphere  2.5-5um spp.",942.4704,NA,2016-05-15
+"Monoraphidium nanum",942.4704,NA,2016-05-15
+"Schroederia setigera",314.1568,NA,2016-05-15
+"Pseudodidymocystis sp.",628.3136,NA,2016-05-15
+"Monoraphidium minutum",314.1568,NA,2016-05-15
+"Koliella longiseta",78.5392,NA,2016-05-15
+"chlorophyte unicell, oval  5-7.5um spp.",314.1568,NA,2016-05-15
+"Dichotomococcus sp.",628.3136,NA,2016-05-15
+"Tetrastrum elegans",628.3136,NA,2016-05-15
+"Desmodesmus cf. bicaudatus",157.0784,NA,2016-05-15
+"Monoraphidium arcuatum",78.5392,NA,2016-05-15
+"Monoraphidium sp.",314.1568,NA,2016-05-15
+"chlorophyte tetrad spp.",1256.6272,NA,2016-05-15
+"Monoraphidium contortum",78.5392,NA,2016-05-15
+"Monoraphidium komarkovae",4,NA,2016-05-15
+"Monoraphidium sp.",4,NA,2016-05-15
+"Tetraedron minimum",2,NA,2016-05-15
+"Chrysococcus sp.",314.1568,22839.45472,2016-05-15
+"chrysophyte flagellate sp.",4,NA,2016-05-15
+"Dinobryon sp.",2,NA,2016-05-15
+"Microcystis sp.",69114.496,6334090.57952,2016-05-15
+"Microcystis wesenbergii",3700,NA,2016-05-15
+"nostocalean filament sp.",3612.8032,NA,2016-05-15
+"Dolichospermum mendotae/sigmoideum",2984.4896,NA,2016-05-15
+"Microcystis spp. (unicell)",628.3136,NA,2016-05-15
+"Microcystis spp. (cell pair)",628.3136,NA,2016-05-15
+"Dolichospermum sp.",200,NA,2016-05-15
+"Cyanodictyon imperfectum",79167.5136,NA,2016-05-15
+"Woronichinia naegeliana (unicell)",628.3136,NA,2016-05-15
+"cyanophyte cell pair spp.",1884.9408,NA,2016-05-15
+"Planktothrix sp.",432,NA,2016-05-15
+"Woronichinia naegeliana (cell pair)",157.0784,NA,2016-05-15
+"cyanophyte unicell, oval/rod  2.5-5um spp.",314.1568,NA,2016-05-15
+"Cyanocatena planctonica",5026.5088,NA,2016-05-15
 "Trachelomonas volvocina",6,6136.2,2016-05-15
-"unknown unicell, sphere spp.",628.3136,74643.65568,2016-05-15
-"unknown unicell, oval spp.",314.1568,34651.49504,2016-05-15
-"Aulacoseira sp.",628.3136,308439.14624,2016-06-15
-"Fragilaria capucina",344,171174.4,2016-06-15
-"Aulacoseira distans",235.6176,83267.25984,2016-06-15
-"Asterionella formosa",12,9010.8,2016-06-15
-"Cymbella/Encyonema sp.",2,5576,2016-06-15
-"Navicula sp.",2,3402.4,2016-06-15
-"Closterium sp.",2,6065.2,2016-06-15
-"Closterium acutum v. linea",16,4761.6,2016-06-15
-"Staurastrum sp.",4,3931.6,2016-06-15
-"Pseudopediastrum boryanum",3141.568,300019.744,2016-06-15
-"Mychonastes sp.",13613.4613333333,98016.9216,2016-06-15
-"Desmodesmus sempervirens",1884.9408,60318.1056,2016-06-15
-"Tetraedron minimum",523.594666666667,53616.0938666667,2016-06-15
-"Oocystis sp.",942.4704,42316.92096,2016-06-15
-"Crucigeniella pulchra",392.696,38562.7472,2016-06-15
-"Desmodesmus serratus",314.1568,33174.95808,2016-06-15
-"Oocystis spp.",314.1568,28556.85312,2016-06-15
-"Dichotomococcus sp.",2094.37866666667,20943.7866666667,2016-06-15
-"Tetraedron caudatum",157.0784,11560.97024,2016-06-15
-"chlorophyte unicell sp.",78.5392,11553.11632,2016-06-15
-"chlorophyte unicell, oval  2.5-5um spp.",523.594666666667,11100.2069333333,2016-06-15
-"Desmodesmus spp.",628.3136,10806.99392,2016-06-15
-"Coenochloris fottii",112,7784,2016-06-15
-"Monoraphidium nanum",523.594666666667,7225.6064,2016-06-15
-"Tetrastrum staurogeniaeforme",314.1568,5906.14784,2016-06-15
-"Desmodesmus sp.",314.1568,5403.49696,2016-06-15
-"Treubaria triappendiculata",78.5392,4861.57648,2016-06-15
-"Nephrochlamys subsolitaria",157.0784,3738.46592,2016-06-15
-"Schroederia setigera",78.5392,2882.38864,2016-06-15
-"Desmodesmus smithii",8,2285.6,2016-06-15
+"unknown unicell, sphere spp.",628.3136,109295.15072,2016-05-15
+"unknown unicell, oval spp.",314.1568,NA,2016-05-15
+"Aulacoseira sp.",628.3136,580870.00608,2016-06-15
+"Fragilaria capucina",344,NA,2016-06-15
+"Aulacoseira distans",235.6176,NA,2016-06-15
+"Asterionella formosa",12,NA,2016-06-15
+"Cymbella/Encyonema sp.",2,NA,2016-06-15
+"Navicula sp.",2,NA,2016-06-15
+"Closterium sp.",2,14758.4,2016-06-15
+"Closterium acutum v. linea",16,NA,2016-06-15
+"Staurastrum sp.",4,NA,2016-06-15
+"Pseudopediastrum boryanum",3141.568,760634.700746667,2016-06-15
+"Mychonastes sp.",13613.4613333333,NA,2016-06-15
+"Desmodesmus sempervirens",1884.9408,NA,2016-06-15
+"Tetraedron minimum",523.594666666667,NA,2016-06-15
+"Oocystis sp.",942.4704,NA,2016-06-15
+"Crucigeniella pulchra",392.696,NA,2016-06-15
+"Desmodesmus serratus",314.1568,NA,2016-06-15
+"Oocystis spp.",314.1568,NA,2016-06-15
+"Dichotomococcus sp.",2094.37866666667,NA,2016-06-15
+"Tetraedron caudatum",157.0784,NA,2016-06-15
+"chlorophyte unicell sp.",78.5392,NA,2016-06-15
+"chlorophyte unicell, oval  2.5-5um spp.",523.594666666667,NA,2016-06-15
+"Desmodesmus spp.",628.3136,NA,2016-06-15
+"Coenochloris fottii",112,NA,2016-06-15
+"Monoraphidium nanum",523.594666666667,NA,2016-06-15
+"Tetrastrum staurogeniaeforme",314.1568,NA,2016-06-15
+"Desmodesmus sp.",314.1568,NA,2016-06-15
+"Treubaria triappendiculata",78.5392,NA,2016-06-15
+"Nephrochlamys subsolitaria",157.0784,NA,2016-06-15
+"Schroederia setigera",78.5392,NA,2016-06-15
+"Desmodesmus smithii",8,NA,2016-06-15
 "Cryptomonas cf. ovata",4,4335.2,2016-06-15
-"Dolichospermum mendotae/sigmoideum",14451.2128,1186444.57088,2016-06-15
-"Microcystis sp.",8639.312,673866.336,2016-06-15
-"Cyanodictyon imperfectum",703711.232,211113.3696,2016-06-15
-"Cyanocatena planctonica",395837.568,118751.2704,2016-06-15
-"Microcystis spp. (cell pair)",942.4704,73512.6912,2016-06-15
-"Microcystis spp. (unicell)",628.3136,49008.4608,2016-06-15
-"Microcystis wesenbergii",240,25800,2016-06-15
-"Aphanocapsa sp.",21990.976,10995.488,2016-06-15
-"cyanophyte cell pair spp.",157.0784,1947.77216,2016-06-15
-"Pseudanabaena sp.",156,686.4,2016-06-15
+"Dolichospermum mendotae/sigmoideum",14451.2128,2352126.35904,2016-06-15
+"Microcystis sp.",8639.312,NA,2016-06-15
+"Cyanodictyon imperfectum",703711.232,NA,2016-06-15
+"Cyanocatena planctonica",395837.568,NA,2016-06-15
+"Microcystis spp. (cell pair)",942.4704,NA,2016-06-15
+"Microcystis spp. (unicell)",628.3136,NA,2016-06-15
+"Microcystis wesenbergii",240,NA,2016-06-15
+"Aphanocapsa sp.",21990.976,NA,2016-06-15
+"cyanophyte cell pair spp.",157.0784,NA,2016-06-15
+"Pseudanabaena sp.",156,NA,2016-06-15
 "dinoflagellate sp.",2,8128.8,2016-06-15
-"Trachelomonas volvocina",8,8181.6,2016-06-15
-"Trachelomonas sp.",2,3840.6,2016-06-15
+"Trachelomonas volvocina",8,12022.2,2016-06-15
+"Trachelomonas sp.",2,NA,2016-06-15
 "unknown unicell, sphere spp.",78.5392,9330.45696,2016-06-15
 "Pseudostaurastrum sp.",4,7330.4,2016-06-15
